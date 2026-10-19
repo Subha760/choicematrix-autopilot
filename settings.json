@@ -1,0 +1,17 @@
+{
+  "brand": "Choicematrix",
+  "niche": "Mixed: learning, technology, productivity, creativity, and everyday life",
+  "audience": "Adults who enjoy useful, short, original educational and lifestyle ideas",
+  "language": "English",
+  "generation_time_ist": "09:00",
+  "publish_time_ist": "19:00",
+  "approval_required": true,
+  "publishing_enabled": false,
+  "content_style": "Human, friendly and visually clear; specific not clickbait; useful but not preachy",
+  "max_post_age_hours": 48,
+  "manual_publish_only": false,
+  "require_original_artwork": true,
+  "require_source_for_facts": true,
+  "content_plan": "content_calendar.json",
+  "content_policy_version": 2
+}

@@ -1,0 +1,32 @@
+{
+  "description": "One original English single-image post per day. Local weekdays use Asia/Kolkata time.",
+  "weekdays": [
+    {"day": "Monday", "category": "Productivity", "type": "practical", "direction": "One precise, doable tactic for better organization, focus or planning. Show a concrete micro-action; never promise results."},
+    {"day": "Tuesday", "category": "Digital Safety", "type": "sourced", "direction": "Explain one accessible online-safety practice accurately, without fearmongering or recommending purchases."},
+    {"day": "Wednesday", "category": "Science & Nature", "type": "sourced", "direction": "Teach one accessible, timeless science concept using only the supplied fact. No extra scientific claims."},
+    {"day": "Thursday", "category": "Everyday Life", "type": "practical", "direction": "Suggest one practical home, learning or organization routine. No medical, nutrition, mental-health or financial advice."},
+    {"day": "Friday", "category": "Sustainable Living", "type": "practical", "direction": "Share a simple low-waste habit or household reuse idea, with no made-up impact figures or promises."},
+    {"day": "Saturday", "category": "Creativity & DIY", "type": "practical", "direction": "Offer a low-cost creative exercise or craft idea requiring no dangerous materials, tools, fire or chemicals."},
+    {"day": "Sunday", "category": "Culture & Learning", "type": "sourced", "direction": "Explain one accessible idea about living heritage, arts or cultural practices without attributing it to specific people or inventing historical claims."}
+  ],
+  "source_bank": {
+    "Digital Safety": [
+      {"fact": "A password manager can help create and store strong, unique passwords for different accounts.", "label": "CISA — Password Managers", "url": "https://www.cisa.gov/resources-tools/training/cyb3rsmrt-use-password-manager-create-and-remember-strong-passwords"},
+      {"fact": "Multi-factor authentication adds a second check beyond a password when signing in.", "label": "CISA — Secure Our World", "url": "https://www.cisa.gov/secure-our-world"},
+      {"fact": "Phishing messages may try to trick people into opening malicious attachments or sharing personal information.", "label": "CISA — Secure Our World", "url": "https://www.cisa.gov/secure-our-world"},
+      {"fact": "Keeping software updated is one of CISA's recommended everyday steps for safer online activity.", "label": "CISA — Secure Our World", "url": "https://www.cisa.gov/secure-our-world"}
+    ],
+    "Science & Nature": [
+      {"fact": "The Sun is the star at the center of our solar system, and the planets orbit it.", "label": "NASA — Solar System Facts", "url": "https://science.nasa.gov/solar-system/solar-system-facts/"},
+      {"fact": "Condensation changes water vapor in air into liquid water and plays a role in cloud formation.", "label": "USGS — Condensation", "url": "https://www.usgs.gov/water-science-school/science/condensation-and-water-cycle"},
+      {"fact": "Evaporation changes liquid water into water vapor and is a part of the water cycle.", "label": "USGS — Evaporation", "url": "https://www.usgs.gov/water-science-school/science/evaporation-and-water-cycle"},
+      {"fact": "Precipitation is water released from clouds as rain, snow, sleet or hail.", "label": "USGS — Precipitation", "url": "https://www.usgs.gov/water-science-school/science/precipitation-and-water-cycle"}
+    ],
+    "Culture & Learning": [
+      {"fact": "Intangible cultural heritage includes living oral traditions and expressions passed through communities.", "label": "UNESCO — Intangible Cultural Heritage", "url": "https://ich.unesco.org/en/what-is-intangible-heritage-00003"},
+      {"fact": "Traditional craftsmanship is one form of intangible cultural heritage recognized by UNESCO.", "label": "UNESCO — Intangible Cultural Heritage", "url": "https://ich.unesco.org/en/what-is-intangible-heritage-00003"},
+      {"fact": "Performing arts, social practices and festive events can be part of living cultural heritage.", "label": "UNESCO — Intangible Cultural Heritage", "url": "https://ich.unesco.org/en/what-is-intangible-heritage-00003"},
+      {"fact": "Living heritage can evolve as communities carry knowledge, skills and traditions across generations.", "label": "UNESCO — Intangible Cultural Heritage", "url": "https://www.unesco.org/en/intangible-cultural-heritage"}
+    ]
+  }
+}
