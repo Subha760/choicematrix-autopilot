@@ -2,14 +2,22 @@
   "2026-10-19": {
     "date": "2026-10-19",
     "revision": 1,
-    "title": "Start Strong: Find Your First Step",
-    "subtitle": "Identify the smallest, immediate physical action to kick off any project, no matter how daunting.",
-    "caption": "Ever feel stuck before a big task? Instead of seeing the whole mountain, just look for the very first pebble: pinpoint the single, physical micro-action needed to simply begin. For example, if 'clean the kitchen' feels huge, your first step might be 'pick up one dirty mug.' This small shift reduces overwhelm, making it easier to start and build momentum. Give it a try!\n#ChoicematrixProductivity #MicroAction #GetStarted #ProductivityTips #Focus",
-    "category": "Productivity",
+    "title": "Win11 on 8GB: Smoother Sailing!",
+    "subtitle": "Microsoft is actively working to make Windows 11 perform better on PCs with 8GB RAM, addressing a major user pain point.",
+    "caption": "Ever felt your Windows 11 PC chugging along with 'just' 8GB RAM? You're not alone! 😩 Good news is, Microsoft heard you loud and clear. They're making significant efforts to optimize Windows 11 for better performance on systems with 8GB RAM. This isn't just a minor tweak; it's a commitment to making their OS accessible and efficient for a wider range of users. From memory management improvements to background process optimizations, a smoother experience is on the horizon. Swipe to discover what this means for your everyday computing and how Choicematrix helps you stay ahead with tech insights! 👇 #Windows11 #TechUpdate #PCPerformance #Choicematrix #Innovation",
+    "category": "Tech & Innovation",
     "content_type": "practical",
     "source": null,
-    "image": "posts/2026-10-19-v1.jpg",
-    "image_sha256": "68eb345b87b655c02147ad5d3045e09e065484fedc856518e461ec03067bc121",
+    "image": "posts/2026-10-19-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-19-v1-slide1.jpg",
+      "posts/2026-10-19-v1-slide2.jpg",
+      "posts/2026-10-19-v1-slide3.jpg",
+      "posts/2026-10-19-v1-slide4.jpg",
+      "posts/2026-10-19-v1-slide5.jpg",
+      "posts/2026-10-19-v1-slide6.jpg"
+    ],
+    "image_sha256": "b46237e36eccd46bc853ed084edac928dd20a3fb6ddc672b24d1bdeac638197d",
     "status": "pending",
     "approved_at": null,
     "approval_hash": null,
@@ -27,6 +35,6 @@
       "id": null,
       "container": null
     },
-    "created_at": "2026-10-19T12:58:54.423584+00:00"
+    "created_at": "2026-10-19T13:21:57.540050+00:00"
   }
 }

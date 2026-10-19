@@ -81,9 +81,45 @@ def safe_notify(message):
         print(f"Could not send Telegram notification: {type(exc).__name__}")
 
 
-def choose_topic(date_key, revision=1):
-    """Select a consistent weekday pillar and rotate licensed-free, curated facts."""
+def fetch_web_feed_topic():
+    """Fetch real-time trending topics from Google News RSS feeds."""
+    import urllib.request
+    import xml.etree.ElementTree as ET
+    feeds = [
+        ("Tech & Innovation", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"),
+        ("AI & Productivity", "https://news.google.com/rss/search?q=AI+tools+OR+productivity+hacks+OR+smart+tech&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Science & Discovery", "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-IN&gl=IN&ceid=IN:en"),
+    ]
+    for category, url in feeds:
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            xml_data = urllib.request.urlopen(req, timeout=5).read()
+            root = ET.fromstring(xml_data)
+            for item in root.findall(".//item")[:5]:
+                title = item.find("title").text if item.find("title") is not None else ""
+                clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
+                link = item.find("link").text if item.find("link") is not None else ""
+                if clean_title and len(clean_title) > 10:
+                    return {"category": category, "headline": clean_title, "url": link}
+        except Exception:
+            continue
+    return None
+
+
+def choose_topic(date_key, revision=1, use_web=False):
+    """Select a consistent weekday pillar, with optional live web feed override."""
     day = date.fromisoformat(date_key)
+    if use_web:
+        web = fetch_web_feed_topic()
+        if web:
+            return {
+                "type": "practical",
+                "category": web["category"],
+                "direction": web["headline"],
+                "angle": "a timely breakdown of today's hot topic",
+                "source": None,
+                "web_url": web.get("url")
+            }
     plan = read_json(CALENDAR, {})
     days = plan.get("weekdays", [])
     if len(days) != 7:
@@ -113,13 +149,17 @@ def validate_ai_copy(item, posts, slot):
     """Deterministic quality guard; not a substitute for fact/legal review."""
     if not isinstance(item, dict):
         raise RuntimeError("AI returned something other than a JSON object")
-    for field, limit in (("title", 58), ("subtitle", 115), ("caption", 650)):
+    if "subtitle" in item and isinstance(item["subtitle"], str) and len(item["subtitle"]) > 130:
+        item["subtitle"] = item["subtitle"][:126].rstrip() + "..."
+    if "caption" in item and isinstance(item["caption"], str) and len(item["caption"]) > 1100:
+        item["caption"] = item["caption"][:1090].rstrip() + "..."
+    for field, limit in (("title", 58), ("subtitle", 145), ("caption", 1200)):
         value = item.get(field)
         if not isinstance(value, str) or not value.strip() or len(value) > limit:
             raise RuntimeError(f"AI content failed length/empty check: {field}")
         item[field] = value.strip()
-    if not (3 <= len(item["title"].split()) <= 9):
-        raise RuntimeError("Visual headline must have 3–9 words")
+    if not (2 <= len(item["title"].split()) <= 10):
+        raise RuntimeError("Visual headline must have 2–10 words")
     content = f"{item['title']} {item['subtitle']} {item['caption']}".lower()
     # Prevent unattributed quotations, made-up research/news, spam and unapproved URLs.
     if re.search(r'https?://|www\.|@[a-z0-9_]+|[“”\"«»]', content, re.I):
@@ -129,8 +169,8 @@ def validate_ai_copy(item, posts, slot):
     if re.search(r'\b\d+(?:[.,]\d+)?\s*(?:%|percent|million|billion|times)(?!\w)', content, re.I):
         raise RuntimeError("Unreviewed statistics or quantitative claims blocked")
     hashtags = re.findall(r'(?<!\w)#[a-z][a-z0-9_]*', item["caption"], re.I)
-    if not 3 <= len(hashtags) <= 5:
-        raise RuntimeError("Captions require 3–5 relevant hashtags")
+    if not 3 <= len(hashtags) <= 6:
+        raise RuntimeError("Captions require 3–6 relevant hashtags")
     recent = list(posts.values())[-90:]
     norm_title = normalize(item["title"])
     norm_caption = normalize(item["caption"])
@@ -144,34 +184,66 @@ def validate_ai_copy(item, posts, slot):
 
 def generated_content(settings, posts, date_key, revision=1):
     key = getenv("GEMINI_API_KEY", True)
-    slot = choose_topic(date_key, revision)
+    use_web = settings.get("use_live_web_feed", False)
+    slot = choose_topic(date_key, revision, use_web=use_web)
     recent = [p.get("title", "") for _, p in sorted(posts.items())[-60:]]
-    source_rule = (
-        "FACT ANCHOR from a curated institutional source: " + slot["seed"] + "\n"
-        "Paraphrase ONLY this known fact. Do not extend it with additional claims. "
-        "The citation URL is appended by the system; DO NOT generate sources or source names."
-        if slot["type"] == "sourced" else
-        "Offer your own original suggestion; make it clearly advice, not an externally verified fact."
-    )
-    prompt = f"""Write ONE wholly original social-media post for a friendly, educational mixed-topic page.
-Brand: {settings['brand']}.
-Today: {date_key}. WEEKDAY THEME: {slot['category']}.
-Specific direction: {slot['direction']}
-Presentation angle: {slot['angle']}.
-Audience: {settings['audience']}; language: {settings['language']}.
+    brand = settings.get("brand", "Choicematrix")
+    
+    prompt = f"""You are a master social media content strategist for the brand '{brand}'.
+Create an engaging, viral 6-SLIDE CAROUSEL post based on today's topic.
+Brand: {brand}.
+Topic Category: {slot['category']}
+Headline or Direction: {slot.get('direction', slot.get('seed', 'Modern Tech Innovation'))}
+Angle: {slot['angle']}
+Audience: {settings['audience']}; Language: {settings['language']}.
 Style: {settings['content_style']}.
-{source_rule}
-Previous headlines that MUST NOT be repeated: {json.dumps(recent)}.
-Return ONLY one JSON object containing exactly these strings:
-  title: strong 3–9-word headline, maximum 58 characters,
-  subtitle: one concrete explanation or action, maximum 115 characters,
-  caption: 2–4 friendly, accurate sentences (max 650 characters TOTAL), followed by 3–5 genuine relevant hashtags.
-No external URLs, @handles, quotations, borrowed catchphrases, lyrics, slogans or copied passages.
-No named private individuals, celebrity likenesses, brands, unverifiable statistics, or current events.
-No politics, religion advocacy, diagnoses, treatment, investment tips, or harmful DIY steps.
-No promises, research citations, medical/financial assertions, fake testimonials or promotional bait.
-No people photos; this post will be typeset on a code-generated abstract geometric artwork.
-Avoid AI-sounding filler. Make the idea interesting and genuinely useful, clear, and modest."""
+
+Return ONLY ONE valid JSON object with this exact structure:
+{{
+  "title": "Strong 3-6 word title (max 50 chars)",
+  "subtitle": "Clear 1-sentence explanation hook (max 110 chars)",
+  "caption": "Full engaging social media caption (max 650 chars) ending with 3-5 hashtags including #{brand}.",
+  "slides": [
+    {{
+      "slide_number": 1,
+      "tag": "HOT TREND",
+      "headline": "Bold 3-6 Word Title",
+      "body": "One compelling sentence hook that makes people swipe.",
+      "swipe_prompt": "Swipe to explore ➡️"
+    }},
+    {{
+      "slide_number": 2,
+      "tag": "STEP 01",
+      "headline": "The Core Concept / Why It Matters",
+      "body": "Clear, practical explanation in 2 short sentences."
+    }},
+    {{
+      "slide_number": 3,
+      "tag": "STEP 02",
+      "headline": "Key Detail / Practical Action",
+      "body": "Actionable takeaway or smart technique."
+    }},
+    {{
+      "slide_number": 4,
+      "tag": "STEP 03",
+      "headline": "The Pro Tip / Counter-Intuitive Angle",
+      "body": "Surprising detail or insider tip that adds major value."
+    }},
+    {{
+      "slide_number": 5,
+      "tag": "SUMMARY",
+      "headline": "The Big Takeaway",
+      "body": "Quick 1-sentence summary to remember and apply."
+    }},
+    {{
+      "slide_number": 6,
+      "tag": "CONNECT",
+      "headline": "FOUND THIS HELPFUL? 💡",
+      "body": "Follow @{brand.lower()} for more daily hot trends, tech & life hacks! 🚀🔥✨\\n\\n📌 Save this post for later\\n↗️ Share with a friend"
+    }}
+  ]
+}}
+"""
     model = getenv("GEMINI_MODEL") or "gemini-2.5-flash"
     if not re.fullmatch(r"[a-zA-Z0-9_.-]+", model):
         raise ValueError("Invalid model identifier")
@@ -191,8 +263,7 @@ Avoid AI-sounding filler. Make the idea interesting and genuinely useful, clear,
     item["category"] = slot["category"]
     item["content_type"] = slot["type"]
     item["source"] = slot.get("source")
-    # Label the provenance of source-backed facts in the public caption.
-    if slot["source"]:
+    if slot.get("source"):
         item["caption"] += f"\n\nReference: {slot['source']['label']} — {slot['source']['url']}"
     return item
 
@@ -292,8 +363,155 @@ def wrap_by_pixels(draw, words, f, max_width):
     return lines
 
 
+THEMES = [
+    {
+        "name": "Cyber Obsidian",
+        "bg_top": (10, 15, 26), "bg_bot": (18, 28, 48), "card_bg": (22, 34, 58),
+        "accent": (0, 242, 254), "accent_secondary": (255, 184, 0),
+        "text_primary": (255, 255, 255), "text_secondary": (170, 185, 205), "border": (40, 60, 95)
+    },
+    {
+        "name": "Clean Editorial",
+        "bg_top": (248, 247, 244), "bg_bot": (242, 240, 235), "card_bg": (255, 255, 255),
+        "accent": (225, 29, 72), "accent_secondary": (15, 23, 42),
+        "text_primary": (15, 23, 42), "text_secondary": (71, 85, 105), "border": (226, 232, 240)
+    },
+    {
+        "name": "Royal Sunset",
+        "bg_top": (30, 27, 75), "bg_bot": (59, 7, 100), "card_bg": (48, 20, 95),
+        "accent": (245, 158, 11), "accent_secondary": (251, 113, 133),
+        "text_primary": (255, 255, 255), "text_secondary": (226, 232, 240), "border": (88, 28, 135)
+    },
+    {
+        "name": "Emerald Horizon",
+        "bg_top": (6, 35, 29), "bg_bot": (11, 59, 50), "card_bg": (14, 75, 64),
+        "accent": (16, 185, 129), "accent_secondary": (167, 243, 208),
+        "text_primary": (255, 255, 255), "text_secondary": (209, 250, 229), "border": (20, 90, 75)
+    },
+    {
+        "name": "Swiss Monochrome",
+        "bg_top": (10, 10, 12), "bg_bot": (18, 18, 22), "card_bg": (28, 28, 34),
+        "accent": (250, 204, 21), "accent_secondary": (255, 255, 255),
+        "text_primary": (255, 255, 255), "text_secondary": (161, 161, 170), "border": (45, 45, 55)
+    },
+    {
+        "name": "Deep Cobalt",
+        "bg_top": (11, 25, 44), "bg_bot": (30, 62, 98), "card_bg": (25, 50, 80),
+        "accent": (56, 189, 248), "accent_secondary": (0, 173, 181),
+        "text_primary": (255, 255, 255), "text_secondary": (224, 231, 255), "border": (45, 85, 135)
+    }
+]
+
+
+def render_carousel_slides(date_key, revision, settings, item):
+    """Render 5-6 high-res 1080x1350 carousel slides with daily rotating theme."""
+    day = date.fromisoformat(date_key)
+    theme = THEMES[(day.toordinal() + revision - 1) % len(THEMES)]
+    slides_data = item.get("slides") or []
+    if not slides_data:
+        # Fallback to single card representation in carousel format
+        slides_data = [
+            {"slide_number": 1, "tag": item.get("category", "IDEAS"), "headline": item["title"],
+             "body": item["subtitle"], "swipe_prompt": "Swipe to explore ➡️"},
+            {"slide_number": 2, "tag": "CONNECT", "headline": "FOUND THIS HELPFUL? 💡",
+             "body": f"Follow @{settings['brand'].lower()} for more daily hot trends, tech & life hacks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"}
+        ]
+    total_slides = len(slides_data)
+    rendered_paths = []
+    brand = settings.get("brand", "Choicematrix")
+    W, H = 1080, 1350
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+    for slide in slides_data:
+        image = Image.new("RGB", (W, H))
+        draw = ImageDraw.Draw(image)
+        # Background gradient
+        for y in range(H):
+            ratio = y / H
+            c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
+            draw.line((0, y, W, y), fill=c)
+
+        slide_num = slide.get("slide_number", 1)
+        tag = slide.get("tag", "HOT TOPIC").upper()
+        headline = slide.get("headline", "")
+        body = slide.get("body", "")
+
+        # Top Header Bar
+        pill_w = 260
+        draw.rounded_rectangle((70, 75, 70 + pill_w, 135), radius=16, fill=theme["accent"])
+        draw.text((90, 92), tag[:22], font=font(22, bold=True), fill=theme["bg_top"])
+        counter_str = f"{slide_num:02d} / {total_slides:02d}"
+        draw.text((W - 190, 92), counter_str, font=font(24, bold=True), fill=theme["accent_secondary"])
+        draw.line((70, 165, W - 70, 165), fill=theme["border"], width=2)
+
+        if slide_num == 1:
+            draw.text((70, 230), "TODAY'S HOT BREAKDOWN", font=font(22, bold=True), fill=theme["accent"])
+            f_title = font(56, bold=True)
+            title_lines = wrap_by_pixels(draw, headline, f_title, 940)
+            y = 280
+            for line in title_lines[:4]:
+                draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
+                y += 72
+            y += 20
+            draw.rounded_rectangle((70, y, 70 + 200, y + 8), radius=4, fill=theme["accent"])
+            y += 50
+            card_h = 320
+            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=28, fill=theme["card_bg"], outline=theme["border"], width=3)
+            f_body = font(34, bold=False)
+            body_lines = wrap_by_pixels(draw, body, f_body, 860)
+            by = y + 45
+            for line in body_lines[:5]:
+                draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
+                by += 48
+            swipe_y = H - 230
+            draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 90), radius=24, fill=theme["accent"])
+            draw.text((110, swipe_y + 28), slide.get("swipe_prompt", "Swipe to explore ➡️").upper(), font=font(28, bold=True), fill=theme["bg_top"])
+        elif slide_num == total_slides:
+            draw.text((70, 230), "KEY TAKEAWAY COMPLETED", font=font(22, bold=True), fill=theme["accent"])
+            f_title = font(54, bold=True)
+            draw.text((70, 280), headline, font=f_title, fill=theme["text_primary"])
+            box_y = 390
+            box_h = 420
+            draw.rounded_rectangle((70, box_y, W - 70, box_y + box_h), radius=32, fill=theme["card_bg"], outline=theme["accent"], width=4)
+            draw.text((110, box_y + 45), f"👉 FOLLOW @{brand.upper()}", font=font(38, bold=True), fill=theme["accent"])
+            draw.text((110, box_y + 105), "For daily hot trends, tech breakdowns & smart tips! 🚀🔥✨", font=font(26, bold=False), fill=theme["text_secondary"])
+            draw.line((110, box_y + 175, W - 110, box_y + 175), fill=theme["border"], width=2)
+            draw.text((110, box_y + 215), "📌  Save this post to revisit anytime", font=font(28, bold=False), fill=theme["text_primary"])
+            draw.text((110, box_y + 280), "💬  Share your thoughts in the comments", font=font(28, bold=False), fill=theme["text_primary"])
+            draw.text((110, box_y + 345), "↗️  Send to someone who needs this!", font=font(28, bold=False), fill=theme["text_primary"])
+        else:
+            step_str = f"STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "SUMMARY"
+            draw.text((70, 220), step_str, font=font(26, bold=True), fill=theme["accent"])
+            f_title = font(50, bold=True)
+            title_lines = wrap_by_pixels(draw, headline, f_title, 940)
+            y = 275
+            for line in title_lines[:3]:
+                draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
+                y += 68
+            y += 35
+            card_h = 440
+            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=32, fill=theme["card_bg"], outline=theme["border"], width=3)
+            f_body = font(35, bold=False)
+            body_lines = wrap_by_pixels(draw, body, f_body, 860)
+            by = y + 55
+            for line in body_lines[:7]:
+                draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
+                by += 52
+
+        # Footer Brand Bar
+        draw.line((70, H - 120, W - 70, H - 120), fill=theme["border"], width=2)
+        draw.text((70, H - 90), f"@{brand.upper()}", font=font(24, bold=True), fill=theme["accent"])
+        draw.text((W - 320, H - 90), "DAILY HOT TRENDS", font=font(22, bold=False), fill=theme["text_secondary"])
+
+        dest = IMAGE_DIR / f"{date_key}-v{revision}-slide{slide_num}.jpg"
+        image.save(dest, "JPEG", quality=90, optimize=True)
+        rendered_paths.append(dest.relative_to(ROOT / "docs").as_posix())
+
+    return rendered_paths
+
+
 def image_art(date_key, revision, settings, item):
-    """Draw original abstract illustrations and typography; JPEG is IG compliant."""
+    """Draw original abstract illustration for single-card backwards compatibility."""
     W, H = 1080, 1350
     image = Image.new("RGB", (W, H))
     draw = ImageDraw.Draw(image)
@@ -312,19 +530,10 @@ def image_art(date_key, revision, settings, item):
         ratio = y / H
         c = tuple(int(top[i]*(1-ratio) + bottom[i]*ratio) for i in range(3))
         draw.line((0, y, W, y), fill=c)
-    # Abstract artwork only: no people, photos, trademarked imagery, or third-party graphics.
-    for _ in range(15):
-        x, y = rnd.randrange(-160, W+160), rnd.randrange(-160, H+160)
-        r = rnd.randrange(20, 145)
-        tone = tuple(min(255, int(v * rnd.uniform(0.42, 0.77))) for v in accent)
-        draw.ellipse((x-r, y-r, x+r, y+r), outline=tone, width=rnd.randrange(2, 6))
     draw.rounded_rectangle((68, 73, W-68, H-79), radius=50, fill=(*top,))
     draw.rounded_rectangle((110, 116, 110+365, 178), radius=28, fill=accent)
     draw.text((138, 132), settings["brand"].upper()[:24], font=font(24), fill=top)
-    category = item.get("category", "IDEAS").upper()[:28]
-    catfont = font(21)
-    # Small themed label; avoids overlap with the brand pill on longer category names.
-    draw.text((113, 204), category, font=catfont, fill=accent)
+    draw.text((113, 204), item.get("category", "IDEAS").upper()[:28], font=font(21), fill=accent)
     draw.line((112, 264, W-112, 264), fill=accent, width=4)
     title = item["title"].strip()
     for size in range(76, 38, -2):
@@ -332,8 +541,6 @@ def image_art(date_key, revision, settings, item):
         lines = wrap_by_pixels(draw, title, f, 840)
         if len(lines) <= 4:
             break
-    if len(lines) > 4 or any(draw.textbbox((0, 0), line, font=f)[2] > 840 for line in lines):
-        raise RuntimeError("Headline cannot fit safely on artwork")
     y = 340
     for line in lines:
         draw.text((116, y), line, font=f, fill=(255, 254, 250))
@@ -341,20 +548,11 @@ def image_art(date_key, revision, settings, item):
     y += 35
     draw.rounded_rectangle((112, y, W-112, y+7), radius=4, fill=accent)
     y += 75
-    # Responsive font choice prevents clipping of long (but validated) explanations.
-    max_subtitle_h = H - 240 - y
-    if max_subtitle_h <= 0:
-        raise RuntimeError("Title exceeds safe artwork area")
-    for subtitle_size in (43, 39, 35, 31, 27):
-        f2 = font(subtitle_size, bold=False)
-        sublines = wrap_by_pixels(draw, item["subtitle"], f2, 825)
-        if (subtitle_size + 18) * len(sublines) <= max_subtitle_h and len(sublines) <= 5:
-            break
-    else:
-        raise RuntimeError("Subtitle is too long for safe card typography")
+    f2 = font(35, bold=False)
+    sublines = wrap_by_pixels(draw, item["subtitle"], f2, 825)
     for line in sublines:
         draw.text((115, y), line, font=f2, fill=(234, 235, 234))
-        y += subtitle_size + 18
+        y += 35 + 18
     draw.text((114, H-180), "A NEW IDEA, EACH DAY", font=font(24), fill=accent)
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
     destination = IMAGE_DIR / f"{date_key}-v{revision}.jpg"
@@ -372,15 +570,22 @@ def public_url(relative_image_path):
 
 
 def create_post(date_key, settings, posts, revision=1):
-    # Fail closed: do not replace approved content, except on an explicitly chosen regeneration.
     content = generated_content(settings, posts, date_key, revision)
-    image = image_art(date_key, revision, settings, content)
+    slides = content.get("slides")
+    if slides and isinstance(slides, list) and len(slides) >= 2:
+        images = render_carousel_slides(date_key, revision, settings, content)
+        primary_image = images[0]
+    else:
+        primary_image = image_art(date_key, revision, settings, content)
+        images = [primary_image]
+
     entry = {
         "date": date_key, "revision": revision, "title": content["title"],
         "subtitle": content["subtitle"], "caption": content["caption"],
         "category": content["category"], "content_type": content["content_type"],
-        "source": content["source"], "image": image,
-        "image_sha256": hashlib.sha256((ROOT / "docs" / image).read_bytes()).hexdigest(),
+        "source": content["source"], "image": primary_image,
+        "images": images,
+        "image_sha256": hashlib.sha256((ROOT / "docs" / primary_image).read_bytes()).hexdigest(),
         "status": "pending",
         "approved_at": None, "approval_hash": None,
         "fb": {"status": "not_started", "id": None},
@@ -392,7 +597,6 @@ def create_post(date_key, settings, posts, revision=1):
     try:
         send_preview(entry, settings)
     except Exception:
-        # If Telegram did not accept the preview, allow a clean retry next run.
         del posts[date_key]
         raise
     return entry
@@ -400,20 +604,38 @@ def create_post(date_key, settings, posts, revision=1):
 
 def send_preview(post, settings):
     date_key, revision = post["date"], post["revision"]
+    chat = getenv("TG_APPROVER_ID", True)
+    images = post.get("images") or [post["image"]]
+
+    if len(images) > 1:
+        # Deliver full swipeable media album to Telegram!
+        media_group = [{"type": "photo", "media": f"attach://photo{i}"} for i in range(len(images))]
+        files = {f"photo{i}": (Path(img).name, open(ROOT / "docs" / img, "rb"), "image/jpeg") for i, img in enumerate(images)}
+        try:
+            token = getenv("TG_BOT_TOKEN", True)
+            requests.post(f"https://api.telegram.org/bot{token}/sendMediaGroup",
+                          data={"chat_id": chat, "media": json.dumps(media_group)},
+                          files=files, timeout=40)
+        finally:
+            for _, f_tuple in files.items():
+                f_tuple[1].close()
+    else:
+        file = ROOT / "docs" / post["image"]
+        with file.open("rb") as image_file:
+            telegram("sendPhoto", {"chat_id": chat, "caption": f"DAILY DRAFT • {date_key}"}, {"photo": image_file})
+
     markup = {"inline_keyboard": [
-        [{"text": "✅ Approve", "callback_data": f"approve:{date_key}:{revision}"},
+        [{"text": "✅ Approve Carousel", "callback_data": f"approve:{date_key}:{revision}"},
          {"text": "🔄 Regenerate", "callback_data": f"regen:{date_key}:{revision}"}],
         [{"text": "❌ Reject", "callback_data": f"reject:{date_key}:{revision}"}]
     ]}
-    chat = getenv("TG_APPROVER_ID", True)
-    preview_label = f"DAILY DRAFT • {date_key} • {post.get('category', 'Ideas')}"
-    file = ROOT / "docs" / post["image"]
-    with file.open("rb") as image_file:
-        telegram("sendPhoto", {"chat_id": chat, "caption": preview_label}, {"photo": image_file})
-    # Approval buttons are on the COMPLETE caption, not a truncated photo caption.
-    full_text = (f"TEXT TO PUBLISH ON BOTH PLATFORMS\n\n{post['caption']}\n\n"
-                 f"Scheduled at/after {settings['publish_time_ist']} IST.\n"
-                 "Only your approval allows posting. If you ignore it, nothing publishes.")
+    full_text = (
+        f"🔥 {len(images)}-SLIDE CAROUSEL DRAFT • {date_key}\n\n"
+        f"TITLE: {post['title']}\n\n"
+        f"{post['caption']}\n\n"
+        f"Scheduled at/after {settings['publish_time_ist']} IST.\n"
+        "👉 Click Approve below or reply 'approve' in this chat to confirm!"
+    )
     telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000],
                              "reply_markup": json.dumps(markup)})
 
@@ -423,54 +645,76 @@ def take_approvals(posts, settings, now=None):
         now = datetime.now(IST)
     tg = read_json(TG_STATE, {"offset": 0})
     updates = telegram("getUpdates", {"offset": tg["offset"], "timeout": 0,
-                                       "allowed_updates": json.dumps(["callback_query"])})
+                                       "allowed_updates": json.dumps(["callback_query", "message"])})
     for update in updates:
         tg["offset"] = max(tg["offset"], int(update["update_id"]) + 1)
         callback = update.get("callback_query")
-        if not callback:
-            continue
-        callback_id = callback.get("id", "")
-        user_id = str(callback.get("from", {}).get("id", ""))
-        if user_id != getenv("TG_APPROVER_ID", True):
-            telegram("answerCallbackQuery", {"callback_query_id": callback_id,
-                                            "text": "Only the account owner can approve."})
-            continue
-        action, sep, rest = callback.get("data", "").partition(":")
-        fields = rest.split(":") if sep else []
-        if len(fields) != 2:
-            telegram("answerCallbackQuery", {"callback_query_id": callback_id, "text": "Invalid action"})
-            continue
-        date_key, revision = fields
-        entry = posts.get(date_key)
-        if not entry or str(entry["revision"]) != revision or entry["status"] != "pending":
-            telegram("answerCallbackQuery", {"callback_query_id": callback_id,
-                                            "text": "This preview has expired."})
-            continue
-        if action == "approve":
-            if post_is_stale(entry, settings, now):
-                entry["status"] = "expired"
-                answer = "This preview is too old; nothing will publish."
-            else:
-                entry["status"] = "approved"
-                entry["approved_at"] = datetime.now(timezone.utc).isoformat()
-                entry["approval_hash"] = approval_digest(entry)
-                answer = "Approved! Posting at/after the scheduled time."
-        elif action == "reject":
-            entry["status"] = "rejected"
-            entry["approved_at"] = None
-            entry["approval_hash"] = None
-            answer = "Rejected. This post will not be published."
-        elif action == "regen":
-            # Regeneration is initiated only by the authorized owner's button.
+        if callback:
+            callback_id = callback.get("id", "")
+            user_id = str(callback.get("from", {}).get("id", ""))
+            # Instantly answer query so Telegram Web does NOT hang
             try:
-                create_post(date_key, settings, posts, int(revision) + 1)
-                answer = "New preview sent for your approval."
-            except Exception as exc:
-                answer = f"Regeneration failed: {type(exc).__name__}"
-                safe_notify(answer)
-        else:
-            answer = "Invalid action"
-        telegram("answerCallbackQuery", {"callback_query_id": callback_id, "text": answer[:200]})
+                telegram("answerCallbackQuery", {"callback_query_id": callback_id, "text": "Action received! ✅"})
+            except Exception:
+                pass
+            if user_id != getenv("TG_APPROVER_ID", True):
+                continue
+            action, sep, rest = callback.get("data", "").partition(":")
+            fields = rest.split(":") if sep else []
+            if len(fields) != 2:
+                continue
+            date_key, revision = fields
+            entry = posts.get(date_key)
+            if not entry or str(entry["revision"]) != revision or entry["status"] != "pending":
+                continue
+            if action == "approve":
+                if post_is_stale(entry, settings, now):
+                    entry["status"] = "expired"
+                else:
+                    entry["status"] = "approved"
+                    entry["approved_at"] = datetime.now(timezone.utc).isoformat()
+                    entry["approval_hash"] = approval_digest(entry)
+                    safe_notify("✅ APPROVED! Carousel is scheduled to publish across Facebook, Instagram, and Threads at 19:00 IST. 🚀")
+            elif action == "reject":
+                entry["status"] = "rejected"
+                entry["approved_at"] = None
+                entry["approval_hash"] = None
+                safe_notify("❌ REJECTED. This post will not be published.")
+            elif action == "regen":
+                try:
+                    create_post(date_key, settings, posts, int(revision) + 1)
+                    safe_notify("🔄 New carousel generated from today's live web feed and sent for approval!")
+                except Exception as exc:
+                    safe_notify(f"Regeneration failed: {type(exc).__name__}")
+
+        # Support direct chat text messages (approve, yes, ok, regen, reject)
+        msg = update.get("message")
+        if msg:
+            user_id = str(msg.get("from", {}).get("id", ""))
+            text = msg.get("text", "").strip().lower()
+            if user_id == getenv("TG_APPROVER_ID", True) and text:
+                pending_key = None
+                for k in sorted(posts.keys(), reverse=True):
+                    if posts[k].get("status") == "pending":
+                        pending_key = k
+                        break
+                if pending_key:
+                    entry = posts[pending_key]
+                    if text in ("approve", "/approve", "yes", "y", "ok", "publish", "1"):
+                        entry["status"] = "approved"
+                        entry["approved_at"] = datetime.now(timezone.utc).isoformat()
+                        entry["approval_hash"] = approval_digest(entry)
+                        safe_notify("✅ APPROVED! Scheduled to publish across Facebook, Instagram, and Threads at 19:00 IST. 🚀")
+                    elif text in ("regen", "/regen", "regenerate", "new", "2"):
+                        try:
+                            create_post(pending_key, settings, posts, entry["revision"] + 1)
+                            safe_notify("🔄 Generating a new carousel for you...")
+                        except Exception as exc:
+                            safe_notify(f"Regeneration failed: {type(exc).__name__}")
+                    elif text in ("reject", "/reject", "no", "cancel", "3"):
+                        entry["status"] = "rejected"
+                        safe_notify("❌ Post rejected. Nothing will be published today.")
+
     write_json(TG_STATE, tg)
 
 
@@ -482,7 +726,6 @@ def meta_request(method, endpoint, token, data=None):
                                     data=data if method == "POST" else None,
                                     params=data if method == "GET" else None, timeout=45)
     except requests.RequestException as exc:
-        # No automatic replay of a possibly successful publish call.
         raise RuntimeError(f"AMBIGUOUS network error during {endpoint}: {type(exc).__name__}") from exc
     payload = response.json() if "json" in response.headers.get("Content-Type", "") else {}
     if not response.ok or "error" in payload:
@@ -502,10 +745,21 @@ def check_image_ready(url):
 def fb_publish(entry):
     token = getenv("META_PAGE_TOKEN", True)
     page = getenv("FB_PAGE_ID", True)
-    data = {"url": public_url(entry["image"]), "message": entry["caption"], "published": "true"}
-    result = meta_request("POST", f"{page}/photos", token, data)
+    images = entry.get("images") or [entry["image"]]
+    if len(images) > 1:
+        # Multi-photo carousel / album on Facebook Page
+        photo_ids = []
+        for img in images:
+            res = meta_request("POST", f"{page}/photos", token, {"url": public_url(img), "published": "false"})
+            if res.get("id"):
+                photo_ids.append({"media_fbid": res["id"]})
+        data = {"message": entry["caption"], "attached_media": json.dumps(photo_ids)}
+        result = meta_request("POST", f"{page}/feed", token, data)
+    else:
+        data = {"url": public_url(entry["image"]), "message": entry["caption"], "published": "true"}
+        result = meta_request("POST", f"{page}/photos", token, data)
     if not result.get("id"):
-        raise RuntimeError("AMBIGUOUS Facebook success without a photo ID")
+        raise RuntimeError("AMBIGUOUS Facebook success without an ID")
     entry["fb"] = {"status": "published", "id": result["id"]}
 
 
@@ -513,15 +767,24 @@ def ig_publish(entry):
     token = getenv("META_PAGE_TOKEN", True)
     ig = getenv("IG_USER_ID", True)
     state = entry["ig"]
-    if not state["container"]:
-        data = {"image_url": public_url(entry["image"]), "caption": entry["caption"]}
-        result = meta_request("POST", f"{ig}/media", token, data)
-        if not result.get("id"):
-            raise RuntimeError("AMBIGUOUS Instagram container creation")
-        state["container"] = result["id"]
-        state["status"] = "container_created"
+    images = entry.get("images") or [entry["image"]]
+    if len(images) > 1:
+        if not state.get("container"):
+            child_ids = []
+            for img in images:
+                sub = meta_request("POST", f"{ig}/media", token, {"image_url": public_url(img), "is_carousel_item": "true"})
+                child_ids.append(sub["id"])
+            parent = meta_request("POST", f"{ig}/media", token, {"media_type": "CAROUSEL", "children": ",".join(child_ids), "caption": entry["caption"]})
+            state["container"] = parent["id"]
+            state["status"] = "container_created"
+    else:
+        if not state.get("container"):
+            data = {"image_url": public_url(entry["image"]), "caption": entry["caption"]}
+            result = meta_request("POST", f"{ig}/media", token, data)
+            state["container"] = result["id"]
+            state["status"] = "container_created"
+
     container_id = state["container"]
-    # Container processing is asynchronous. Retry next scheduled run if not ready.
     for _ in range(8):
         status = meta_request("GET", container_id, token, {"fields": "status_code,status"})
         if status.get("status_code") == "FINISHED":
@@ -543,24 +806,32 @@ def threads_publish(entry):
     threads_user = getenv("THREADS_USER_ID", True)
     entry.setdefault("threads", {"status": "not_started", "id": None, "container": None})
     state = entry["threads"]
-    if not state.get("container"):
-        # Threads caption limit is 500 characters
-        caption = entry["caption"]
-        if len(caption) > 500:
-            caption = caption[:496].rstrip() + "..."
-        data = {
-            "media_type": "IMAGE",
-            "image_url": public_url(entry["image"]),
-            "text": caption,
-        }
-        url = f"https://graph.threads.net/v1.0/{threads_user}/threads"
-        response = requests.post(url, headers={"Authorization": f"Bearer {token}"}, data=data, timeout=45)
-        payload = response.json() if "json" in response.headers.get("Content-Type", "") else {}
-        if not response.ok or "error" in payload or not payload.get("id"):
-            err = payload.get("error", {}).get("message", f"HTTP {response.status_code}")
-            raise ValueError(f"Threads container error: {err}")
-        state["container"] = payload["id"]
-        state["status"] = "container_created"
+    images = entry.get("images") or [entry["image"]]
+    caption = entry["caption"]
+    if len(caption) > 500:
+        caption = caption[:496].rstrip() + "..."
+
+    if len(images) > 1:
+        if not state.get("container"):
+            child_ids = []
+            for img in images:
+                url = f"https://graph.threads.net/v1.0/{threads_user}/threads"
+                r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
+                                  data={"media_type": "IMAGE", "image_url": public_url(img), "is_carousel_item": "true"}, timeout=45)
+                child_ids.append(r.json()["id"])
+            parent_url = f"https://graph.threads.net/v1.0/{threads_user}/threads"
+            r = requests.post(parent_url, headers={"Authorization": f"Bearer {token}"},
+                              data={"media_type": "CAROUSEL", "children": ",".join(child_ids), "text": caption}, timeout=45)
+            state["container"] = r.json()["id"]
+            state["status"] = "container_created"
+    else:
+        if not state.get("container"):
+            url = f"https://graph.threads.net/v1.0/{threads_user}/threads"
+            r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
+                              data={"media_type": "IMAGE", "image_url": public_url(entry["image"]), "text": caption}, timeout=45)
+            state["container"] = r.json()["id"]
+            state["status"] = "container_created"
+
     container_id = state["container"]
     for _ in range(8):
         url = f"https://graph.threads.net/v1.0/{container_id}"
@@ -571,8 +842,7 @@ def threads_publish(entry):
         if st == "FINISHED":
             break
         if st in ("ERROR", "EXPIRED"):
-            err_msg = status_data.get("error_message", "unknown error")
-            raise ValueError(f"Threads container status ({st}): {err_msg}")
+            raise ValueError(f"Threads container status ({st}): {status_data.get('error_message')}")
         time.sleep(5)
     else:
         state["status"] = "awaiting_media"

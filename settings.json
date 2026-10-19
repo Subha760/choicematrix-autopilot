@@ -13,5 +13,6 @@
   "require_original_artwork": true,
   "require_source_for_facts": true,
   "content_plan": "content_calendar.json",
+  "use_live_web_feed": true,
   "content_policy_version": 2
 }
