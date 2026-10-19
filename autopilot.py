@@ -406,7 +406,6 @@ THEMES = [
 def render_carousel_slides(date_key, revision, settings, item):
     """Render 5-6 high-res 1080x1350 carousel slides with daily rotating theme."""
     day = date.fromisoformat(date_key)
-    theme = THEMES[(day.toordinal() + revision - 1) % len(THEMES)]
     slides_data = item.get("slides") or []
     if not slides_data:
         # Fallback to single card representation in carousel format
@@ -422,7 +421,21 @@ def render_carousel_slides(date_key, revision, settings, item):
     W, H = 1080, 1350
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-    for slide in slides_data:
+    for idx, slide in enumerate(slides_data):
+        slide_num = slide.get("slide_number", idx + 1)
+        if slide_num == total_slides:
+            # Special vibrant Outro / CTA Theme with gold & rose glow
+            theme = {
+                "name": "Radiant Outro",
+                "bg_top": (22, 12, 38), "bg_bot": (44, 15, 62), "card_bg": (36, 16, 52),
+                "accent": (255, 184, 0), "accent_secondary": (244, 63, 94),
+                "text_primary": (255, 255, 255), "text_secondary": (235, 220, 245), "border": (85, 25, 105)
+            }
+        else:
+            # Rotate distinct themes across slides so every slide has its own theme
+            theme_idx = (day.toordinal() + revision - 1 + idx) % len(THEMES)
+            theme = THEMES[theme_idx]
+
         image = Image.new("RGB", (W, H))
         draw = ImageDraw.Draw(image)
         # Background gradient
@@ -430,6 +443,14 @@ def render_carousel_slides(date_key, revision, settings, item):
             ratio = y / H
             c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
             draw.line((0, y, W, y), fill=c)
+
+        # Subtle geometric decorative accents matching slide theme
+        rnd = random.Random(int(hashlib.sha256(f"{date_key}-{revision}-{slide_num}-{theme['name']}".encode()).hexdigest()[:12], 16))
+        for _ in range(8):
+            rx, ry = rnd.randrange(0, W), rnd.randrange(0, H)
+            rad = rnd.randrange(40, 180)
+            alpha_color = tuple(min(255, int(v * 0.45)) for v in theme["border"])
+            draw.ellipse((rx-rad, ry-rad, rx+rad, ry+rad), outline=alpha_color, width=2)
 
         slide_num = slide.get("slide_number", 1)
         tag = slide.get("tag", "HOT TOPIC").upper()
