@@ -1,0 +1,70 @@
+name: Social Autopilot 24/7 (Choicematrix)
+
+on:
+  schedule:
+    # 09:00 IST = 03:30 UTC (Draft Generation & Telegram Preview)
+    - cron: '30 3 * * *'
+    # 19:00 IST = 13:30 UTC (Publishing Window)
+    - cron: '30 13 * * *'
+    # Hourly Heartbeat (Check Telegram Approvals & Stale Post Expirations)
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    inputs:
+      manual_action:
+        description: 'Optional manual trigger action'
+        required: false
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - draft_now
+          - publish_now
+
+permissions:
+  contents: write
+
+jobs:
+  autopilot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Social Autopilot Cycle
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_APPROVER_ID: ${{ secrets.TG_APPROVER_ID }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          python autopilot.py
+
+      - name: Commit and persist state & rendered carousels
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add state/ docs/posts/
+          if git diff --staged --quiet; then
+            echo "No state or post changes to commit."
+          else
+            git commit -m "chore(autopilot): persist state and generated carousel slides [skip ci]"
+            git push origin main
+          fi

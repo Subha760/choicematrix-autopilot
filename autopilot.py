@@ -81,36 +81,64 @@ def safe_notify(message):
         print(f"Could not send Telegram notification: {type(exc).__name__}")
 
 
-def fetch_web_feed_topic():
-    """Fetch real-time trending topics from Google News RSS feeds."""
+def fetch_web_feed_topic(date_key=None, revision=1, recent_titles=None):
+    """Fetch real-time trending topics from diverse daily Google News RSS feeds."""
     import urllib.request
     import xml.etree.ElementTree as ET
-    feeds = [
-        ("Tech & Innovation", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"),
-        ("AI & Productivity", "https://news.google.com/rss/search?q=AI+tools+OR+productivity+hacks+OR+smart+tech&hl=en-IN&gl=IN&ceid=IN:en"),
+    feed_channels = [
+        ("AI & Future Tech", "https://news.google.com/rss/search?q=AI+breakthrough+OR+generative+AI+OR+future+technology&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Smart Productivity", "https://news.google.com/rss/search?q=productivity+tools+OR+digital+habits+OR+smart+work&hl=en-IN&gl=IN&ceid=IN:en"),
         ("Science & Discovery", "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Startups & Growth", "https://news.google.com/rss/search?q=tech+startup+OR+creator+economy+OR+business+trends&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Gadgets & Cyber Tech", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Creativity & Mindset", "https://news.google.com/rss/search?q=creative+thinking+OR+design+trends+OR+mindset+hacks&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Future Lifestyle & Green Tech", "https://news.google.com/rss/search?q=green+energy+innovation+OR+smart+living+tech&hl=en-IN&gl=IN&ceid=IN:en"),
     ]
-    for category, url in feeds:
+    day_idx = 0
+    if date_key:
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            xml_data = urllib.request.urlopen(req, timeout=5).read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall(".//item")[:5]:
+            day_idx = date.fromisoformat(date_key).weekday()
+        except Exception:
+            day_idx = 0
+    category, feed_url = feed_channels[(day_idx + revision - 1) % len(feed_channels)]
+    try:
+        req = urllib.request.Request(feed_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
+        xml_data = urllib.request.urlopen(req, timeout=6).read()
+        root = ET.fromstring(xml_data)
+        items = root.findall(".//item")
+        if items:
+            offset = (revision - 1) % len(items)
+            for item in items[offset:offset+10]:
                 title = item.find("title").text if item.find("title") is not None else ""
                 clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
+                clean_title = clean_title.strip()
                 link = item.find("link").text if item.find("link") is not None else ""
                 if clean_title and len(clean_title) > 10:
+                    if recent_titles and any(similar(normalize(clean_title), normalize(t)) for t in recent_titles):
+                        continue
                     return {"category": category, "headline": clean_title, "url": link}
-        except Exception:
-            continue
+    except Exception as exc:
+        print(f"Web feed fetch warning: {exc}")
+    try:
+        fallback_url = "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"
+        req = urllib.request.Request(fallback_url, headers={"User-Agent": "Mozilla/5.0"})
+        xml_data = urllib.request.urlopen(req, timeout=6).read()
+        root = ET.fromstring(xml_data)
+        for item in root.findall(".//item")[:5]:
+            title = item.find("title").text if item.find("title") is not None else ""
+            clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
+            if clean_title and len(clean_title) > 10:
+                return {"category": "Tech & Innovation", "headline": clean_title.strip(), "url": item.find("link").text if item.find("link") is not None else ""}
+    except Exception:
+        pass
     return None
 
 
-def choose_topic(date_key, revision=1, use_web=False):
+def choose_topic(date_key, revision=1, use_web=False, recent_titles=None):
     """Select a consistent weekday pillar, with optional live web feed override."""
     day = date.fromisoformat(date_key)
     if use_web:
-        web = fetch_web_feed_topic()
+        web = fetch_web_feed_topic(date_key, revision, recent_titles=recent_titles)
         if web:
             return {
                 "type": "practical",
@@ -149,11 +177,11 @@ def validate_ai_copy(item, posts, slot):
     """Deterministic quality guard; not a substitute for fact/legal review."""
     if not isinstance(item, dict):
         raise RuntimeError("AI returned something other than a JSON object")
-    if "subtitle" in item and isinstance(item["subtitle"], str) and len(item["subtitle"]) > 130:
-        item["subtitle"] = item["subtitle"][:126].rstrip() + "..."
-    if "caption" in item and isinstance(item["caption"], str) and len(item["caption"]) > 1100:
-        item["caption"] = item["caption"][:1090].rstrip() + "..."
-    for field, limit in (("title", 58), ("subtitle", 145), ("caption", 1200)):
+    if "subtitle" in item and isinstance(item["subtitle"], str) and len(item["subtitle"]) > 160:
+        item["subtitle"] = item["subtitle"][:156].rstrip() + "..."
+    if "caption" in item and isinstance(item["caption"], str) and len(item["caption"]) > 1500:
+        item["caption"] = item["caption"][:1490].rstrip() + "..."
+    for field, limit in (("title", 65), ("subtitle", 165), ("caption", 1600)):
         value = item.get(field)
         if not isinstance(value, str) or not value.strip() or len(value) > limit:
             raise RuntimeError(f"AI content failed length/empty check: {field}")
@@ -179,18 +207,30 @@ def validate_ai_copy(item, posts, slot):
         raise RuntimeError("Too close to a previous title/caption; no new preview sent")
     if slot["type"] == "sourced" and not slot.get("source"):
         raise RuntimeError("Factual posts must use a source selected by code, never AI")
+    if "recommended_audio" not in item or not isinstance(item.get("recommended_audio"), dict):
+        item["recommended_audio"] = {
+            "title": "Neon Horizons",
+            "artist": "Synthwave Collective",
+            "vibe": "Focus / Tech Flow",
+            "search_query": "Neon Horizons Synthwave"
+        }
+    else:
+        for k in ("title", "artist", "vibe"):
+            val = item["recommended_audio"].get(k)
+            if not isinstance(val, str) or not val.strip():
+                item["recommended_audio"][k] = "Trending Tech Focus"
     return item
 
 
 def generated_content(settings, posts, date_key, revision=1):
     key = getenv("GEMINI_API_KEY", True)
     use_web = settings.get("use_live_web_feed", False)
-    slot = choose_topic(date_key, revision, use_web=use_web)
     recent = [p.get("title", "") for _, p in sorted(posts.items())[-60:]]
+    slot = choose_topic(date_key, revision, use_web=use_web, recent_titles=recent)
     brand = settings.get("brand", "Choicematrix")
     
-    prompt = f"""You are a master social media content strategist for the brand '{brand}'.
-Create an engaging, viral 6-SLIDE CAROUSEL post based on today's topic.
+    prompt = f"""You are a master social media content strategist for '{brand}'.
+Create an ultra-high-value, highly engaging 6-SLIDE CAROUSEL post based on today's topic.
 Brand: {brand}.
 Topic Category: {slot['category']}
 Headline or Direction: {slot.get('direction', slot.get('seed', 'Modern Tech Innovation'))}
@@ -198,48 +238,61 @@ Angle: {slot['angle']}
 Audience: {settings['audience']}; Language: {settings['language']}.
 Style: {settings['content_style']}.
 
+DEPTH & QUALITY REQUIREMENTS:
+- Provide rich depth, specific takeaways, and substantial explanations on each slide. Avoid shallow, generic bullet points.
+- Slide 1: High-impact hook and clear problem/opportunity overview.
+- Slides 2-5: Detailed 3-4 sentence comprehensive breakdown of principles, practical mechanics, implementation steps, and pro tips.
+- Recommend a real trending background audio / music track (title, artist, vibe) that pairs perfectly with this post on Instagram Reels / Facebook / Threads.
+- Slide 6: Follow & Save CTA.
+
 Return ONLY ONE valid JSON object with this exact structure:
 {{
   "title": "Strong 3-6 word title (max 50 chars)",
-  "subtitle": "Clear 1-sentence explanation hook (max 110 chars)",
-  "caption": "Full engaging social media caption (max 650 chars) ending with 3-5 hashtags including #{brand}.",
+  "subtitle": "Clear explanation hook of what readers will learn (max 130 chars)",
+  "caption": "Full high-value social caption (max 850 chars) breaking down the essence, ending with 3-5 hashtags including #{brand}.",
+  "recommended_audio": {{
+    "title": "Track Title (e.g., 'Resonance', 'Midnight City', or 'Lofi Focus')",
+    "artist": "Artist Name (e.g., 'HOME', 'M83', or 'Chillhop')",
+    "vibe": "Genre / Vibe (e.g., 'Futuristic Synthwave / High Focus')",
+    "search_query": "Exact search query for Instagram/TikTok audio picker"
+  }},
   "slides": [
     {{
       "slide_number": 1,
       "tag": "HOT TREND",
       "headline": "Bold 3-6 Word Title",
-      "body": "One compelling sentence hook that makes people swipe.",
+      "body": "Compelling 2-3 sentence overview that breaks down the big picture and compels readers to swipe.",
       "swipe_prompt": "Swipe to explore ➡️"
     }},
     {{
       "slide_number": 2,
       "tag": "STEP 01",
-      "headline": "The Core Concept / Why It Matters",
-      "body": "Clear, practical explanation in 2 short sentences."
+      "headline": "The Core Mechanism",
+      "body": "In-depth 3-4 sentence breakdown of the foundation. Explain the underlying mechanics and why conventional methods fall short."
     }},
     {{
       "slide_number": 3,
       "tag": "STEP 02",
-      "headline": "Key Detail / Practical Action",
-      "body": "Actionable takeaway or smart technique."
+      "headline": "Actionable Implementation",
+      "body": "Step-by-step practical implementation. Detail the exact actions, tools, or framework to apply immediately."
     }},
     {{
       "slide_number": 4,
       "tag": "STEP 03",
-      "headline": "The Pro Tip / Counter-Intuitive Angle",
-      "body": "Surprising detail or insider tip that adds major value."
+      "headline": "Pro Tips & Insider Nuance",
+      "body": "Surprising nuance, counter-intuitive angle, or high-value optimization that gives readers an unfair advantage."
     }},
     {{
       "slide_number": 5,
       "tag": "SUMMARY",
-      "headline": "The Big Takeaway",
-      "body": "Quick 1-sentence summary to remember and apply."
+      "headline": "The Executive Takeaway",
+      "body": "Comprehensive synthesis of the entire strategy into a memorable, actionable takeaway ready to execute."
     }},
     {{
       "slide_number": 6,
       "tag": "CONNECT",
       "headline": "FOUND THIS HELPFUL? 💡",
-      "body": "Follow @{brand.lower()} for more daily hot trends, tech & life hacks! 🚀🔥✨\\n\\n📌 Save this post for later\\n↗️ Share with a friend"
+      "body": "Follow @{brand.lower()} for more daily hot trends, tech breakdowns & smart tips! 🚀🔥✨\\n\\n📌 Save this post for later\\n↗️ Share with a friend"
     }}
   ]
 }}
@@ -265,6 +318,11 @@ Return ONLY ONE valid JSON object with this exact structure:
     item["source"] = slot.get("source")
     if slot.get("source"):
         item["caption"] += f"\n\nReference: {slot['source']['label']} — {slot['source']['url']}"
+    audio = item.get("recommended_audio")
+    if audio and isinstance(audio, dict) and audio.get("title"):
+        audio_line = f"\n\n🎵 Suggested Audio: {audio.get('title')} - {audio.get('artist')} ({audio.get('vibe')})"
+        if audio_line not in item["caption"] and len(item["caption"]) + len(audio_line) < 1800:
+            item["caption"] += audio_line
     return item
 
 
@@ -456,6 +514,7 @@ def render_carousel_slides(date_key, revision, settings, item):
         tag = slide.get("tag", "HOT TOPIC").upper()
         headline = slide.get("headline", "")
         body = slide.get("body", "")
+        audio = item.get("recommended_audio") or {}
 
         # Top Header Bar
         pill_w = 260
@@ -466,58 +525,74 @@ def render_carousel_slides(date_key, revision, settings, item):
         draw.line((70, 165, W - 70, 165), fill=theme["border"], width=2)
 
         if slide_num == 1:
-            draw.text((70, 230), "TODAY'S HOT BREAKDOWN", font=font(22, bold=True), fill=theme["accent"])
-            f_title = font(56, bold=True)
+            draw.text((70, 220), "TODAY'S HOT BREAKDOWN", font=font(22, bold=True), fill=theme["accent"])
+            f_title = font(54, bold=True)
             title_lines = wrap_by_pixels(draw, headline, f_title, 940)
-            y = 280
+            y = 265
             for line in title_lines[:4]:
                 draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
-                y += 72
-            y += 20
-            draw.rounded_rectangle((70, y, 70 + 200, y + 8), radius=4, fill=theme["accent"])
-            y += 50
-            card_h = 320
-            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=28, fill=theme["card_bg"], outline=theme["border"], width=3)
-            f_body = font(34, bold=False)
-            body_lines = wrap_by_pixels(draw, body, f_body, 860)
-            by = y + 45
-            for line in body_lines[:5]:
-                draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
-                by += 48
-            swipe_y = H - 230
-            draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 90), radius=24, fill=theme["accent"])
-            draw.text((110, swipe_y + 28), slide.get("swipe_prompt", "Swipe to explore ➡️").upper(), font=font(28, bold=True), fill=theme["bg_top"])
-        elif slide_num == total_slides:
-            draw.text((70, 230), "KEY TAKEAWAY COMPLETED", font=font(22, bold=True), fill=theme["accent"])
-            f_title = font(54, bold=True)
-            draw.text((70, 280), headline, font=f_title, fill=theme["text_primary"])
-            box_y = 390
-            box_h = 420
-            draw.rounded_rectangle((70, box_y, W - 70, box_y + box_h), radius=32, fill=theme["card_bg"], outline=theme["accent"], width=4)
-            draw.text((110, box_y + 45), f"👉 FOLLOW @{brand.upper()}", font=font(38, bold=True), fill=theme["accent"])
-            draw.text((110, box_y + 105), "For daily hot trends, tech breakdowns & smart tips! 🚀🔥✨", font=font(26, bold=False), fill=theme["text_secondary"])
-            draw.line((110, box_y + 175, W - 110, box_y + 175), fill=theme["border"], width=2)
-            draw.text((110, box_y + 215), "📌  Save this post to revisit anytime", font=font(28, bold=False), fill=theme["text_primary"])
-            draw.text((110, box_y + 280), "💬  Share your thoughts in the comments", font=font(28, bold=False), fill=theme["text_primary"])
-            draw.text((110, box_y + 345), "↗️  Send to someone who needs this!", font=font(28, bold=False), fill=theme["text_primary"])
-        else:
-            step_str = f"STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "SUMMARY"
-            draw.text((70, 220), step_str, font=font(26, bold=True), fill=theme["accent"])
-            f_title = font(50, bold=True)
-            title_lines = wrap_by_pixels(draw, headline, f_title, 940)
-            y = 275
-            for line in title_lines[:3]:
-                draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
                 y += 68
+            y += 15
+            draw.rounded_rectangle((70, y, 70 + 200, y + 8), radius=4, fill=theme["accent"])
             y += 35
-            card_h = 440
-            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=32, fill=theme["card_bg"], outline=theme["border"], width=3)
-            f_body = font(35, bold=False)
+            card_h = 380
+            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=28, fill=theme["card_bg"], outline=theme["border"], width=3)
+            f_body = font(33, bold=False)
             body_lines = wrap_by_pixels(draw, body, f_body, 860)
-            by = y + 55
+            by = y + 40
             for line in body_lines[:7]:
                 draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
-                by += 52
+                by += 46
+
+            if audio.get("title"):
+                audio_title_clean = str(audio.get("title", ""))[:28]
+                audio_artist_clean = str(audio.get("artist", ""))[:22]
+                draw.rounded_rectangle((70, H - 325, W - 70, H - 265), radius=18, fill=theme["card_bg"], outline=theme["accent_secondary"], width=2)
+                draw.text((105, H - 308), f"🎵 AUDIO: {audio_title_clean} • {audio_artist_clean}", font=font(21, bold=True), fill=theme["accent_secondary"])
+                draw.text((W - 270, H - 308), str(audio.get("vibe", "Trending"))[:16].upper(), font=font(19, bold=False), fill=theme["text_secondary"])
+
+            swipe_y = H - 235
+            draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 85), radius=24, fill=theme["accent"])
+            draw.text((110, swipe_y + 26), slide.get("swipe_prompt", "Swipe to explore ➡️").upper(), font=font(28, bold=True), fill=theme["bg_top"])
+        elif slide_num == total_slides:
+            draw.text((70, 220), "KEY TAKEAWAY COMPLETED", font=font(22, bold=True), fill=theme["accent"])
+            f_title = font(54, bold=True)
+            draw.text((70, 270), headline, font=f_title, fill=theme["text_primary"])
+            box_y = 360
+            box_h = 490
+            draw.rounded_rectangle((70, box_y, W - 70, box_y + box_h), radius=32, fill=theme["card_bg"], outline=theme["accent"], width=4)
+            draw.text((110, box_y + 40), f"👉 FOLLOW @{brand.upper()}", font=font(38, bold=True), fill=theme["accent"])
+            draw.text((110, box_y + 98), "For daily hot trends, tech breakdowns & smart tips! 🚀🔥✨", font=font(25, bold=False), fill=theme["text_secondary"])
+            
+            if audio.get("title"):
+                draw.text((110, box_y + 148), f"🎵 Recommended Reel Audio: {audio.get('title')} — {audio.get('artist')}", font=font(23, bold=True), fill=theme["accent_secondary"])
+                draw.line((110, box_y + 195, W - 110, box_y + 195), fill=theme["border"], width=2)
+                line_offset = 230
+            else:
+                draw.line((110, box_y + 165, W - 110, box_y + 165), fill=theme["border"], width=2)
+                line_offset = 200
+
+            draw.text((110, box_y + line_offset), "📌  Save this post to revisit anytime", font=font(28, bold=False), fill=theme["text_primary"])
+            draw.text((110, box_y + line_offset + 60), "💬  Share your thoughts in the comments", font=font(28, bold=False), fill=theme["text_primary"])
+            draw.text((110, box_y + line_offset + 120), "↗️  Send to someone who needs this!", font=font(28, bold=False), fill=theme["text_primary"])
+        else:
+            step_str = f"STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "SUMMARY"
+            draw.text((70, 210), step_str, font=font(26, bold=True), fill=theme["accent"])
+            f_title = font(48, bold=True)
+            title_lines = wrap_by_pixels(draw, headline, f_title, 940)
+            y = 260
+            for line in title_lines[:3]:
+                draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
+                y += 64
+            y += 25
+            card_h = 600
+            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=32, fill=theme["card_bg"], outline=theme["border"], width=3)
+            f_body = font(32, bold=False)
+            body_lines = wrap_by_pixels(draw, body, f_body, 860)
+            by = y + 45
+            for line in body_lines[:11]:
+                draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
+                by += 46
 
         # Footer Brand Bar
         draw.line((70, H - 120, W - 70, H - 120), fill=theme["border"], width=2)
@@ -606,6 +681,7 @@ def create_post(date_key, settings, posts, revision=1):
         "category": content["category"], "content_type": content["content_type"],
         "source": content["source"], "image": primary_image,
         "images": images,
+        "recommended_audio": content.get("recommended_audio"),
         "image_sha256": hashlib.sha256((ROOT / "docs" / primary_image).read_bytes()).hexdigest(),
         "status": "pending",
         "approved_at": None, "approval_hash": None,
@@ -650,9 +726,15 @@ def send_preview(post, settings):
          {"text": "🔄 Regenerate", "callback_data": f"regen:{date_key}:{revision}"}],
         [{"text": "❌ Reject", "callback_data": f"reject:{date_key}:{revision}"}]
     ]}
+    audio = post.get("recommended_audio")
+    audio_info = ""
+    if audio and isinstance(audio, dict) and audio.get("title"):
+        audio_info = f"🎵 RECOMMENDED AUDIO: {audio.get('title')} — {audio.get('artist')} ({audio.get('vibe')})\n\n"
+
     full_text = (
         f"🔥 {len(images)}-SLIDE CAROUSEL DRAFT • {date_key}\n\n"
         f"TITLE: {post['title']}\n\n"
+        f"{audio_info}"
         f"{post['caption']}\n\n"
         f"Scheduled at/after {settings['publish_time_ist']} IST.\n"
         "👉 Click Approve below or reply 'approve' in this chat to confirm!"
