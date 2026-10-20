@@ -36,5 +36,49 @@
       "container": null
     },
     "created_at": "2026-10-19T13:27:40.679997+00:00"
+  },
+  "2026-10-20": {
+    "date": "2026-10-20",
+    "revision": 1,
+    "title": "Windows Productivity Power-Up",
+    "subtitle": "Unlock your potential! Discover the ultimate Windows apps to transform your ideas into completed projects faster than ever.",
+    "caption": "Ever had a brilliant idea only for it to get lost in the shuffle? You're not alone! Many of us struggle to bridge the gap between inspiration and execution. But what if your Windows PC held the key to unlocking that potential?\n\nAt Choicematrix, we believe in smart productivity, not just busy work. That's why we've curated a powerful trio of native Windows tools and features designed to streamline your workflow from concept to completion. Forget juggling multiple platforms; these apps integrate seamlessly, turning your scattered thoughts into actionable plans.\n\nFrom boundless brainstorming in OneNote to meticulous task management in To Do, and hyper-focused work sessions with Windows' built-in tools – we'll show you how to leverage your existing ecosystem for maximum efficiency. Stop procrastinating, start creating! Dive in and revolutionize your productivity today.\n\n#Choicematrix #WindowsProductivity #IdeaToDone #TechTips #SmartWork\n\n🎵 Suggested Audio: Lofi Study - Dreamy Lofi Beats (Chillhop / Instrumental Focus)",
+    "category": "Smart Productivity",
+    "content_type": "practical",
+    "source": null,
+    "image": "posts/2026-10-20-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-20-v1-slide1.jpg",
+      "posts/2026-10-20-v1-slide2.jpg",
+      "posts/2026-10-20-v1-slide3.jpg",
+      "posts/2026-10-20-v1-slide4.jpg",
+      "posts/2026-10-20-v1-slide5.jpg",
+      "posts/2026-10-20-v1-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "Lofi Study",
+      "artist": "Dreamy Lofi Beats",
+      "vibe": "Chillhop / Instrumental Focus",
+      "search_query": "Lofi Study Dreamy Lofi Beats"
+    },
+    "image_sha256": "30198b49a91241da5565b55740a555302dd4047a00e460b9d2b5ab6c5121cc4b",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-20T08:23:11.282485+00:00"
   }
 }
