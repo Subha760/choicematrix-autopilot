@@ -7,3 +7,7 @@ __pycache__/
 .venv/
 *.tmp
 .DS_Store
+state/unsplash_cache/
+*.png
+test_*.py
+test_*.jpg

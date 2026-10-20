@@ -74,6 +74,37 @@ def reject_pending_post(posts, approver_name="Subha"):
     write_json(STATE, posts)
     return True, f"❌ REJECTED by {approver_name}. This post will not be published."
 
+def recreate_and_send_post(posts, approver_name="Subha"):
+    approver_id = str(os.getenv("TG_APPROVER_ID", ""))
+    today = datetime.now().date().isoformat()
+    entry = posts.get(today)
+    if not entry:
+        for k in sorted(posts.keys(), reverse=True):
+            entry = posts[k]
+            today = k
+            break
+            
+    old_rev = entry.get("revision", 1) if entry else 1
+    new_rev = old_rev + 1
+    
+    if entry:
+        entry["status"] = "rejected"
+        write_json(STATE, posts)
+        
+    tg_api("sendMessage", {
+        "chat_id": approver_id,
+        "text": f"🔄 RECREATING POST (Revision {new_rev}) with fresh hot topic & Unsplash imagery... Generating now (15-20s) ⏳"
+    })
+    
+    import autopilot
+    settings = read_json(ROOT / "settings.json", {})
+    try:
+        new_entry = autopilot.create_post(today, settings, posts, revision=new_rev)
+        write_json(STATE, posts)
+        return True, f"✨ New Carousel Revision {new_rev} generated and sent above! Tap [Approve & Schedule] when ready. 🚀"
+    except Exception as e:
+        return False, f"⚠️ Error regenerating post: {e}"
+
 def poll_once(offset=0):
     token = os.getenv("TG_BOT_TOKEN")
     approver_id = str(os.getenv("TG_APPROVER_ID", ""))
@@ -124,18 +155,18 @@ def poll_once(offset=0):
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg})
                 print(f"[APPROVED] by button from {first_name}")
                 
-            elif action in ("reject", "test_reject"):
-                success, msg = reject_pending_post(posts, first_name)
+            elif action in ("reject", "test_reject", "regenerate", "recreate", "regen"):
                 if "message" in cb:
                     chat_id = cb["message"]["chat"]["id"]
                     msg_id = cb["message"]["message_id"]
                     tg_api("editMessageText", {
                         "chat_id": chat_id,
                         "message_id": msg_id,
-                        "text": f"❌ REJECTED BY {first_name.upper()}\n\nThis draft will not publish."
+                        "text": f"🔄 RECREATING DRAFT BY {first_name.upper()}...\nGenerating fresh carousel with new topic & Unsplash imagery! ⏳"
                     })
+                success, msg = recreate_and_send_post(posts, first_name)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg})
-                print(f"[REJECTED] by button from {first_name}")
+                print(f"[RECREATED] via button from {first_name}")
                 
         # 2. Handle Direct Text Replies (approve, yes, ok, regen, reject)
         elif "message" in u:
@@ -152,10 +183,10 @@ def poll_once(offset=0):
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg})
                 print(f"[APPROVED] via text '{text}' from {first_name}")
                 
-            elif text in ("reject", "/reject", "no", "cancel", "stop", "3"):
-                success, msg = reject_pending_post(posts, first_name)
+            elif text in ("regenerate", "/regenerate", "recreate", "/recreate", "reject", "/reject", "no", "cancel", "redo", "retry", "regen", "2", "3"):
+                success, msg = recreate_and_send_post(posts, first_name)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg})
-                print(f"[REJECTED] via text '{text}' from {first_name}")
+                print(f"[RECREATED] via text '{text}' from {first_name}")
                 
             elif text in ("/status", "status"):
                 today = datetime.now().date().isoformat()

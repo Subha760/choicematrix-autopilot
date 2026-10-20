@@ -47,6 +47,7 @@ class WorkflowTests(unittest.TestCase):
             "approval_hash": None,
             "fb": {"status": "not_started", "id": None},
             "ig": {"status": "not_started", "id": None, "container": None},
+            "threads": {"status": "not_started", "id": None, "container": None},
         }
         if p["approved_at"]:
             p["approval_hash"] = app.approval_digest(p)
@@ -160,6 +161,7 @@ class WorkflowTests(unittest.TestCase):
     def test_approved_post_only_publishes_once_per_platform(self):
         p = self.example()
         p['fb'] = {'status': 'published', 'id': 'fb123'}
+        p['threads'] = {'status': 'published', 'id': 'th123'}
         posts = {p['date']: p}
         def fake_ig(e):
             e['ig']['status'] = 'published'
@@ -183,6 +185,7 @@ class WorkflowTests(unittest.TestCase):
             p = self.example()
             p['fb'] = {'status': failure, 'id': None}
             p['ig'] = {'status': 'published', 'id': 'ig123', 'container': 'c123'}
+            p['threads'] = {'status': 'published', 'id': 'th123', 'container': 'c123'}
             with patch.object(app, 'public_url', return_value='https://example.org/photo.jpg'), \
                  patch.object(app, 'check_image_ready', return_value=True), \
                  patch.object(app, 'durable_reserve') as rs, \

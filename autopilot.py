@@ -6,6 +6,7 @@ Only original text and locally drawn, people-free JPEG artwork are generated.
 from __future__ import annotations
 
 import hashlib
+import io
 import json
 import os
 import random
@@ -20,6 +21,17 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent
+
+def _load_env_fallback():
+    env_file = ROOT / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
+_load_env_fallback()
 STATE = ROOT / "state" / "posts.json"
 TG_STATE = ROOT / "state" / "telegram.json"
 GEN_ERRORS = ROOT / "state" / "generation-attempts.json"
@@ -30,6 +42,85 @@ try:
 except Exception:
     IST = timezone(timedelta(hours=5, minutes=30), name="IST")
 TIMEOUT = 20
+UNSPLASH_CACHE = ROOT / "state" / "unsplash_cache"
+
+
+def resize_and_crop(photo: Image.Image, W: int, H: int) -> Image.Image:
+    pw, ph = photo.size
+    target_aspect = W / H
+    current_aspect = pw / ph
+    if current_aspect > target_aspect:
+        new_w = int(ph * target_aspect)
+        left = (pw - new_w) // 2
+        photo = photo.crop((left, 0, left + new_w, ph))
+    else:
+        new_h = int(pw / target_aspect)
+        top = (ph - new_h) // 2
+        photo = photo.crop((0, top, pw, top + new_h))
+    return photo.resize((W, H), Image.Resampling.LANCZOS)
+
+
+def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350) -> Image.Image | None:
+    """Fetch high-res photo from Unsplash matching query, with curated fallback."""
+    UNSPLASH_CACHE.mkdir(parents=True, exist_ok=True)
+    access_key = getenv("UNSPLASH_ACCESS_KEY")
+    cleaned_query = re.sub(r"[^\w\s]", "", query or "technology").strip() or "technology"
+    cache_key = hashlib.sha256(cleaned_query.lower().encode()).hexdigest()[:12]
+    cached_file = UNSPLASH_CACHE / f"{cache_key}.jpg"
+    if cached_file.exists():
+        try:
+            return Image.open(cached_file).convert("RGB")
+        except Exception:
+            pass
+
+    # 1. Try official Unsplash API if access key is present
+    if access_key:
+        try:
+            url = "https://api.unsplash.com/search/photos"
+            params = {"query": cleaned_query, "per_page": 1, "orientation": "portrait"}
+            headers = {"Authorization": f"Client-ID {access_key}"}
+            r = requests.get(url, params=params, headers=headers, timeout=6)
+            if r.status_code == 200:
+                results = r.json().get("results", [])
+                if results:
+                    img_url = results[0]["urls"].get("regular") or results[0]["urls"].get("small")
+                    img_data = requests.get(img_url, timeout=10).content
+                    photo = Image.open(io.BytesIO(img_data)).convert("RGB")
+                    processed = resize_and_crop(photo, W, H)
+                    try:
+                        processed.save(cached_file, "JPEG", quality=92)
+                    except Exception:
+                        pass
+                    return processed
+        except Exception as e:
+            print(f"Unsplash API search warning: {e}")
+
+    # 2. Curated high-res Unsplash photos mapped across topic categories
+    CURATED_UNSPLASH = [
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1080&q=80",  # Tech / Circuit
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&q=80",  # AI / Neon Flow
+        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1080&q=80",  # Coding / Laptop
+        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1080&q=80",  # Cosmos / Space
+        "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1080&q=80",  # Team / Startup
+        "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1080&q=80",  # India Monument / Heritage
+        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1080&q=80",  # Gadget / Audio
+        "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1080&q=80",  # Green Energy
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1080&q=80",  # Strategy / Mindset
+    ]
+    idx = int(hashlib.sha256(cleaned_query.encode()).hexdigest()[:8], 16) % len(CURATED_UNSPLASH)
+    try:
+        r = requests.get(CURATED_UNSPLASH[idx], timeout=8)
+        if r.status_code == 200:
+            photo = Image.open(io.BytesIO(r.content)).convert("RGB")
+            processed = resize_and_crop(photo, W, H)
+            try:
+                processed.save(cached_file, "JPEG", quality=92)
+            except Exception:
+                pass
+            return processed
+    except Exception as e:
+        print(f"Curated photo fallback warning: {e}")
+    return None
 
 
 def read_json(path, default):
@@ -82,17 +173,17 @@ def safe_notify(message):
 
 
 def fetch_web_feed_topic(date_key=None, revision=1, recent_titles=None):
-    """Fetch real-time trending topics from diverse daily Google News RSS feeds."""
+    """Fetch real-time trending topics from diverse daily Global & India Hot Topic RSS feeds."""
     import urllib.request
     import xml.etree.ElementTree as ET
     feed_channels = [
-        ("AI & Future Tech", "https://news.google.com/rss/search?q=AI+breakthrough+OR+generative+AI+OR+future+technology&hl=en-IN&gl=IN&ceid=IN:en"),
-        ("Smart Productivity", "https://news.google.com/rss/search?q=productivity+tools+OR+digital+habits+OR+smart+work&hl=en-IN&gl=IN&ceid=IN:en"),
-        ("Science & Discovery", "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-IN&gl=IN&ceid=IN:en"),
-        ("Startups & Growth", "https://news.google.com/rss/search?q=tech+startup+OR+creator+economy+OR+business+trends&hl=en-IN&gl=IN&ceid=IN:en"),
-        ("Gadgets & Cyber Tech", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-IN&gl=IN&ceid=IN:en"),
-        ("Creativity & Mindset", "https://news.google.com/rss/search?q=creative+thinking+OR+design+trends+OR+mindset+hacks&hl=en-IN&gl=IN&ceid=IN:en"),
-        ("Future Lifestyle & Green Tech", "https://news.google.com/rss/search?q=green+energy+innovation+OR+smart+living+tech&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("AI & Deep Tech [Global]", "https://news.google.com/rss/search?q=AI+breakthrough+OR+generative+AI+OR+OpenAI+OR+Anthropic+OR+NVIDIA&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("India Tech & Smart Gadgets [India Hot Topic]", "https://news.google.com/rss/search?q=India+technology+OR+smartphone+launch+India+OR+gadgets+360+India&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("High-Performance Productivity [Global]", "https://news.google.com/rss/search?q=productivity+tools+OR+digital+habits+OR+deep+work+software&hl=en-US&gl=US&ceid=US:en"),
+        ("India Startups & Innovation [India Hot Topic]", "https://news.google.com/rss/search?q=Indian+startups+OR+unicorn+India+OR+founder+growth+India&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Science & Space Frontiers [Global]", "https://news.google.com/rss/headlines/section/topic/SCIENCE?hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Strategic Mindset & Growth [Mindset]", "https://news.google.com/rss/search?q=mental+models+thinking+OR+career+growth+strategy+OR+psychology+hacks&hl=en-IN&gl=IN&ceid=IN:en"),
+        ("Future Clean Tech & Living [Global & India]", "https://news.google.com/rss/search?q=green+energy+tech+OR+electric+mobility+OR+sustainable+future&hl=en-IN&gl=IN&ceid=IN:en"),
     ]
     day_idx = 0
     if date_key:
@@ -240,16 +331,18 @@ Style: {settings['content_style']}.
 
 DEPTH & QUALITY REQUIREMENTS:
 - Provide rich depth, specific takeaways, and substantial explanations on each slide. Avoid shallow, generic bullet points.
-- Slide 1: High-impact hook and clear problem/opportunity overview.
-- Slides 2-5: Detailed 3-4 sentence comprehensive breakdown of principles, practical mechanics, implementation steps, and pro tips.
+- Slide 1: High-impact hook and clear problem/opportunity overview with a compelling teaser.
+- Slides 2-5: Detailed 4-6 sentence comprehensive breakdown (65 to 95 words per slide). Explain the core logic, actionable implementation steps, real-world examples, and nuanced pro tips that make the reader stop and read every sentence.
 - Recommend a real trending background audio / music track (title, artist, vibe) that pairs perfectly with this post on Instagram Reels / Facebook / Threads.
+- Provide a targeted 'unsplash_query' (2-3 words, e.g., 'artificial intelligence laboratory', 'workspace laptop coding', 'modern gadgets desk') for high-resolution photography.
 - Slide 6: Follow & Save CTA.
 
 Return ONLY ONE valid JSON object with this exact structure:
 {{
   "title": "Strong 3-6 word title (max 50 chars)",
   "subtitle": "Clear explanation hook of what readers will learn (max 130 chars)",
-  "caption": "Full high-value social caption (max 850 chars) breaking down the essence, ending with 3-5 hashtags including #{brand}.",
+  "caption": "Full high-value social caption (max 950 chars) breaking down the essence, ending with 3-5 hashtags including #{brand}.",
+  "unsplash_query": "2-3 word photo query (e.g., 'workspace laptop desk' or 'futuristic artificial intelligence')",
   "recommended_audio": {{
     "title": "Track Title (e.g., 'Resonance', 'Midnight City', or 'Lofi Focus')",
     "artist": "Artist Name (e.g., 'HOME', 'M83', or 'Chillhop')",
@@ -261,32 +354,32 @@ Return ONLY ONE valid JSON object with this exact structure:
       "slide_number": 1,
       "tag": "HOT TREND",
       "headline": "Bold 3-6 Word Title",
-      "body": "Compelling 2-3 sentence overview that breaks down the big picture and compels readers to swipe.",
+      "body": "Compelling 3-4 sentence overview breaking down the problem or opportunity and compelling the user to read all slides.",
       "swipe_prompt": "Swipe to explore ➡️"
     }},
     {{
       "slide_number": 2,
       "tag": "STEP 01",
-      "headline": "The Core Mechanism",
-      "body": "In-depth 3-4 sentence breakdown of the foundation. Explain the underlying mechanics and why conventional methods fall short."
+      "headline": "The Core Foundation",
+      "body": "Detailed 4-6 sentence deep dive explaining the foundational mechanism, why traditional approaches fail, and what the new breakthrough does differently."
     }},
     {{
       "slide_number": 3,
       "tag": "STEP 02",
       "headline": "Actionable Implementation",
-      "body": "Step-by-step practical implementation. Detail the exact actions, tools, or framework to apply immediately."
+      "body": "Comprehensive 4-6 sentence breakdown of the exact step-by-step process, tools, metrics, and workflows to apply immediately."
     }},
     {{
       "slide_number": 4,
       "tag": "STEP 03",
-      "headline": "Pro Tips & Insider Nuance",
-      "body": "Surprising nuance, counter-intuitive angle, or high-value optimization that gives readers an unfair advantage."
+      "headline": "Nuance & Pro Insights",
+      "body": "In-depth 4-6 sentence analysis of common pitfalls to avoid, insider optimizations, and high-leverage habits that multiply your results."
     }},
     {{
       "slide_number": 5,
       "tag": "SUMMARY",
-      "headline": "The Executive Takeaway",
-      "body": "Comprehensive synthesis of the entire strategy into a memorable, actionable takeaway ready to execute."
+      "headline": "The Master Takeaway",
+      "body": "Full synthesized conclusion uniting the entire framework into a memorable, actionable takeaway ready to put into practice today."
     }},
     {{
       "slide_number": 6,
@@ -305,9 +398,15 @@ Return ONLY ONE valid JSON object with this exact structure:
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"responseMimeType": "application/json", "temperature": 0.75},
     }
-    response = requests.post(url, headers={"x-goog-api-key": key}, json=body, timeout=45)
-    if response.status_code != 200:
-        raise RuntimeError(f"Gemini draft HTTP {response.status_code}; fail closed")
+    response = None
+    for attempt in range(3):
+        response = requests.post(url, headers={"x-goog-api-key": key}, json=body, timeout=45)
+        if response.status_code == 200:
+            break
+        print(f"Gemini API returned {response.status_code}, retrying in {(attempt + 1) * 2}s...")
+        time.sleep((attempt + 1) * 2)
+    if not response or response.status_code != 200:
+        raise RuntimeError(f"Gemini draft HTTP {response.status_code if response else 'None'}; fail closed")
     parts = response.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
     if not parts:
         raise RuntimeError("AI returned no text; no post generated")
@@ -494,13 +593,30 @@ def render_carousel_slides(date_key, revision, settings, item):
             theme_idx = (day.toordinal() + revision - 1 + idx) % len(THEMES)
             theme = THEMES[theme_idx]
 
-        image = Image.new("RGB", (W, H))
-        draw = ImageDraw.Draw(image)
-        # Background gradient
-        for y in range(H):
-            ratio = y / H
-            c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
-            draw.line((0, y, W, y), fill=c)
+        slide_tag = slide.get("tag", "")
+        photo_query = f"{item.get('unsplash_query', '')} {slide_tag}".strip()
+        bg_photo = fetch_unsplash_image(photo_query or item.get("title", "technology"), W, H)
+
+        if bg_photo:
+            overlay = Image.new("RGBA", (W, H))
+            draw_ol = ImageDraw.Draw(overlay)
+            for y in range(H):
+                ratio = y / H
+                alpha = int(185 + 50 * ratio)  # Darkened tint to preserve 100% text contrast
+                r = int(theme["bg_top"][0]*(1-ratio) + theme["bg_bot"][0]*ratio)
+                g = int(theme["bg_top"][1]*(1-ratio) + theme["bg_bot"][1]*ratio)
+                b = int(theme["bg_top"][2]*(1-ratio) + theme["bg_bot"][2]*ratio)
+                draw_ol.line((0, y, W, y), fill=(r, g, b, alpha))
+            image = Image.alpha_composite(bg_photo.convert("RGBA"), overlay).convert("RGB")
+            draw = ImageDraw.Draw(image)
+        else:
+            image = Image.new("RGB", (W, H))
+            draw = ImageDraw.Draw(image)
+            # Background gradient
+            for y in range(H):
+                ratio = y / H
+                c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
+                draw.line((0, y, W, y), fill=c)
 
         # Subtle geometric decorative accents matching slide theme
         rnd = random.Random(int(hashlib.sha256(f"{date_key}-{revision}-{slide_num}-{theme['name']}".encode()).hexdigest()[:12], 16))
@@ -585,14 +701,14 @@ def render_carousel_slides(date_key, revision, settings, item):
                 draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
                 y += 64
             y += 25
-            card_h = 600
+            card_h = 670
             draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=32, fill=theme["card_bg"], outline=theme["border"], width=3)
-            f_body = font(32, bold=False)
+            f_body = font(29, bold=False)
             body_lines = wrap_by_pixels(draw, body, f_body, 860)
-            by = y + 45
-            for line in body_lines[:11]:
+            by = y + 40
+            for line in body_lines[:14]:
                 draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
-                by += 46
+                by += 43
 
         # Footer Brand Bar
         draw.line((70, H - 120, W - 70, H - 120), fill=theme["border"], width=2)
