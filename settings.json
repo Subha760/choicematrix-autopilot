@@ -6,7 +6,7 @@
   "generation_time_ist": "09:00",
   "publish_time_ist": "19:00",
   "approval_required": true,
-  "publishing_enabled": false,
+  "publishing_enabled": true,
   "content_style": "Human, friendly and visually clear; specific not clickbait; useful but not preachy",
   "max_post_age_hours": 48,
   "manual_publish_only": false,
