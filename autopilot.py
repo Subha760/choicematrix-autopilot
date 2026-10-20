@@ -400,17 +400,51 @@ Return ONLY ONE valid JSON object with this exact structure:
     }
     response = None
     for attempt in range(3):
-        response = requests.post(url, headers={"x-goog-api-key": key}, json=body, timeout=45)
-        if response.status_code == 200:
-            break
-        print(f"Gemini API returned {response.status_code}, retrying in {(attempt + 1) * 2}s...")
+        try:
+            response = requests.post(url, headers={"x-goog-api-key": key}, json=body, timeout=45)
+            if response.status_code == 200:
+                break
+            print(f"Gemini API returned {response.status_code}, retrying in {(attempt + 1) * 2}s...")
+        except Exception as exc:
+            print(f"Gemini request error: {exc}")
         time.sleep((attempt + 1) * 2)
-    if not response or response.status_code != 200:
-        raise RuntimeError(f"Gemini draft HTTP {response.status_code if response else 'None'}; fail closed")
-    parts = response.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
-    if not parts:
-        raise RuntimeError("AI returned no text; no post generated")
-    item = json.loads("".join(part.get("text", "") for part in parts))
+
+    item = None
+    if response and response.status_code == 200:
+        parts = response.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
+        if parts:
+            try:
+                item = json.loads("".join(part.get("text", "") for part in parts))
+            except Exception:
+                item = None
+
+    # Ultra-fast Groq LLM Fallback (Zero downtime)
+    if not item:
+        groq_key = getenv("GROQ_API_KEY")
+        if groq_key:
+            print("Falling back to ultra-fast Groq LLM (qwen/qwen3.8-27b)...")
+            try:
+                groq_res = requests.post(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"},
+                    json={
+                        "model": "qwen/qwen3.8-27b",
+                        "messages": [
+                            {"role": "system", "content": "You are a master social media content strategist. Return ONLY one valid JSON object."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "response_format": {"type": "json_object"},
+                        "temperature": 0.7
+                    },
+                    timeout=25
+                )
+                if groq_res.status_code == 200:
+                    item = json.loads(groq_res.json()["choices"][0]["message"]["content"])
+            except Exception as e:
+                print(f"Groq fallback warning: {e}")
+
+    if not item:
+        raise RuntimeError("AI returned no text; fail closed")
     item = validate_ai_copy(item, posts, slot)
     item["category"] = slot["category"]
     item["content_type"] = slot["type"]

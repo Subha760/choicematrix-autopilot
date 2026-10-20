@@ -62,8 +62,8 @@
       "search_query": "Lofi Study Beats Lofi Fruits Music"
     },
     "image_sha256": "1927192202acbd3bc216eea7a041d45ecdf99b1643ce4d563cc801931561cd1d",
-    "status": "pending",
-    "approved_at": null,
+    "status": "approved",
+    "approved_at": "2026-10-20T09:24:27.140550+00:00",
     "approval_hash": null,
     "fb": {
       "status": "not_started",

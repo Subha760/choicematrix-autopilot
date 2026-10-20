@@ -11,3 +11,9 @@ state/unsplash_cache/
 *.png
 test_*.py
 test_*.jpg
+add_*.py
+browser_*.py
+check_*.py
+find_*.py
+deploy_*.py
+create_*.py

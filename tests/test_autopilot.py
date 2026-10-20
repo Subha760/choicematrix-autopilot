@@ -102,6 +102,31 @@ class WorkflowTests(unittest.TestCase):
         self.assertIn(post["source"]["url"], post["caption"])
         self.assertEqual(post["content_type"], "sourced")
 
+    def test_groq_fallback_when_gemini_unavailable(self):
+        class MockGeminiFail:
+            status_code = 503
+        class MockGroqSuccess:
+            status_code = 200
+            def json(self):
+                return {"choices": [{"message": {"content": json.dumps({
+                    "title": "Use A Safer Login Habit",
+                    "subtitle": "Try enabling another sign-in check.",
+                    "caption": "Another sign-in factor adds a barrier. #Safety #Passwords #DigitalTips"
+                })}}]}
+        def mock_post(url, *args, **kwargs):
+            if "generativelanguage" in url:
+                return MockGeminiFail()
+            elif "groq.com" in url:
+                return MockGroqSuccess()
+            return MockGeminiFail()
+
+        with patch.object(app, 'getenv', side_effect=lambda name, required=False: 'fake_gemini' if name == 'GEMINI_API_KEY' else ('fake_groq' if name == 'GROQ_API_KEY' else '')), \
+             patch.object(app.time, 'sleep', return_value=None), \
+             patch.object(app.requests, 'post', side_effect=mock_post):
+            post = app.generated_content(SETTINGS, {}, "2026-10-13")
+        self.assertEqual(post["title"], "Use A Safer Login Habit")
+        self.assertEqual(post["category"], "Digital Safety")
+
     def test_code_draws_original_full_resolution_jpeg(self):
         from PIL import Image
         for category in ("Productivity", "Digital Safety", "Science & Nature", "Creativity & DIY"):
