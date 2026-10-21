@@ -81,34 +81,38 @@
     },
     "created_at": "2026-10-20T09:20:56.818990+00:00"
   },
-  "2026-10-21": {
-    "date": "2026-10-21",
+  "2026-10-21_afternoon": {
+    "date": "2026-10-21_afternoon",
+    "clean_date": "2026-10-21",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
     "revision": 1,
-    "title": "NYC's AI Pause: A Genius Move",
-    "subtitle": "Discover why NYC's temporary ban on AI in hiring is a strategic win for fairness, innovation, and high-performance productivity.",
-    "caption": "New York City's bold pause on AI in hiring is a strategic masterstroke! 💡 This isn't a roadblock, but a crucial opportunity for ethical innovation and long-term productivity.\n\nChoicematrix believes this move sets a vital precedent. It forces businesses to audit algorithmic biases, ensuring fairness and transparency in AI tools before widespread deployment. Rushing AI without scrutiny can lead to costly errors and erode trust. By taking this time, companies can build more robust, equitable systems that truly enhance human potential, attracting diverse talent and fostering genuine innovation.\n\nIt's a proactive investment in a smarter, fairer, and ultimately more productive future. What are your thoughts on this AI timeout? 👇\n\n#AIMoratorium #NYCAI #EthicalAI #FutureOfWork #Choicematrix\n\n🎵 Suggested Audio: Lofi Focus - Chillhop Music (Calm / Focused Lofi Beats)",
-    "category": "High-Performance Productivity [Global]",
+    "title": "Quantum Leap for Processors",
+    "subtitle": "Discover how a new quantum computing breakthrough is paving the way for exponentially more powerful processors.",
+    "caption": "Ever wondered what's next for computing power? Today, we're diving deep into a monumental quantum computing breakthrough that's literally reshaping the future of processors! 🚀\n\nFor years, the dream of truly powerful quantum computers has been hampered by fragility and connectivity issues. But a recent innovation is changing the game, offering a clear path to larger, more stable, and incredibly powerful quantum chips. We're talking about systems that can solve problems far beyond the reach of even the most advanced supercomputers today.\n\nThis isn't just theoretical; it’s a significant engineering leap. Imagine a world where drug discovery accelerates exponentially, new materials with unheard-of properties are designed in days, and AI reaches unprecedented levels of intelligence. This breakthrough tackles core challenges like qubit decoherence and inter-chip communication, paving the way for modular, scalable quantum architectures.\n\nJoin us as we break down the science behind this incredible development and explore what it means for our technological future. The era of truly powerful quantum computing is closer than you think!\n\n#QuantumComputing #TechBreakthrough #FutureTech #Innovation #Choicematrix\n\n🎵 Suggested Audio: Aurora Dream - Lofi Fruits Music (Futuristic Ambient)",
+    "category": "Future Science & Innovation [Global]",
     "content_type": "practical",
     "source": null,
-    "image": "posts/2026-10-21-v1-slide1.jpg",
+    "image": "posts/2026-10-21_afternoon-v1-slide1.jpg",
     "images": [
-      "posts/2026-10-21-v1-slide1.jpg",
-      "posts/2026-10-21-v1-slide2.jpg",
-      "posts/2026-10-21-v1-slide3.jpg",
-      "posts/2026-10-21-v1-slide4.jpg",
-      "posts/2026-10-21-v1-slide5.jpg",
-      "posts/2026-10-21-v1-slide6.jpg"
+      "posts/2026-10-21_afternoon-v1-slide1.jpg",
+      "posts/2026-10-21_afternoon-v1-slide2.jpg",
+      "posts/2026-10-21_afternoon-v1-slide3.jpg",
+      "posts/2026-10-21_afternoon-v1-slide4.jpg",
+      "posts/2026-10-21_afternoon-v1-slide5.jpg",
+      "posts/2026-10-21_afternoon-v1-slide6.jpg"
     ],
     "recommended_audio": {
-      "title": "Lofi Focus",
-      "artist": "Chillhop Music",
-      "vibe": "Calm / Focused Lofi Beats",
-      "search_query": "Lofi Focus Chillhop"
+      "title": "Aurora Dream",
+      "artist": "Lofi Fruits Music",
+      "vibe": "Futuristic Ambient",
+      "search_query": "futuristic ambient instrumental lofi"
     },
-    "image_sha256": "beca6b240660c185b4f303ae66a27b9b1ee92d27ef62a3833b59515805593a8e",
-    "status": "approved",
-    "approved_at": "2026-10-21T10:34:36.147041+00:00",
-    "approval_hash": "df27628b614a6969f2d12d587a1d1c96d67ba0728c83fdee8d4489201f7f90b4",
+    "image_sha256": "4f1086ef4b805c4a3253fd094da195bd03f716199c2acfd98a28e616a692eb0f",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
     "fb": {
       "status": "not_started",
       "id": null
@@ -123,6 +127,54 @@
       "id": null,
       "container": null
     },
-    "created_at": "2026-10-21T05:18:21.753928+00:00"
+    "created_at": "2026-10-21T10:48:37.023279+00:00"
+  },
+  "2026-10-21_evening": {
+    "date": "2026-10-21_evening",
+    "clean_date": "2026-10-21",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 2,
+    "title": "পশ্চিমবঙ্গের ভবিষ্যৎ: বাজেট ও উন্নয়ন",
+    "subtitle": "জানুন কিভাবে এই বাজেট রাজ্যের পরিকাঠামো ও শিল্পে নতুন দিগন্ত উন্মোচন করতে পারে।",
+    "caption": "পশ্চিমবঙ্গের রাজনীতিতে এক ঐতিহাসিক মুহূর্ত! 📊 বিজেপি সরকারের প্রথম বাজেট রাজ্যের পরিকাঠামো ও শিল্প উন্নয়নের উপর বিশেষ জোর দিয়েছে, যা আমাদের রাজ্যের অর্থনৈতিক ভবিষ্যতের জন্য এক নতুন দিক খুলে দিতে পারে।\n\nএই বাজেটে সড়ক, রেল, বন্দর এবং বিমানবন্দর সহ যোগাযোগ ব্যবস্থার আধুনিকীকরণে বিপুল অর্থ বরাদ্দ করা হয়েছে। এর লক্ষ্য হল প্রতিটি প্রান্তকে নিবিড়ভাবে সংযুক্ত করা, যা শুধু যাতায়াতের সুবিধা বাড়াবে না, বরং শিল্প স্থাপন ও বাণিজ্যের প্রসারেও অপরিহার্য ভূমিকা পালন করবে। কল্পনা করুন, আপনার এলাকার কৃষিপণ্যগুলি কত দ্রুত রাজ্যের বিভিন্ন বাজারে পৌঁছাতে পারবে!\n\nএছাড়াও, ক্ষুদ্র ও মাঝারি শিল্পের (MSME) বিকাশে বিশেষ মনোযোগ দেওয়া হয়েছে। নতুন শিল্পতালুক স্থাপন, পুরনো শিল্পগুলির আধুনিকীকরণ এবং 'মেক ইন বেঙ্গল' উদ্যোগকে শক্তিশালী করতে বিভিন্ন ইনসেনটিভ প্যাকেজ ঘোষণা করা হয়েছে। এর ফলে নতুন কর্মসংস্থান সৃষ্টি হবে এবং আমাদের তরুণ প্রজন্ম নতুন সুযোগ পাবে।\n\nতবে, এই উচ্চাকাঙ্ক্ষী পরিকল্পনা বাস্তবায়নে কিছু চ্যালেঞ্জও রয়েছে, যেমন জমি অধিগ্রহণ ও পরিবেশগত ছাড়পত্র। কিন্তু সঠিক পরিকল্পনা ও বাস্তবায়নের মাধ্যমে এই বাধাগুলি অতিক্রম করা সম্ভব।\n\nএই পোস্টটি আপনাকে বিজেপির প্রথম পশ্চিমবঙ্গ বাজেটের মূল দিকগুলি সম্পর্কে একটি পরিষ্কার ধারণা দেবে। জানুন কিভাবে এই বাজেট আপনার জীবন এবং রাজ্যের অর্থনীতিকে প্রভাবিত করতে পারে। #পশ্চিমবঙ্গবাজেট #পরিকাঠামোউন্নয়ন #শিল্পায়ন #কর্মসংস্থান #Choicematrix\n\n🎵 Suggested Audio: শান্তিনিকেতন Lo-Fi - ইন্ডি ফিউশন (আধুনিক রবীন্দ্র ফিউশন)",
+    "category": "Bengal Infrastructure & Future [West Bengal]",
+    "content_type": "practical",
+    "source": null,
+    "image": "posts/2026-10-21_evening-v2-slide1.jpg",
+    "images": [
+      "posts/2026-10-21_evening-v2-slide1.jpg",
+      "posts/2026-10-21_evening-v2-slide2.jpg",
+      "posts/2026-10-21_evening-v2-slide3.jpg",
+      "posts/2026-10-21_evening-v2-slide4.jpg",
+      "posts/2026-10-21_evening-v2-slide5.jpg",
+      "posts/2026-10-21_evening-v2-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "শান্তিনিকেতন Lo-Fi",
+      "artist": "ইন্ডি ফিউশন",
+      "vibe": "আধুনিক রবীন্দ্র ফিউশন",
+      "search_query": "Rabindra Lo-Fi Fusion Instrumental"
+    },
+    "image_sha256": "816fd2eee73ba239b44577cdda45f9107fc9ec36bf1b2d165efeeba58586b2b5",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-21T10:50:48.437115+00:00"
   }
 }

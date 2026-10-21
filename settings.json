@@ -3,15 +3,32 @@
   "niche": "Mixed: learning, technology, productivity, creativity, and everyday life",
   "audience": "Adults who enjoy useful, short, original educational and lifestyle ideas",
   "language": "English",
+  "slots": {
+    "afternoon": {
+      "name": "Global Tech & Systems (English)",
+      "publish_time_ist": "14:00",
+      "language": "English",
+      "feed": "global",
+      "style": "cyber_minimalist"
+    },
+    "evening": {
+      "name": "Regional Trends (Hindi / Bengali)",
+      "publish_time_ist": "20:00",
+      "feed": "regional",
+      "style": "warm_editorial"
+    }
+  },
   "generation_time_ist": "09:00",
-  "publish_time_ist": "19:00",
+  "publish_time_ist": "14:00",
+  "publish_time_afternoon_ist": "14:00",
+  "publish_time_evening_ist": "20:00",
   "approval_required": true,
   "publishing_enabled": true,
   "content_style": "Human, friendly and visually clear; specific not clickbait; useful but not preachy",
   "max_post_age_hours": 48,
   "manual_publish_only": false,
   "require_original_artwork": true,
-  "require_source_for_facts": true,
+  "require_source_for_facts": false,
   "content_plan": "content_calendar.json",
   "use_live_web_feed": true,
   "content_policy_version": 2

@@ -320,6 +320,30 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(p["threads"]["status"], "published")
         self.assertEqual(p["threads"]["id"], "th_post_999")
 
+    def test_dual_slots_alternation_hindi_bengali(self):
+        self.assertEqual(app.get_evening_language("2026-10-20"), "Hindi")
+        self.assertEqual(app.get_evening_language("2026-10-21"), "Bengali")
+        self.assertEqual(app.get_evening_language("2026-10-22"), "Hindi")
+        self.assertEqual(app.get_evening_language("2026-10-23"), "Bengali")
+
+    def test_indic_digits_translation(self):
+        self.assertEqual(app.to_indic_digits("0123456789", "Bengali"), "০১২৩৪৫৬৭৮৯")
+        self.assertEqual(app.to_indic_digits("0123456789", "Hindi"), "\u0966\u0967\u0968\u0969\u096a\u096b\u096c\u096d\u096e\u096f")
+        self.assertEqual(app.to_indic_digits("0123456789", "English"), "0123456789")
+
+    def test_choose_topic_slots(self):
+        afternoon = app.choose_topic("2026-10-21", slot_type="afternoon")
+        self.assertEqual(afternoon["language"], "English")
+        self.assertEqual(afternoon["slot"], "afternoon")
+
+        evening_bengal = app.choose_topic("2026-10-21", slot_type="evening")
+        self.assertEqual(evening_bengal["language"], "Bengali")
+        self.assertEqual(evening_bengal["slot"], "evening")
+
+        evening_hindi = app.choose_topic("2026-10-20", slot_type="evening")
+        self.assertEqual(evening_hindi["language"], "Hindi")
+        self.assertEqual(evening_hindi["slot"], "evening")
+
 
 if __name__ == '__main__':
     unittest.main()
