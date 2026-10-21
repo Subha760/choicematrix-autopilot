@@ -106,9 +106,9 @@
       "search_query": "Lofi Focus Chillhop"
     },
     "image_sha256": "beca6b240660c185b4f303ae66a27b9b1ee92d27ef62a3833b59515805593a8e",
-    "status": "pending",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-10-21T10:34:36.147041+00:00",
+    "approval_hash": "df27628b614a6969f2d12d587a1d1c96d67ba0728c83fdee8d4489201f7f90b4",
     "fb": {
       "status": "not_started",
       "id": null
