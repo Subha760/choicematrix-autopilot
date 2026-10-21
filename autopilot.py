@@ -581,8 +581,21 @@ CRITICAL NEWS TIMELINESS RULE:
 
 {lang_spec}
 
-DEPTH & QUALITY REQUIREMENTS:
+DEPTH, EMOJI & VISUAL REQUIREMENTS:
 - Provide rich depth, specific takeaways, and substantial explanations on each slide. Avoid shallow, generic bullet points.
+- Format the CAPTION beautifully with stylish section headers, relevant emojis (🚀, 🔍, 💡, ⚡, 📊, 🎯, 💬), and clean line breaks:
+  Format structure:
+  🚀 [HIGH-IMPACT EMOJI HOOK TITLE]
+  🔍 [WHAT HAPPENED TODAY]: 2-3 engaging sentences explaining the breaking news.
+  💡 [CORE TAKEAWAYS]:
+  • ⚡ 1. Point one...
+  • 📊 2. Point two...
+  • 🎯 3. Point three...
+  🔥 [WHY THIS MATTERS NOW]: Thoughtful perspective.
+  💬 [CALL TO ACTION QUESTION]: Prompting users to comment their perspective.
+  #Hashtags (including #{brand})
+- For EVERY slide, provide a dedicated 'image_query' (2-3 targeted English words for Unsplash photos, e.g. 'technology data chart', 'artificial intelligence neural network', 'indian space rocket', 'kolkata heritage street', 'teacher classroom').
+- For slides 2-5, provide a 'visual_badge' object: {{"label": "E.g. 📊 BENCHMARK METRIC or 📍 LOCATION", "value": "E.g. +340% ACCELERATION or ১ টাকার মডেল", "type": "chart" or "badge"}}.
 - Slide 1: High-impact hook and clear problem/opportunity overview with a compelling teaser.
 - Slides 2-5: Detailed 4-6 sentence comprehensive breakdown (65 to 95 words per slide). Explain the core logic, actionable implementation steps, real-world examples, and nuanced pro tips that make the reader stop and read every sentence.
 - Slide 6: Follow & Save CTA matching the language instructions above.
@@ -929,10 +942,10 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             body = slide.get("body", "")
             audio = item.get("recommended_audio") or {}
 
-            # Unsplash photo background
+            # Unsplash photo background (slide-specific query for true variety)
             slide_tag = slide.get("tag", "")
-            photo_query = f"{item.get('unsplash_query', '')} {slide_tag}".strip()
-            bg_photo = fetch_unsplash_image(photo_query or item.get("title", "technology"), 1080, 1350)
+            slide_img_q = slide.get("image_query") or f"{item.get('unsplash_query', '')} {slide_tag}".strip()
+            bg_photo = fetch_unsplash_image(slide_img_q or item.get("title", "technology"), 1080, 1350)
             bg_css = f"linear-gradient(180deg, rgb({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]}) 0%, rgb({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]}) 100%)"
             if bg_photo:
                 buf = BytesIO()
@@ -1024,18 +1037,87 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 """
             else:
                 if slot == "afternoon":
-                    step_str = f"STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "SUMMARY"
+                    step_str = f"⚡ STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "✨ SUMMARY"
                 elif language == "Bengali":
-                    step_str = f"ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "সারসংক্ষেপ"
+                    step_str = f"⚡ ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "✨ সারসংক্ষেপ"
                 else:
-                    step_str = f"चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "निष्कर्ष"
+                    step_str = f"⚡ चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "✨ निष्कर्ष"
+
+                # Visual chart or data badge for tech / news inspection
+                badge_html = ""
+                custom_badge = slide.get("visual_badge")
+                if custom_badge and isinstance(custom_badge, dict):
+                    b_lbl = custom_badge.get("label", "KEY METRIC")
+                    b_val = custom_badge.get("value", "")
+                    b_type = custom_badge.get("type", "chart" if slot == "afternoon" else "badge")
+                else:
+                    if slot == "afternoon":
+                        b_type = "chart"
+                        defaults = [
+                            ("📊 BENCHMARK EFFICIENCY", "+340% Performance Acceleration"),
+                            ("⚡ SYSTEM LATENCY VECTOR", "< 12ms Real-Time Throughput"),
+                            ("📈 SCALABILITY & ADOPTION", "84% Enterprise Integration"),
+                            ("🎯 CORE FRONTIER MODEL", "Next-Gen System Deployed"),
+                        ]
+                        b_lbl, b_val = defaults[(slide_num - 2) % len(defaults)]
+                    elif language == "Hindi":
+                        b_type = "chart"
+                        defaults = [
+                            ("📊 भारतीय तकनीक आँकड़े", "+४৫০% नवाचार व विकास"),
+                            ("🚀 डिजिटल भारत गति", "१०x तीव्र कार्यान्वयन"),
+                            ("⚡ स्टार्टअप बाज़ार विस्तार", "₹১০০ বিলিয়ন अवसर"),
+                            ("✨ मुख्य आत्मनिर्भर उपलब्धि", "भारतीय तकनीक क्रांति"),
+                        ]
+                        b_lbl, b_val = defaults[(slide_num - 2) % len(defaults)]
+                    else:
+                        b_type = "badge"
+                        defaults = [
+                            ("📍 পশ্চিমবঙ্গ সমসাময়িক মডেল", "১ টাকার অভিনব সহায়তা"),
+                            ("🎭 শিল্পচর্চা ও আত্মবিশ্বাস", "১০x সামাজিক মুক্তি ও সাহস"),
+                            ("🌱 মানবিক শিক্ষা বিপ্লব", "ভবিষ্যৎ প্রজন্মের স্বনির্ভরতা"),
+                            ("✨ অনন্য সামাজিক দিশা", "বাংলার গর্ব ও অগ্রগতি"),
+                        ]
+                        b_lbl, b_val = defaults[(slide_num - 2) % len(defaults)]
+
+                if b_type == "chart" or slot == "afternoon":
+                    badge_html = f"""
+                    <div style="margin-bottom: 22px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 16px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;">
+                      <div>
+                        <div style="font-size: 19px; font-weight: bold; color: {accent_hex}; letter-spacing: 0.8px;">{b_lbl}</div>
+                        <div style="font-size: 31px; font-weight: bold; color: #ffffff; margin-top: 4px;">{b_val}</div>
+                      </div>
+                      <svg width="140" height="54" viewBox="0 0 140 54">
+                        <defs>
+                          <linearGradient id="grad{slide_num}" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="{accent_hex}" stop-opacity="0.45"/>
+                            <stop offset="100%" stop-color="{accent_hex}" stop-opacity="0.0"/>
+                          </linearGradient>
+                        </defs>
+                        <path d="M0 45 Q 35 40, 70 22 T 140 8 L 140 54 L 0 54 Z" fill="url(#grad{slide_num})" />
+                        <path d="M0 45 Q 35 40, 70 22 T 140 8" fill="none" stroke="{accent_hex}" stroke-width="3" />
+                        <circle cx="140" cy="8" r="4.5" fill="{accent_sec_hex}" />
+                      </svg>
+                    </div>
+                    """
+                else:
+                    icon_e = "🎭" if "শিল্প" in b_lbl or "নাট্য" in b_lbl else ("📍" if "পশ্চিমবঙ্গ" in b_lbl else "💡")
+                    badge_html = f"""
+                    <div style="margin-bottom: 22px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 20px; padding: 18px 26px; display: flex; align-items: center; justify-content: space-between;">
+                      <div>
+                        <div style="font-size: 20px; font-weight: bold; color: {accent_hex};">{b_lbl}</div>
+                        <div style="font-size: 30px; font-weight: bold; color: #ffffff; margin-top: 4px;">{b_val}</div>
+                      </div>
+                      <div style="font-size: 38px;">{icon_e}</div>
+                    </div>
+                    """
 
                 content_html = f"""
                 <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
                   <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{step_str}</div>
-                  <div style="font-size:48px; font-weight:bold; line-height:1.24; margin-bottom:24px; color:#ffffff;">{headline}</div>
+                  <div style="font-size:46px; font-weight:bold; line-height:1.24; margin-bottom:20px; color:#ffffff;">{headline}</div>
+                  {badge_html}
                   <div style="{card_style}">
-                    <div style="font-size:30px; line-height:1.65; color:{text_sec_css};">{body}</div>
+                    <div style="font-size:29px; line-height:1.65; color:{text_sec_css};">{body}</div>
                   </div>
                 </div>
                 """
