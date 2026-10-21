@@ -1,3 +1,5 @@
 requests>=2.32,<3
 Pillow>=11,<13
 tzdata; sys_platform == 'win32'
+playwright>=1.40.0
+

@@ -362,6 +362,118 @@ def validate_ai_copy(item, posts, slot):
     return item
 
 
+def tri_ai_generate_and_upgrade(prompt, slot_info, gemini_key):
+    """Simultaneously query 3 AI models in parallel:
+    1. Google Gemini 2.5 Flash
+    2. Groq Qwen 3.8 27B (Specialized in Indic/Bengali linguistics)
+    3. Groq OpenAI GPT-OSS 120B (Editorial structuring)
+    """
+    import concurrent.futures
+    groq_key = getenv("GROQ_API_KEY")
+    candidates = {}
+
+    def fetch_gemini():
+        if not gemini_key:
+            return None
+        model = getenv("GEMINI_MODEL") or "gemini-2.5-flash"
+        if not re.fullmatch(r"[a-zA-Z0-9_.-]+", model):
+            raise ValueError("Invalid model identifier")
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+        body = {
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"responseMimeType": "application/json", "temperature": 0.75},
+        }
+        for attempt in range(2):
+            try:
+                res = requests.post(url, headers={"x-goog-api-key": gemini_key}, json=body, timeout=35)
+                if res.status_code == 200:
+                    parts = res.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
+                    if parts:
+                        return json.loads("".join(p.get("text", "") for p in parts))
+            except Exception as e:
+                print(f"Gemini API warning: {e}")
+            time.sleep(1)
+        return None
+
+    def fetch_groq_qwen():
+        if not groq_key:
+            return None
+        try:
+            res = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"},
+                json={
+                    "model": "qwen/qwen3.8-27b",
+                    "messages": [
+                        {"role": "system", "content": "You are a master social media content strategist and Indic linguistic specialist. Return ONLY valid JSON."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                },
+                timeout=25
+            )
+            if res.status_code == 200:
+                payload = res.json()
+                content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
+                return json.loads(content)
+        except Exception as e:
+            print(f"Groq-Qwen warning: {e}")
+        return None
+
+    def fetch_groq_gpt_oss():
+        if not groq_key:
+            return None
+        try:
+            res = requests.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers={"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"},
+                json={
+                    "model": "openai/gpt-oss-120b",
+                    "messages": [
+                        {"role": "system", "content": "You are a senior social media director and content editor. Return ONLY valid JSON."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                },
+                timeout=25
+            )
+            if res.status_code == 200:
+                payload = res.json()
+                content = payload.get("choices", [{}])[0].get("message", {}).get("content", "")
+                return json.loads(content)
+        except Exception as e:
+            print(f"Groq-GPT-OSS warning: {e}")
+        return None
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        f_gemini = executor.submit(fetch_gemini)
+        f_qwen = executor.submit(fetch_groq_qwen)
+        f_gpt = executor.submit(fetch_groq_gpt_oss)
+
+        try:
+            candidates["gemini"] = f_gemini.result()
+        except Exception:
+            candidates["gemini"] = None
+        try:
+            candidates["qwen"] = f_qwen.result()
+        except Exception:
+            candidates["qwen"] = None
+        try:
+            candidates["gpt_oss"] = f_gpt.result()
+        except Exception:
+            candidates["gpt_oss"] = None
+
+    valid = [c for c in [candidates.get("gemini"), candidates.get("qwen"), candidates.get("gpt_oss")] if c and isinstance(c, dict) and c.get("title")]
+
+    if not valid:
+        raise RuntimeError("AI returned no text; fail closed")
+
+    best = max(valid, key=lambda c: (len(c.get("slides", [])), len(c.get("caption", ""))))
+    return best
+
+
 def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
     key = getenv("GEMINI_API_KEY", True)
     use_web = settings.get("use_live_web_feed", False)
@@ -474,61 +586,8 @@ Return ONLY ONE valid JSON object with this exact structure:
   ]
 }}
 """
-    model = getenv("GEMINI_MODEL") or "gemini-2.5-flash"
-    if not re.fullmatch(r"[a-zA-Z0-9_.-]+", model):
-        raise ValueError("Invalid model identifier")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    body = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "temperature": 0.75},
-    }
-    response = None
-    for attempt in range(3):
-        try:
-            response = requests.post(url, headers={"x-goog-api-key": key}, json=body, timeout=45)
-            if response.status_code == 200:
-                break
-            print(f"Gemini API returned {response.status_code}, retrying in {(attempt + 1) * 2}s...")
-        except Exception as exc:
-            print(f"Gemini request error: {exc}")
-        time.sleep((attempt + 1) * 2)
-
-    item = None
-    if response and response.status_code == 200:
-        parts = response.json().get("candidates", [{}])[0].get("content", {}).get("parts", [])
-        if parts:
-            try:
-                item = json.loads("".join(part.get("text", "") for part in parts))
-            except Exception:
-                item = None
-
-    # Ultra-fast Groq LLM Fallback (Zero downtime)
-    if not item:
-        groq_key = getenv("GROQ_API_KEY")
-        if groq_key:
-            print("Falling back to ultra-fast Groq LLM (qwen/qwen3.8-27b)...")
-            try:
-                groq_res = requests.post(
-                    "https://api.groq.com/openai/v1/chat/completions",
-                    headers={"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"},
-                    json={
-                        "model": "qwen/qwen3.8-27b",
-                        "messages": [
-                            {"role": "system", "content": "You are a master social media content strategist. Return ONLY one valid JSON object."},
-                            {"role": "user", "content": prompt}
-                        ],
-                        "response_format": {"type": "json_object"},
-                        "temperature": 0.7
-                    },
-                    timeout=25
-                )
-                if groq_res.status_code == 200:
-                    item = json.loads(groq_res.json()["choices"][0]["message"]["content"])
-            except Exception as e:
-                print(f"Groq fallback warning: {e}")
-
-    if not item:
-        raise RuntimeError("AI returned no text; fail closed")
+    # Call 3 AI models simultaneously (Gemini + Groq Qwen + Groq GPT-OSS)
+    item = tri_ai_generate_and_upgrade(prompt, slot_info, key)
     item = validate_ai_copy(item, posts, slot_info)
     item["category"] = slot_info["category"]
     item["content_type"] = slot_info["type"]
@@ -736,7 +795,249 @@ THEMES_WARM = [
 THEMES = THEMES_CYBER
 
 
+def get_browser_executable():
+    paths = [
+        r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        "/usr/bin/google-chrome",
+        "/usr/bin/google-chrome-stable",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser",
+    ]
+    for p in paths:
+        if Path(p).exists():
+            return str(p)
+    return None
+
+
+def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afternoon", browser_exe=None):
+    """Render pixel-perfect 1080x1350 carousel slides using Chromium HTML/CSS engine.
+    Ensures 100% correct typography, conjuncts (যুক্তাক্ষর), and vowel matras for Bengali & Hindi.
+    """
+    import base64
+    from io import BytesIO
+    from playwright.sync_api import sync_playwright
+
+    clean_date = date_key.split("_")[0]
+    language = item.get("language", "English")
+    slides_data = item.get("slides") or []
+    if not slides_data:
+        slides_data = [
+            {"slide_number": 1, "tag": item.get("category", "IDEAS"), "headline": item["title"],
+             "body": item["subtitle"], "swipe_prompt": "Swipe to explore ➡️"},
+            {"slide_number": 2, "tag": "CONNECT", "headline": "FOUND THIS HELPFUL? 💡",
+             "body": f"Follow @{settings['brand'].lower()} for more daily updates! 🚀🔥✨\n\n📌 Save this post\n↗️ Share with a friend"}
+        ]
+    total_slides = len(slides_data)
+    rendered_paths = []
+    brand = settings.get("brand", "Choicematrix").upper()
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Encode native Indic fonts if needed
+    font_face_css = ""
+    font_family_css = "sans-serif"
+    if language == "Bengali":
+        f_b_path = ROOT / "fonts" / "NotoSansBengali-Bold.ttf"
+        f_r_path = ROOT / "fonts" / "NotoSansBengali-Regular.ttf"
+        if f_b_path.exists() and f_r_path.exists():
+            b64_b = base64.b64encode(f_b_path.read_bytes()).decode()
+            b64_r = base64.b64encode(f_r_path.read_bytes()).decode()
+            font_face_css = f"""
+            @font-face {{ font-family: 'NotoBengali'; src: url('data:font/truetype;charset=utf-8;base64,{b64_b}') format('truetype'); font-weight: bold; }}
+            @font-face {{ font-family: 'NotoBengali'; src: url('data:font/truetype;charset=utf-8;base64,{b64_r}') format('truetype'); font-weight: normal; }}
+            """
+            font_family_css = "'NotoBengali', 'Nirmala UI', sans-serif"
+    elif language == "Hindi":
+        f_b_path = ROOT / "fonts" / "NotoSansDevanagari-Bold.ttf"
+        f_r_path = ROOT / "fonts" / "NotoSansDevanagari-Regular.ttf"
+        if f_b_path.exists() and f_r_path.exists():
+            b64_b = base64.b64encode(f_b_path.read_bytes()).decode()
+            b64_r = base64.b64encode(f_r_path.read_bytes()).decode()
+            font_face_css = f"""
+            @font-face {{ font-family: 'NotoDevanagari'; src: url('data:font/truetype;charset=utf-8;base64,{b64_b}') format('truetype'); font-weight: bold; }}
+            @font-face {{ font-family: 'NotoDevanagari'; src: url('data:font/truetype;charset=utf-8;base64,{b64_r}') format('truetype'); font-weight: normal; }}
+            """
+            font_family_css = "'NotoDevanagari', 'Nirmala UI', sans-serif"
+
+    theme_pool = THEMES_CYBER if slot == "afternoon" else THEMES_WARM
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(executable_path=browser_exe, headless=True)
+        page = browser.new_page(viewport={"width": 1080, "height": 1350})
+
+        for idx, slide in enumerate(slides_data):
+            slide_num = slide.get("slide_number", idx + 1)
+            theme = theme_pool[idx % len(theme_pool)]
+            tag = slide.get("tag", "HOT TOPIC").upper()
+            headline = slide.get("headline", "")
+            body = slide.get("body", "")
+            audio = item.get("recommended_audio") or {}
+
+            # Unsplash photo background
+            slide_tag = slide.get("tag", "")
+            photo_query = f"{item.get('unsplash_query', '')} {slide_tag}".strip()
+            bg_photo = fetch_unsplash_image(photo_query or item.get("title", "technology"), 1080, 1350)
+            bg_css = f"linear-gradient(180deg, rgb({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]}) 0%, rgb({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]}) 100%)"
+            if bg_photo:
+                buf = BytesIO()
+                bg_photo.save(buf, format="JPEG", quality=85)
+                bg_b64 = base64.b64encode(buf.getvalue()).decode()
+                bg_css = f"linear-gradient(180deg, rgba({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]},0.82) 0%, rgba({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]},0.92) 100%), url('data:image/jpeg;base64,{bg_b64}') center/cover no-repeat"
+
+            accent_hex = f"#{theme['accent'][0]:02x}{theme['accent'][1]:02x}{theme['accent'][2]:02x}"
+            accent_sec_hex = f"#{theme['accent_secondary'][0]:02x}{theme['accent_secondary'][1]:02x}{theme['accent_secondary'][2]:02x}"
+            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.82)"
+            border_css = f"rgba({theme['border'][0]}, {theme['border'][1]}, {theme['border'][2]}, 0.65)"
+            text_sec_css = f"rgb({theme['text_secondary'][0]}, {theme['text_secondary'][1]}, {theme['text_secondary'][2]})"
+
+            if slot == "afternoon":
+                counter_str = f"{slide_num:02d} / {total_slides:02d}"
+                frame_html = f"""
+                <div style="width:100%; height:100%; border:2px solid {border_css}; position:relative; padding:20px;">
+                  <div style="position:absolute; top:-2px; left:-2px; width:34px; height:34px; border-top:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
+                  <div style="position:absolute; top:-2px; right:-2px; width:34px; height:34px; border-top:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
+                  <div style="position:absolute; bottom:-2px; left:-2px; width:34px; height:34px; border-bottom:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
+                  <div style="position:absolute; bottom:-2px; right:-2px; width:34px; height:34px; border-bottom:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
+                  <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:32px 36px;">
+                """
+                frame_close = "</div></div>"
+                pill_style = f"background:{accent_hex}; color:#0a0f1a; border-radius:8px; padding:10px 24px; font-size:22px; font-weight:bold;"
+                card_style = f"background:{card_bg_css}; border:2px solid {border_css}; border-radius:18px; padding:36px 40px;"
+            else:
+                s_ind = to_indic_digits(f"{slide_num:02d}", language)
+                t_ind = to_indic_digits(f"{total_slides:02d}", language)
+                counter_str = f"{s_ind} / {t_ind}"
+                frame_html = f"""
+                <div style="width:100%; height:100%; border:3px solid {border_css}; border-radius:36px; padding:12px; position:relative;">
+                  <div style="width:100%; height:100%; border:1.5px solid {accent_hex}; border-radius:26px; padding:32px 38px; display:flex; flex-direction:column; justify-content:space-between;">
+                """
+                frame_close = "</div></div>"
+                pill_style = f"background:{accent_hex}; color:#241018; border-radius:24px; padding:10px 28px; font-size:22px; font-weight:bold;"
+                card_style = f"background:{card_bg_css}; border:2px solid {border_css}; border-radius:28px; padding:36px 40px;"
+
+            if slide_num == 1:
+                header_tag = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ অন্তর্দৃষ্টি" if language == "Bengali" else "आज का विशेष विश्लेषण")
+                swipe_prompt = slide.get("swipe_prompt") or ("Swipe to explore ➡️" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন ➡️" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें ➡️"))
+                audio_line = ""
+                if audio.get("title"):
+                    audio_prefix = "AUDIO" if slot == "afternoon" else ("অডিও" if language == "Bengali" else "ऑडियो")
+                    audio_line = f"""<div style="margin-top:20px; background:rgba(0,0,0,0.5); border:1.5px solid {accent_hex}; border-radius:16px; padding:12px 24px; font-size:22px; color:{accent_sec_hex};">
+                      🎵 {audio_prefix}: {audio.get('title')} • {audio.get('artist')} ({audio.get('vibe')})
+                    </div>"""
+
+                content_html = f"""
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
+                  <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{header_tag}</div>
+                  <div style="font-size:52px; font-weight:bold; line-height:1.24; margin-bottom:24px; color:#ffffff;">{headline}</div>
+                  <div style="{card_style}">
+                    <div style="font-size:32px; line-height:1.6; color:{text_sec_css};">{body}</div>
+                    {audio_line}
+                  </div>
+                  <div style="margin-top:24px; background:{accent_hex}; color:#1a0f28; font-size:26px; font-weight:bold; padding:18px 32px; border-radius:20px; text-align:center;">
+                    {swipe_prompt}
+                  </div>
+                </div>
+                """
+            elif slide_num == total_slides:
+                header_tag = "KEY TAKEAWAY COMPLETED" if slot == "afternoon" else ("গুরুত্বপূর্ণ তথ্যাবলী সমাপ্ত" if language == "Bengali" else "मुख्य बिंदु संपन्न")
+                if language == "Bengali":
+                    sub_cta = "প্রতিদিনের সেরা টেক ও জ্ঞানমূলক আপডেটের জন্য! 🚀🔥✨"
+                    b1, b2, b3 = "📌 ভবিষ্যতের জন্য পোস্টটি সেভ করে রাখুন", "💬 আপনার মতামত কমেন্টে জানান", "↗️ বন্ধুদের সাথে শেয়ার করুন!"
+                elif language == "Hindi":
+                    sub_cta = "रोज़ाना बेहतरीन टेक इनसाइट्स और स्मार्ट अपडेट्स के लिए! 🚀🔥✨"
+                    b1, b2, b3 = "📌 इस पोस्ट को बाद के लिए सेव करें", "💬 कमेंट्स में अपनी राय साझा करें", "↗️ अपने दोस्तों के साथ ज़रूर शेयर करें!"
+                else:
+                    sub_cta = "For daily hot trends, tech breakthroughs & smart tips! 🚀🔥✨"
+                    b1, b2, b3 = "📌 Save this post to revisit anytime", "💬 Share your thoughts in the comments", "↗️ Send to someone who needs this!"
+
+                content_html = f"""
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
+                  <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{header_tag}</div>
+                  <div style="font-size:50px; font-weight:bold; line-height:1.24; margin-bottom:24px; color:#ffffff;">{headline}</div>
+                  <div style="{card_style}">
+                    <div style="font-size:38px; font-weight:bold; color:{accent_hex}; margin-bottom:12px;">👉 FOLLOW @{brand}</div>
+                    <div style="font-size:24px; color:{text_sec_css}; margin-bottom:24px;">{sub_cta}</div>
+                    <hr style="border:none; border-top:1.5px solid {border_css}; margin:20px 0;">
+                    <div style="font-size:27px; line-height:2.0; color:#ffffff;">
+                      <div>{b1}</div>
+                      <div>{b2}</div>
+                      <div>{b3}</div>
+                    </div>
+                  </div>
+                </div>
+                """
+            else:
+                if slot == "afternoon":
+                    step_str = f"STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "SUMMARY"
+                elif language == "Bengali":
+                    step_str = f"ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "সারসংক্ষেপ"
+                else:
+                    step_str = f"चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "निष्कर्ष"
+
+                content_html = f"""
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
+                  <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{step_str}</div>
+                  <div style="font-size:48px; font-weight:bold; line-height:1.24; margin-bottom:24px; color:#ffffff;">{headline}</div>
+                  <div style="{card_style}">
+                    <div style="font-size:30px; line-height:1.65; color:{text_sec_css};">{body}</div>
+                  </div>
+                </div>
+                """
+
+            footer_tag = "GLOBAL TECH & SYSTEMS" if slot == "afternoon" else ("পশ্চিমবঙ্গ ইনোভেশন ও টেক ট্রেন্ড" if language == "Bengali" else "डिजिटल भारत व टेक ट्रेंड्स")
+
+            slide_html = f"""<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  {font_face_css}
+  * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+  body {{
+    width: 1080px; height: 1350px;
+    background: {bg_css};
+    font-family: {font_family_css};
+    color: #ffffff; padding: 34px;
+    display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+  }}
+</style>
+</head>
+<body>
+  {frame_html}
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid {border_css}; padding-bottom:18px;">
+      <div style="{pill_style}">{tag}</div>
+      <div style="font-size:26px; font-weight:bold; color:{accent_sec_hex};">{counter_str}</div>
+    </div>
+    {content_html}
+    <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid {border_css}; padding-top:18px;">
+      <div style="font-size:24px; font-weight:bold; color:{accent_hex};">@{brand}</div>
+      <div style="font-size:21px; color:{accent_sec_hex};">{footer_tag}</div>
+    </div>
+  {frame_close}
+</body>
+</html>"""
+
+            dest = IMAGE_DIR / f"{date_key}-v{revision}-slide{slide_num}.jpg"
+            page.set_content(slide_html)
+            page.screenshot(path=str(dest), type="jpeg", quality=92)
+            rendered_paths.append(dest.relative_to(ROOT / "docs").as_posix())
+
+        browser.close()
+
+    return rendered_paths
+
+
 def render_carousel_slides(date_key, revision, settings, item, slot="afternoon"):
+    # Use Chromium layout engine for pixel-perfect typography, conjuncts & styling when available
+    browser_exe = get_browser_executable()
+    if browser_exe:
+        try:
+            return render_carousel_slides_chrome(date_key, revision, settings, item, slot=slot, browser_exe=browser_exe)
+        except Exception as exc:
+            print(f"Chromium render warning ({exc}), falling back to PIL: {exc}")
+
     """Render 5-6 high-res 1080x1350 carousel slides with dedicated frame & style per slot."""
     clean_date = date_key.split("_")[0]
     day = date.fromisoformat(clean_date)
