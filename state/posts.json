@@ -113,7 +113,7 @@
       "search_query": "Lofi Fruits Music Deep Focus"
     },
     "image_sha256": "537ce5c2b3f41dfec824d0cd395959b973314e053cca8fdfa6de177e4db87574",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -164,7 +164,7 @@
       "search_query": "Ekhon Onek Raat Anupam Roy acoustic"
     },
     "image_sha256": "95da4ca6f59a6576ed35fca4d39f31d591627a51a3532adb4596bf192dcb471f",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
