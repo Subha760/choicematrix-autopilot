@@ -215,7 +215,7 @@
       "search_query": "Lofi Fruits Music Deep Focus"
     },
     "image_sha256": "69a8a094738c207160d81ddbe7fbae427f161a78c712e96b2faa842a76314d08",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -266,7 +266,7 @@
       "search_query": "Indian Lo-Fi Beats Palash Instrumental"
     },
     "image_sha256": "74f74946c1e815420c62e96dfb8a6c74b1cf9e2d17e4f57932a9ef35e8867e53",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
