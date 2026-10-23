@@ -284,5 +284,107 @@
       "container": null
     },
     "created_at": "2026-10-22T06:35:22.947350+00:00"
+  },
+  "2026-10-23_afternoon": {
+    "date": "2026-10-23_afternoon",
+    "clean_date": "2026-10-23",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Apple's Giant iPhone Duo Shakes NYC",
+    "subtitle": "Discover why colossal iPhones appeared at Apple Fifth Avenue and what it means for tech's future.",
+    "caption": "🚀 APPLE'S MONUMENTAL MARKETING MOVE! 🍎\n\n🔍 WHAT HAPPENED TODAY: Giant iPhone Duo installations have popped up at Apple Fifth Avenue in New York City, creating an immediate global spectacle. This timely appearance, just hours ago, signals a powerful post-launch marketing push for the latest iPhone 15 series, captivating passersby and dominating social feeds.\n\n💡 CORE TAKEAWAYS:\n• ⚡ 1. Experiential Marketing Masterclass: Apple transforms a product into a cultural event.\n• 📊 2. Drives Organic Buzz: Encourages user-generated content and social sharing.\n• 🎯 3. Redefines Launch Strategy: Physical presence remains critical for premium tech.\n\n🔥 WHY THIS MATTERS NOW: In a hyper-digital world, Apple proves that grand physical installations still generate unparalleled hype and deepen brand connection. This move keeps the iPhone 15 front-of-mind, showcasing key features in an unforgettable, immersive way long after the initial launch buzz. It's about making technology tangible and aspirational.\n\n💬 CALL TO ACTION QUESTION: What's your take on Apple's giant iPhone installations? Genius marketing or over-the-top? Share your thoughts below! 👇\n\n#AppleFifthAve #iPhone15 #TechMarketing #GlobalTech #Choicematrix\n\nReference: MacRumors — https://news.google.com/rss/articles/CBMifkFVX3lxTFBFMkR1U1BzeHJnQWZ3Q0g0NVp5b3dwbFdvYVhqX3pXcVNDSDFUTzExdjQzdmtjdkJsR1N4NGhKclNsV01ZQ2ZrcC00VW5pZDRBUVZFbi12N1FSejhVWnJzVVc1dVZKSGF5ZW1KOGhuWDRFMDZuajQyTzBrcUh4QQ?oc=5\n\n🎵 Suggested Audio: Future Holds - LiQWYD (Uplifting Electronic Pop)",
+    "category": "Global Breaking Tech",
+    "content_type": "practical",
+    "source": {
+      "label": "MacRumors",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTFBFMkR1U1BzeHJnQWZ3Q0g0NVp5b3dwbFdvYVhqX3pXcVNDSDFUTzExdjQzdmtjdkJsR1N4NGhKclNsV01ZQ2ZrcC00VW5pZDRBUVZFbi12N1FSejhVWnJzVVc1dVZKSGF5ZW1KOGhuWDRFMDZuajQyTzBrcUh4QQ?oc=5"
+    },
+    "image": "posts/2026-10-23_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-23_afternoon-v1-slide1.jpg",
+      "posts/2026-10-23_afternoon-v1-slide2.jpg",
+      "posts/2026-10-23_afternoon-v1-slide3.jpg",
+      "posts/2026-10-23_afternoon-v1-slide4.jpg",
+      "posts/2026-10-23_afternoon-v1-slide5.jpg",
+      "posts/2026-10-23_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "Future Holds",
+      "artist": "LiQWYD",
+      "vibe": "Uplifting Electronic Pop",
+      "search_query": "LiQWYD Future Holds"
+    },
+    "image_sha256": "764dbcd28f189193939a4e2714b904ebce11945fcfc8c1f8675d55485d99434a",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-23T04:42:49.438976+00:00"
+  },
+  "2026-10-23_evening": {
+    "date": "2026-10-23_evening",
+    "clean_date": "2026-10-23",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 1,
+    "title": "পশ্চিমবঙ্গ IT নীতি: অগ্রগতি ও চ্যালেঞ্জ",
+    "subtitle": "রাজ্যের প্রযুক্তিগত ভবিষ্যৎ গড়ে তুলতে 2018 সালের IT নীতির সাম্প্রতিক মূল্যায়ন কেন গুরুত্বপূর্ণ, জেনে নিন।",
+    "caption": "🚀 **পশ্চিমবঙ্গ IT নীতি: অগ্রগতি ও নতুন চ্যালেঞ্জ!**\n\n🔍 **আজ কী ঘটল:** IMPRI-এর সাম্প্রতিক মূল্যায়নে উঠে এসেছে পশ্চিমবঙ্গ IT ও ইলেকট্রনিক্স নীতি 2018-এর কার্যকারিতা, এর ফলে সৃষ্ট অগ্রগতি এবং বর্তমানে বিদ্যমান ফাঁকগুলি। দ্রুত পরিবর্তনশীল প্রযুক্তির জগতে এই নীতি কতটা প্রাসঙ্গিক, তা খতিয়ে দেখা হচ্ছে। এই পর্যালোচনা রাজ্যের প্রযুক্তিগত ভবিষ্যৎকে নতুন দিশা দেবে।\n\n💡 **মূল বিষয়গুলি:**\n• ⚡ **নীতি পর্যালোচনা:** 2018 সালের নীতিটি কর্মসংস্থান সৃষ্টি ও বিনিয়োগ আকর্ষণে আংশিক সফল হলেও, বর্তমান প্রেক্ষাপটে এর আপডেটের প্রয়োজন।\n• 📊 **উদীয়মান ফাঁক:** AI, ML, IoT-এর মতো অত্যাধুনিক প্রযুক্তির জন্য প্রয়োজনীয় দক্ষতা এবং পরিকাঠামোর অভাব একটি বড় চ্যালেঞ্জ।\n• 🎯 **ভবিষ্যৎ দিকনির্দেশ:** এই মূল্যায়ন রাজ্যের IT ইকোসিস্টেমকে আরও শক্তিশালী করতে এবং দীর্ঘমেয়াদী উন্নয়নের জন্য গুরুত্বপূর্ণ সুপারিশ তুলে ধরেছে।\n\n🔥 **এখন কেন এটি জরুরি:** এই মূল্যায়ন রাজ্যের প্রযুক্তিগত উন্নয়নের পরবর্তী ধাপ নির্ধারণ করবে। এটি নতুন বিনিয়োগ, উন্নত কর্মসংস্থান এবং আধুনিক শিক্ষা ব্যবস্থার পথ খুলে দেবে, যা সাধারণ মানুষের দৈনন্দিন জীবনে ইতিবাচক প্রভাব ফেলবে। সঠিক পদক্ষেপ গ্রহণ করলে পশ্চিমবঙ্গ ভারতের প্রযুক্তি মানচিত্রে আরও উজ্জ্বল হয়ে উঠবে।\n\n💬 **আপনার মতামত কী?** পশ্চিমবঙ্গের প্রযুক্তিগত ভবিষ্যৎ সম্পর্কে আপনার কী ভাবনা? কমেন্টে জানান!\n\n#Choicematrix #BengalTech #WestBengalIT #TechPolicy #KolkataInnovation #DigitalBengal\n\nReference: IMPRI Impact and Policy Research Institute — https://news.google.com/rss/articles/CBMifkFVX3lxTE1uN0NoM2dMUXJrdm1ZZ2xEdV9LeDVFQ2p5bDE4aWtwX28yWXJqMlM4UjJXSTVBQ09HWHc0RGRlMzh0RTFNa3RqOC1aTjlxU3A3Vy1Ga1h2aGk2ckhBRVlmWWhsTDdyR3ptekt5OU1mS2JLMVFicjl4WWRtWnowUQ?oc=5\n\n🎵 Suggested Audio: শহরের সুর - সায়ক বন্দ্যোপাধ্যায় (আধুনিক বাংলা ল-ফাই অ্যাকোস্টিক)",
+    "category": "Bengal Innovation, Tech & Education",
+    "content_type": "practical",
+    "source": {
+      "label": "IMPRI Impact and Policy Research Institute",
+      "url": "https://news.google.com/rss/articles/CBMifkFVX3lxTE1uN0NoM2dMUXJrdm1ZZ2xEdV9LeDVFQ2p5bDE4aWtwX28yWXJqMlM4UjJXSTVBQ09HWHc0RGRlMzh0RTFNa3RqOC1aTjlxU3A3Vy1Ga1h2aGk2ckhBRVlmWWhsTDdyR3ptekt5OU1mS2JLMVFicjl4WWRtWnowUQ?oc=5"
+    },
+    "image": "posts/2026-10-23_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-23_evening-v1-slide1.jpg",
+      "posts/2026-10-23_evening-v1-slide2.jpg",
+      "posts/2026-10-23_evening-v1-slide3.jpg",
+      "posts/2026-10-23_evening-v1-slide4.jpg",
+      "posts/2026-10-23_evening-v1-slide5.jpg",
+      "posts/2026-10-23_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "শহরের সুর",
+      "artist": "সায়ক বন্দ্যোপাধ্যায়",
+      "vibe": "আধুনিক বাংলা ল-ফাই অ্যাকোস্টিক",
+      "search_query": "সায়ক বন্দ্যোপাধ্যায় শহরের সুর লো-ফাই"
+    },
+    "image_sha256": "777de11d2f37c11540a169cc7972248d4aa6c86f186fcfc5238ba81b6e5107a1",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-23T04:43:20.842323+00:00"
   }
 }
