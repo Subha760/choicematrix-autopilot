@@ -317,7 +317,7 @@
       "search_query": "LiQWYD Future Holds"
     },
     "image_sha256": "764dbcd28f189193939a4e2714b904ebce11945fcfc8c1f8675d55485d99434a",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -368,7 +368,7 @@
       "search_query": "সায়ক বন্দ্যোপাধ্যায় শহরের সুর লো-ফাই"
     },
     "image_sha256": "777de11d2f37c11540a169cc7972248d4aa6c86f186fcfc5238ba81b6e5107a1",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
