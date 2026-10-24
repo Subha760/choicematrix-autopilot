@@ -386,5 +386,56 @@
       "container": null
     },
     "created_at": "2026-10-23T04:43:20.842323+00:00"
+  },
+  "2026-10-24_afternoon": {
+    "date": "2026-10-24_afternoon",
+    "clean_date": "2026-10-24",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "iPhone Pickup Resumes: Limited Window!",
+    "subtitle": "Apple Store pickups for iPhone 15 Pro/Max are slowly returning, but you need to be lightning-fast. Here’s what it means for you & the industry. 🚀",
+    "caption": "🚀 APPLE IPHONE PICKUP RESUMES!\n🔍 WHAT HAPPENED TODAY: Just in! Apple is reportedly starting to resume in-store pickup options for the highly sought-after iPhone 15 Pro and iPhone 15 Pro Max. However, this isn't a full recovery – availability remains extremely limited and sporadic across various Apple Store locations. This subtle shift indicates a very slight easing of the intense supply constraints faced since launch.\n💡 CORE TAKEAWAYS:\n• ⚡ 1. Act Fast: Pickup slots will vanish instantly due to high demand.\n• 📊 2. Supply Signal: A tiny glimmer of hope for Apple's challenged supply chain.\n• 🎯 3. Pro Models Dominate: Demand for the premium iPhone 15 Pro series remains overwhelming.\n🔥 WHY THIS MATTERS NOW: For eager customers, this is a rare, albeit brief, window to snag the latest Pro iPhone without waiting weeks for delivery. For the tech industry, it's a critical indicator that Apple is slowly, but surely, navigating its production bottlenecks, giving a peek into the ongoing battle between unprecedented demand and complex manufacturing.\n💬 CALL TO ACTION QUESTION: Are you still trying to get your hands on an iPhone 15 Pro/Max? Would you rush to an Apple Store for a pickup if a slot appeared? Share your thoughts below! 👇\n#Apple #iPhone15Pro #TechNews #SupplyChain #GlobalTech #Choicematrix\n\nReference: MacRumors — https://news.google.com/rss/articles/CBMiggFBVV95cUxQZ0JUeExrZGppRmtHQkhZcmFSYkpHMTV1SkpVSUZvVEt6c1FDMFpKY0hiY1NFYW9VeUdpMTBzS0lCTDlmekZHdVZZOEZESjJkMGFPcW1nZEVKRE02bnFUaURpYURRaXFrR245LW8xWlcyanJnU3N2dEZtWndZWndhVjVR?oc=5\n\n🎵 Suggested Audio: Future Echoes - Synthwave Dreams (Upbeat Synthwave)",
+    "category": "Global Breaking Tech",
+    "content_type": "practical",
+    "source": {
+      "label": "MacRumors",
+      "url": "https://news.google.com/rss/articles/CBMiggFBVV95cUxQZ0JUeExrZGppRmtHQkhZcmFSYkpHMTV1SkpVSUZvVEt6c1FDMFpKY0hiY1NFYW9VeUdpMTBzS0lCTDlmekZHdVZZOEZESjJkMGFPcW1nZEVKRE02bnFUaURpYURRaXFrR245LW8xWlcyanJnU3N2dEZtWndZWndhVjVR?oc=5"
+    },
+    "image": "posts/2026-10-24_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-24_afternoon-v1-slide1.jpg",
+      "posts/2026-10-24_afternoon-v1-slide2.jpg",
+      "posts/2026-10-24_afternoon-v1-slide3.jpg",
+      "posts/2026-10-24_afternoon-v1-slide4.jpg",
+      "posts/2026-10-24_afternoon-v1-slide5.jpg",
+      "posts/2026-10-24_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "Future Echoes",
+      "artist": "Synthwave Dreams",
+      "vibe": "Upbeat Synthwave",
+      "search_query": "Future Echoes Synthwave Dreams"
+    },
+    "image_sha256": "5664201f0b7519c513d4e170048855ad8c7187389751b2d30a3f5897a930f742",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-24T04:30:46.932578+00:00"
   }
 }
