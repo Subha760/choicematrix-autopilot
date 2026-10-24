@@ -656,6 +656,13 @@ Return ONLY ONE valid JSON object with this exact structure:
 """
     # Call 3 AI models simultaneously (Gemini + Groq Qwen + Groq GPT-OSS)
     item = tri_ai_generate_and_upgrade(prompt, slot_info, key)
+    if item and isinstance(item, dict):
+        for field in ("title", "subtitle", "caption"):
+            if field in item and isinstance(item[field], str):
+                item[field] = re.sub(r'[“”"«»]', '', item[field]).strip()
+        if "caption" in item and isinstance(item["caption"], str):
+            item["caption"] = re.sub(r'@[a-zA-Z0-9_]+', brand, item["caption"])
+            item["caption"] = re.sub(r'https?://\S+|www\.\S+', '', item["caption"]).strip()
     item = validate_ai_copy(item, posts, slot_info)
     item["category"] = slot_info["category"]
     item["content_type"] = slot_info["type"]
@@ -882,6 +889,7 @@ def get_browser_executable():
 def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afternoon", browser_exe=None):
     """Render pixel-perfect 1080x1350 carousel slides using Chromium HTML/CSS engine.
     Ensures 100% correct typography, conjuncts (যুক্তাক্ষর), and vowel matras for Bengali & Hindi.
+    Displays clear, prominent, un-obscured foreground photos and architecture diagrams.
     """
     import base64
     from io import BytesIO
@@ -942,20 +950,20 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             body = slide.get("body", "")
             audio = item.get("recommended_audio") or {}
 
-            # Unsplash photo background (slide-specific query for true variety)
+            # Unsplash photo (slide-specific query for true variety)
             slide_tag = slide.get("tag", "")
             slide_img_q = slide.get("image_query") or f"{item.get('unsplash_query', '')} {slide_tag}".strip()
             bg_photo = fetch_unsplash_image(slide_img_q or item.get("title", "technology"), 1080, 1350)
             bg_css = f"linear-gradient(180deg, rgb({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]}) 0%, rgb({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]}) 100%)"
+            bg_b64 = None
             if bg_photo:
                 buf = BytesIO()
-                bg_photo.save(buf, format="JPEG", quality=85)
+                bg_photo.save(buf, format="JPEG", quality=88)
                 bg_b64 = base64.b64encode(buf.getvalue()).decode()
-                bg_css = f"linear-gradient(180deg, rgba({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]},0.82) 0%, rgba({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]},0.92) 100%), url('data:image/jpeg;base64,{bg_b64}') center/cover no-repeat"
 
             accent_hex = f"#{theme['accent'][0]:02x}{theme['accent'][1]:02x}{theme['accent'][2]:02x}"
             accent_sec_hex = f"#{theme['accent_secondary'][0]:02x}{theme['accent_secondary'][1]:02x}{theme['accent_secondary'][2]:02x}"
-            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.82)"
+            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.85)"
             border_css = f"rgba({theme['border'][0]}, {theme['border'][1]}, {theme['border'][2]}, 0.65)"
             text_sec_css = f"rgb({theme['text_secondary'][0]}, {theme['text_secondary'][1]}, {theme['text_secondary'][2]})"
 
@@ -967,22 +975,32 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                   <div style="position:absolute; top:-2px; right:-2px; width:34px; height:34px; border-top:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
                   <div style="position:absolute; bottom:-2px; left:-2px; width:34px; height:34px; border-bottom:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
                   <div style="position:absolute; bottom:-2px; right:-2px; width:34px; height:34px; border-bottom:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
-                  <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:32px 36px;">
+                  <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:28px 34px;">
                 """
                 frame_close = "</div></div>"
-                pill_style = f"background:{accent_hex}; color:#0a0f1a; border-radius:8px; padding:10px 24px; font-size:22px; font-weight:bold;"
-                card_style = f"background:{card_bg_css}; border:2px solid {border_css}; border-radius:18px; padding:36px 40px;"
+                pill_style = f"background:{accent_hex}; color:#0a0f1a; border-radius:8px; padding:8px 24px; font-size:22px; font-weight:bold;"
+                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:26px 32px;"
             else:
                 s_ind = to_indic_digits(f"{slide_num:02d}", language)
                 t_ind = to_indic_digits(f"{total_slides:02d}", language)
                 counter_str = f"{s_ind} / {t_ind}"
                 frame_html = f"""
                 <div style="width:100%; height:100%; border:3px solid {border_css}; border-radius:36px; padding:12px; position:relative;">
-                  <div style="width:100%; height:100%; border:1.5px solid {accent_hex}; border-radius:26px; padding:32px 38px; display:flex; flex-direction:column; justify-content:space-between;">
+                  <div style="width:100%; height:100%; border:1.5px solid {accent_hex}; border-radius:26px; padding:28px 34px; display:flex; flex-direction:column; justify-content:space-between;">
                 """
                 frame_close = "</div></div>"
-                pill_style = f"background:{accent_hex}; color:#241018; border-radius:24px; padding:10px 28px; font-size:22px; font-weight:bold;"
-                card_style = f"background:{card_bg_css}; border:2px solid {border_css}; border-radius:28px; padding:36px 40px;"
+                pill_style = f"background:{accent_hex}; color:#241018; border-radius:24px; padding:8px 26px; font-size:22px; font-weight:bold;"
+                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:22px; padding:24px 30px;"
+
+            # Topic domain detection for diagrams and clear photo showcases
+            is_tech_topic = (
+                slot == "afternoon"
+                or any(w in (item.get("title", "") + " " + item.get("category", "") + " " + headline).lower()
+                       for w in ["tech", "ai", "model", "quantum", "data", "chip", "software", "cluster", "hpc",
+                                 "supercomputer", "startup", "প্রযুক্তি", "সুপারকম্পিউটার", "উদ্যোগ", "সফটওয়্যার",
+                                 "तकनीक", "एआई", "सॉफ्टवेयर", "सुपरकंप्यूटर", "स्टार्टअप"])
+                or slide.get("tag", "").upper() in ("HOW IT WORKS", "ARCHITECTURE", "SYSTEM", "PIPELINE")
+            )
 
             if slide_num == 1:
                 header_tag = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ অন্তর্দৃষ্টি" if language == "Bengali" else "आज का विशेष विश्लेषण")
@@ -990,19 +1008,40 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 audio_line = ""
                 if audio.get("title"):
                     audio_prefix = "AUDIO" if slot == "afternoon" else ("অডিও" if language == "Bengali" else "ऑडियो")
-                    audio_line = f"""<div style="margin-top:20px; background:rgba(0,0,0,0.5); border:1.5px solid {accent_hex}; border-radius:16px; padding:12px 24px; font-size:22px; color:{accent_sec_hex};">
+                    audio_line = f"""<div style="margin-top:12px; background:rgba(0,0,0,0.45); border:1px solid {accent_hex}; border-radius:12px; padding:8px 18px; font-size:19px; color:{accent_sec_hex};">
                       🎵 {audio_prefix}: {audio.get('title')} • {audio.get('artist')} ({audio.get('vibe')})
                     </div>"""
 
+                # PROMINENT CLEAR HERO IMAGE (User requirement: un-obscured, crisp photo on front cover)
+                photo_window_html = ""
+                if bg_b64:
+                    loc_badge = "📍 পশ্চিমবঙ্গ • আসল চিত্র" if language == "Bengali" else ("📍 भारत • लाइव अपडेट्स" if language == "Hindi" else "🌐 GLOBAL FRONTIER • LIVE")
+                    ver_badge = "📸 আসল আলোকচিত্র" if language == "Bengali" else ("📸 वास्तविक चित्र" if language == "Hindi" else "📸 VERIFIED VISUAL")
+                    photo_window_html = f"""
+                    <div style="width:100%; height:410px; border-radius:20px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 12px 30px rgba(0,0,0,0.65); position:relative; margin-bottom:14px;">
+                      <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                      <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:12px 20px; display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div style="font-size:20px; font-weight:bold; color:{accent_hex};">{loc_badge}</div>
+                        <div style="font-size:15px; color:#ffffff; background:rgba(255,255,255,0.18); border:1px solid {accent_hex}; border-radius:10px; padding:4px 12px;">{ver_badge}</div>
+                      </div>
+                    </div>
+                    """
+                    card_body_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:18px 24px;"
+                    body_font_size = "25px"
+                else:
+                    card_body_style = card_style
+                    body_font_size = "31px"
+
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
-                  <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{header_tag}</div>
-                  <div style="font-size:52px; font-weight:bold; line-height:1.24; margin-bottom:24px; color:#ffffff;">{headline}</div>
-                  <div style="{card_style}">
-                    <div style="font-size:32px; line-height:1.6; color:{text_sec_css};">{body}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:12px 0;">
+                  <div style="color:{accent_hex}; font-size:22px; font-weight:bold; margin-bottom:8px;">{header_tag}</div>
+                  <div style="font-size:44px; font-weight:bold; line-height:1.24; margin-bottom:14px; color:#ffffff;">{headline}</div>
+                  {photo_window_html}
+                  <div style="{card_body_style}">
+                    <div style="font-size:{body_font_size}; line-height:1.5; color:{text_sec_css};">{body}</div>
                     {audio_line}
                   </div>
-                  <div style="margin-top:24px; background:{accent_hex}; color:#1a0f28; font-size:26px; font-weight:bold; padding:18px 32px; border-radius:20px; text-align:center;">
+                  <div style="margin-top:14px; background:{accent_hex}; color:#1a0f28; font-size:23px; font-weight:bold; padding:14px 28px; border-radius:16px; text-align:center;">
                     {swipe_prompt}
                   </div>
                 </div>
@@ -1020,18 +1059,107 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                     b1, b2, b3 = "📌 Save this post to revisit anytime", "💬 Share your thoughts in the comments", "↗️ Send to someone who needs this!"
 
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
-                  <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{header_tag}</div>
-                  <div style="font-size:50px; font-weight:bold; line-height:1.24; margin-bottom:24px; color:#ffffff;">{headline}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:16px 0;">
+                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:10px;">{header_tag}</div>
+                  <div style="font-size:46px; font-weight:bold; line-height:1.24; margin-bottom:20px; color:#ffffff;">{headline}</div>
                   <div style="{card_style}">
-                    <div style="font-size:38px; font-weight:bold; color:{accent_hex}; margin-bottom:12px;">👉 FOLLOW @{brand}</div>
-                    <div style="font-size:24px; color:{text_sec_css}; margin-bottom:24px;">{sub_cta}</div>
-                    <hr style="border:none; border-top:1.5px solid {border_css}; margin:20px 0;">
-                    <div style="font-size:27px; line-height:2.0; color:#ffffff;">
+                    <div style="font-size:36px; font-weight:bold; color:{accent_hex}; margin-bottom:10px;">👉 FOLLOW @{brand}</div>
+                    <div style="font-size:23px; color:{text_sec_css}; margin-bottom:20px;">{sub_cta}</div>
+                    <hr style="border:none; border-top:1.5px solid {border_css}; margin:16px 0;">
+                    <div style="font-size:26px; line-height:1.9; color:#ffffff;">
                       <div>{b1}</div>
                       <div>{b2}</div>
                       <div>{b3}</div>
                     </div>
+                  </div>
+                </div>
+                """
+            elif slide_num == 2 and is_tech_topic:
+                # Slide 2 for TECH: HOW IT WORKS ARCHITECTURAL WORKFLOW DIAGRAM
+                step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०१")
+                wf_title = "⚙️ সিস্টেম আর্কিটেকচার ওয়ার্কফ্লো" if language == "Bengali" else ("⚙️ सिस्टम आर्किटेक्चर वर्कफ़्लो" if language == "Hindi" else "⚙️ SYSTEM ARCHITECTURE WORKFLOW")
+                live_tag = "লাইভ পাইপলাইন" if language == "Bengali" else ("लाइव पाइपलाइन" if language == "Hindi" else "LIVE PIPELINE")
+
+                if language == "Bengali":
+                    s1_i, s1_t, s1_d = "🚀", "১. ডেটা ফ্রেমওয়ার্ক", "মডেল ইনপুট"
+                    s2_i, s2_t, s2_d = "⚡", "২. কোর প্রসেসর", "সুপারকম্পিউটিং"
+                    s3_i, s3_t, s3_d = "🧠", "৩. নিউরাল ক্লাস্টার", "ডিস্ট্রিবিউটেড মেশ"
+                    s4_i, s4_t, s4_d = "🎯", "৪. গ্লোবাল স্কেল", "বাস্তব প্রয়োগ"
+                elif language == "Hindi":
+                    s1_i, s1_t, s1_d = "🚀", "१. डेटा व मॉडल", "इनपुट फ़्रेमवर्क"
+                    s2_i, s2_t, s2_d = "⚡", "२. सुपरकंप्यूटिंग", "क्लाउड प्रोसेसर"
+                    s3_i, s3_t, s3_d = "🧠", "३. न्यूरल क्लस्टर", "हाई-स्पीड मेश"
+                    s4_i, s4_t, s4_d = "🎯", "४. वैश्विक प्रभाव", "व्यावसायिक उपयोग"
+                else:
+                    s1_i, s1_t, s1_d = "🚀", "1. Startup App", "Model Weights"
+                    s2_i, s2_t, s2_d = "⚡", "2. Core Engine", "Quantum HPC"
+                    s3_i, s3_t, s3_d = "🧠", "3. AI Cluster", "Distributed Mesh"
+                    s4_i, s4_t, s4_d = "🎯", "4. Global Scale", "Commercial API"
+
+                diagram_html = f"""
+                <div style="background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.08); border: 1.5px solid {accent_hex}; border-radius: 18px; padding: 20px 18px; margin-bottom: 20px;">
+                  <div style="font-size: 18px; font-weight: bold; color: {accent_hex}; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>{wf_title}</span>
+                    <span style="font-size: 14px; color: {accent_sec_hex}; background: rgba(255, 255, 255, 0.1); border: 1px solid {accent_sec_hex}; border-radius: 8px; padding: 3px 10px;">{live_tag}</span>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
+                      <div style="font-size: 24px;">{s1_i}</div>
+                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s1_t}</div>
+                      <div style="font-size: 12px; color: {text_sec_css}; margin-top: 2px;">{s1_d}</div>
+                    </div>
+                    <div style="font-size: 18px; color: {accent_hex};">➔</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_sec_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
+                      <div style="font-size: 24px;">{s2_i}</div>
+                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s2_t}</div>
+                      <div style="font-size: 12px; color: {accent_sec_hex}; margin-top: 2px;">{s2_d}</div>
+                    </div>
+                    <div style="font-size: 18px; color: {accent_hex};">➔</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
+                      <div style="font-size: 24px;">{s3_i}</div>
+                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s3_t}</div>
+                      <div style="font-size: 12px; color: {text_sec_css}; margin-top: 2px;">{s3_d}</div>
+                    </div>
+                    <div style="font-size: 18px; color: {accent_hex};">➔</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
+                      <div style="font-size: 24px;">{s4_i}</div>
+                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s4_t}</div>
+                      <div style="font-size: 12px; color: {text_sec_css}; margin-top: 2px;">{s4_d}</div>
+                    </div>
+                  </div>
+                </div>
+                """
+                content_html = f"""
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:16px 0;">
+                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:10px;">{step_str}</div>
+                  <div style="font-size:44px; font-weight:bold; line-height:1.24; margin-bottom:18px; color:#ffffff;">{headline}</div>
+                  {diagram_html}
+                  <div style="{card_style}">
+                    <div style="font-size:27px; line-height:1.6; color:{text_sec_css};">{body}</div>
+                  </div>
+                </div>
+                """
+            elif slide_num == 2 and not is_tech_topic and bg_b64:
+                # Slide 2 for CULTURE / NEWS / HEALTH: CLEAR PHOTO SHOWCASE
+                step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०१")
+                loc_badge = "📍 পশ্চিমবঙ্গ • সমসাময়িক দৃশ্য" if language == "Bengali" else ("📍 भारत • प्रत्यक्ष दृश्य" if language == "Hindi" else "🌐 GROUND PERSPECTIVE")
+                ver_badge = "📸 আসল দৃশ্য" if language == "Bengali" else ("📸 वास्तविक दृश्य" if language == "Hindi" else "📸 VERIFIED")
+                photo_card_html = f"""
+                <div style="width:100%; height:300px; border-radius:18px; overflow:hidden; border:1.5px solid {accent_hex}; box-shadow:0 10px 24px rgba(0,0,0,0.5); position:relative; margin-bottom:18px;">
+                  <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                  <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:10px 18px; display:flex; justify-content:space-between; align-items:flex-end;">
+                    <div style="font-size:18px; font-weight:bold; color:{accent_hex};">{loc_badge}</div>
+                    <div style="font-size:14px; color:#ffffff; background:rgba(255,255,255,0.18); border:1px solid {accent_hex}; border-radius:8px; padding:3px 10px;">{ver_badge}</div>
+                  </div>
+                </div>
+                """
+                content_html = f"""
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:14px 0;">
+                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:10px;">{step_str}</div>
+                  <div style="font-size:44px; font-weight:bold; line-height:1.24; margin-bottom:16px; color:#ffffff;">{headline}</div>
+                  {photo_card_html}
+                  <div style="background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:22px 28px;">
+                    <div style="font-size:26px; line-height:1.55; color:{text_sec_css};">{body}</div>
                   </div>
                 </div>
                 """
