@@ -719,7 +719,8 @@ def eligible_for_publication(entry, settings, now):
 
 def post_is_stale(entry, settings, now):
     try:
-        date_started = datetime.fromisoformat(entry["date"] + "T00:00:00").replace(tzinfo=IST)
+        clean_date = entry.get("clean_date") or str(entry.get("date", "")).split("_")[0]
+        date_started = datetime.fromisoformat(clean_date + "T00:00:00").replace(tzinfo=IST)
         return now - date_started >= timedelta(hours=int(settings.get("max_post_age_hours", 48)))
     except (TypeError, ValueError):
         return True

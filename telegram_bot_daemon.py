@@ -83,7 +83,7 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None):
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") == "pending":
+            if posts[k].get("status") in ("pending", "needs_attention", "expired"):
                 entry = posts[k]
                 target_key = k
                 break
@@ -109,7 +109,7 @@ def reject_pending_post(posts, approver_name="Subha", target_key=None):
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") == "pending":
+            if posts[k].get("status") in ("pending", "needs_attention", "expired"):
                 entry = posts[k]
                 target_key = k
                 break
@@ -131,7 +131,7 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "rejected"):
+            if posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
                 entry = posts[k]
                 target_key = k
                 break
@@ -268,7 +268,7 @@ def poll_once(offset=0):
                 target_key = f"{today}_{target_slot}"
             else:
                 for k in sorted(posts.keys(), reverse=True):
-                    if posts[k].get("status") in ("pending", "rejected"):
+                    if posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
                         target_key = k
                         break
 
