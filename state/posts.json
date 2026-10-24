@@ -419,9 +419,9 @@
       "search_query": "lofi chill study"
     },
     "image_sha256": "41e28e634496bd85ac4fd907979ebccf150f4e7a51c2b9c31061f18b5e65d789",
-    "status": "pending",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-10-24T17:34:23.463614+00:00",
+    "approval_hash": "7bec6f2ee53b8d99081948e9ea1647044830b764334efd6f295db74e3403f025",
     "fb": {
       "status": "not_started",
       "id": null
