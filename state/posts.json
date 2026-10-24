@@ -419,7 +419,7 @@
       "search_query": "Future Echoes Synthwave Dreams"
     },
     "image_sha256": "5664201f0b7519c513d4e170048855ad8c7187389751b2d30a3f5897a930f742",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -437,5 +437,56 @@
       "container": null
     },
     "created_at": "2026-10-24T04:30:46.932578+00:00"
+  },
+  "2026-10-24_evening": {
+    "date": "2026-10-24_evening",
+    "clean_date": "2026-10-24",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Hindi",
+    "revision": 1,
+    "title": "डिजिटल शासन: भविष्य की नींव",
+    "subtitle": "जानें कैसे भारत की डिजिटल क्रांति शासन को मज़बूत कर रही है और आपको कैसे फायदा होगा।",
+    "caption": "🚀 **डिजिटल भारत का नया अध्याय!**\n\n🔍 **आज क्या हुआ:** हाल ही में, भारत सरकार ने अपने डिजिटल इंफ्रास्ट्रक्चर को मज़बूत करने की अपनी प्रतिबद्धता दोहराई है, जिसका लक्ष्य शासन को और अधिक पारदर्शी, कुशल और नागरिक-केंद्रित बनाना है। यह घोषणा 'डिजिटल इंडिया' अभियान को एक नई गति देती है, जिससे हर भारतीय के जीवन में सकारात्मक बदलाव आएगा।\n\n💡 **मुख्य बातें:**\n• ⚡ 1. **DPI का विस्तार:** आधार, UPI और डिजीलॉकर जैसे प्रमुख डिजिटल पब्लिक इंफ्रास्ट्रक्चर को और व्यापक बनाया जा रहा है।\n• 📊 2. **ई-गवर्नेंस सेवाओं में वृद्धि:** सरकारी सेवाओं को ऑनलाइन लाने और उनकी पहुँच बढ़ाने पर ज़ोर।\n• 🎯 3. **डेटा सुरक्षा को प्राथमिकता:** नागरिकों की गोपनीयता और डेटा सुरक्षा सुनिश्चित करने के लिए नए प्रोटोकॉल और कानून।\n\n🔥 **यह अभी क्यों महत्वपूर्ण है:** ये कदम भारत को एक सच्चा डिजिटल राष्ट्र बनाने की दिशा में महत्वपूर्ण हैं। यह न केवल प्रशासनिक प्रक्रियाओं को सरल बनाते हैं, बल्कि भ्रष्टाचार को कम करने और सेवाओं को नागरिकों तक तेज़ी से पहुँचाने में भी मदद करते हैं, जिससे देश की आर्थिक और सामाजिक प्रगति को बल मिलता है।\n\n💬 **आपका क्या विचार है?** क्या आपको लगता है कि डिजिटल शासन भारत को एक नई दिशा दे रहा है? अपने विचार कमेंट्स में साझा करें!\n\n#DigitalIndia #eGovernance #IndiaTech #Choicematrix #DigitalNagarik #BharatTech #सुशासन\n\nReference: Press Information Bureau — https://news.google.com/rss/articles/CBMihwFBVV95cUxPdzdCR2N0a1ZINnh6NmxPVmotMXpfT05hYjNWa2pjeGk0bXdocktFbmlSaHV6RHpLaGxTRVNvRURoNFlLckJSWjY0Wl9YQUM4ZU1rb3ZvR2h0WHQ4WUhnYzlQRkNQX0lXTktrTURtWWIzcjZncVdKWnJCVkpuMVZNdVY3dzhfZnM?oc=5\n\n🎵 Suggested Audio: Gul - Anuv Jain (Acoustic / Chill Indie)",
+    "category": "India Tech & Space Innovations",
+    "content_type": "practical",
+    "source": {
+      "label": "Press Information Bureau",
+      "url": "https://news.google.com/rss/articles/CBMihwFBVV95cUxPdzdCR2N0a1ZINnh6NmxPVmotMXpfT05hYjNWa2pjeGk0bXdocktFbmlSaHV6RHpLaGxTRVNvRURoNFlLckJSWjY0Wl9YQUM4ZU1rb3ZvR2h0WHQ4WUhnYzlQRkNQX0lXTktrTURtWWIzcjZncVdKWnJCVkpuMVZNdVY3dzhfZnM?oc=5"
+    },
+    "image": "posts/2026-10-24_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-24_evening-v1-slide1.jpg",
+      "posts/2026-10-24_evening-v1-slide2.jpg",
+      "posts/2026-10-24_evening-v1-slide3.jpg",
+      "posts/2026-10-24_evening-v1-slide4.jpg",
+      "posts/2026-10-24_evening-v1-slide5.jpg",
+      "posts/2026-10-24_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "Gul",
+      "artist": "Anuv Jain",
+      "vibe": "Acoustic / Chill Indie",
+      "search_query": "Anuv Jain Gul acoustic"
+    },
+    "image_sha256": "5cb9564e8f43304ed19e20d2230cbe4a5786f94a2385a2e2348b50fa382e76ee",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-24T05:11:34.464615+00:00"
   }
 }
