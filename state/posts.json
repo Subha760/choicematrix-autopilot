@@ -419,7 +419,7 @@
       "search_query": "lofi chill study"
     },
     "image_sha256": "41e28e634496bd85ac4fd907979ebccf150f4e7a51c2b9c31061f18b5e65d789",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -470,7 +470,7 @@
       "search_query": "Anuv Jain Kaisi Ye Pehli acoustic"
     },
     "image_sha256": "d5a472cceae5e96d6ae023336892b2b76ff9c99bec6045461f9d4b3d8002b6cc",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
