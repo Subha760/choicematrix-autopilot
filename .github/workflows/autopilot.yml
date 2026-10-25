@@ -9,7 +9,7 @@ on:
     # 20:00 IST = 14:30 UTC (Evening Post Publishing: Bengali/Hindi Regional Trends @ 8 PM IST)
     - cron: '30 14 * * *'
     # Hourly Heartbeat (Check Telegram Approvals & Stale Post Expirations)
-    - cron: '0 * * * *'
+    - cron: '*/15 * * * *'
   workflow_dispatch:
     inputs:
       manual_action:

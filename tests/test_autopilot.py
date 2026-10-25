@@ -261,8 +261,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual([c.args[0] for c in tg.call_args_list], ['sendPhoto', 'sendMessage'])
         full = tg.call_args_list[1].args[1]
         self.assertIn(entry['caption'], full['text'])
-        buttons = json.loads(full['reply_markup'])['inline_keyboard']
-        self.assertIn('approve:2026-10-15:1', str(buttons))
+        self.assertIn("Reply 'approve'", full['text'])
 
     def test_old_preview_button_cannot_approve_regenerated_revision(self):
         entry = self.example('pending')

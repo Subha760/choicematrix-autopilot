@@ -1595,8 +1595,9 @@ def public_url(relative_image_path):
     if not base:
         full = getenv("GITHUB_REPOSITORY", True)
         owner, repo = full.split("/", 1)
-        base = f"https://{owner}.github.io" + ("" if repo.lower() == f"{owner.lower()}.github.io" else f"/{repo}")
-    return base.rstrip("/") + "/" + relative_image_path
+        base = f"https://raw.githubusercontent.com/{owner}/{repo}/main/docs"
+    clean_path = str(relative_image_path).lstrip("/")
+    return base.rstrip("/") + "/" + clean_path
 
 
 def create_post(date_key, settings, posts, revision=1, slot=None):
@@ -1685,11 +1686,6 @@ def send_preview(post, settings):
         with file.open("rb") as image_file:
             telegram("sendPhoto", {"chat_id": chat, "caption": f"DAILY DRAFT • {post_id}"}, {"photo": image_file})
 
-    markup = {"inline_keyboard": [
-        [{"text": f"✅ Approve {slot.capitalize()}", "callback_data": f"approve:{post_id}:{revision}"},
-         {"text": "🔄 Recreate", "callback_data": f"regen:{post_id}:{revision}"}],
-        [{"text": "❌ Reject", "callback_data": f"reject:{post_id}:{revision}"}]
-    ]}
     audio = post.get("recommended_audio")
     audio_info = ""
     if audio and isinstance(audio, dict) and audio.get("title"):
@@ -1702,11 +1698,13 @@ def send_preview(post, settings):
         f"TITLE: {post['title']}\n\n"
         f"{audio_info}"
         f"{post['caption']}\n\n"
-        f"⏰ Scheduled for {publish_time} IST.\n"
-        "👉 Click Approve below or reply 'approve' in this chat to confirm!"
+        f"⏰ Scheduled for {publish_time} IST.\n\n"
+        "👉 Reply 'approve' (or 'approve {slot}') to publish 🚀\n"
+        "👉 Reply 'recreate' to generate a fresh new draft 🔄\n"
+        "👉 Reply 'reject' to cancel ❌\n"
+        "👉 Reply 'status' to check status 📊"
     )
-    telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000],
-                             "reply_markup": json.dumps(markup)})
+    telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000]})
 
 
 def take_approvals(posts, settings, now=None):
@@ -2073,7 +2071,7 @@ def main():
                     count = attempt["count"] + 1
                     attempt_log[post_id] = {
                         "count": count,
-                        "next_after": (now + timedelta(minutes=min(30 * 2**(count-1), 240))).isoformat()
+                        "next_after": (now + timedelta(minutes=min(2 * (2**(count-1)), 15))).isoformat()
                     }
                     print(f"Daily generation failed for {post_id}: {type(exc).__name__}: {exc}")
                     if count == 1 or count == 6:

@@ -1,10 +1,9 @@
 """Real-time Telegram Approval & Interaction Daemon.
-Supports:
-1. Inline buttons with native modal alerts (show_alert=True) for mobile phones.
-2. Bottom persistent reply keyboard buttons for 1-tap mobile phone approval.
-3. Natural language text commands (approve, recreate, reject, status).
-4. Full approval_hash synchronization for publication gating.
-5. Automatic Git sync so GitHub Actions respects local approvals.
+- 100% Pure text command listener (Zero broken/frozen buttons!).
+- Commands supported: 'approve', 'approve afternoon', 'approve evening', 'recreate', 'reject', 'status'.
+- Crash-proof 24/7 background loop with auto-reconnect on network timeout.
+- Instant live publication if approved post is already past its scheduled time.
+- Seamless automatic Git state sync to GitHub main.
 """
 import os
 import json
@@ -19,6 +18,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 ROOT = Path(__file__).resolve().parent
 STATE = ROOT / "state" / "posts.json"
 TG_STATE = ROOT / "state" / "telegram.json"
+GEN_ERRORS = ROOT / "state" / "generation-attempts.json"
 
 def load_env():
     env_file = ROOT / ".env"
@@ -58,23 +58,13 @@ def git_push_state():
     try:
         mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
         git_bin = mingit if Path(mingit).exists() else "git"
-        subprocess.run([git_bin, "-C", str(ROOT), "add", "state/posts.json"], check=True, timeout=15, capture_output=True)
-        subprocess.run([git_bin, "-C", str(ROOT), "commit", "-m", "chore: sync approval state [skip ci]"], check=True, timeout=15, capture_output=True)
+        subprocess.run([git_bin, "-C", str(ROOT), "pull", "--rebase", "origin", "main"], timeout=20, capture_output=True)
+        subprocess.run([git_bin, "-C", str(ROOT), "add", "state/posts.json", "state/generation-attempts.json"], timeout=15, capture_output=True)
+        subprocess.run([git_bin, "-C", str(ROOT), "commit", "-m", "chore: sync approval state [skip ci]"], timeout=15, capture_output=True)
         subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", "main"], check=True, timeout=25, capture_output=True)
         print("📡 Synced approval state to GitHub main!", flush=True)
     except Exception as exc:
         print(f"Git push state warning: {exc}", flush=True)
-
-def get_mobile_keyboard():
-    return {
-        "keyboard": [
-            [{"text": "✅ Approve Afternoon"}, {"text": "✅ Approve Evening"}],
-            [{"text": "🔄 Recreate Afternoon"}, {"text": "🔄 Recreate Evening"}],
-            [{"text": "📊 Check Status"}, {"text": "❌ Reject"}]
-        ],
-        "resize_keyboard": True,
-        "is_persistent": True
-    }
 
 def approve_pending_post(posts, approver_name="Subha", target_key=None):
     import autopilot
@@ -89,10 +79,7 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None):
                 break
 
     if not entry:
-        return False, "⚠️ No post found to approve."
-    if entry.get("status") == "approved":
-        slot_name = entry.get("slot", "post").capitalize()
-        return True, f"ℹ️ {slot_name} post ({target_key}) is already approved and scheduled! 🚀"
+        return False, "⚠️ No pending draft found to approve."
 
     entry["status"] = "approved"
     entry["approved_at"] = datetime.now(timezone.utc).isoformat()
@@ -101,7 +88,36 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None):
     pub_time = entry.get("publish_time_ist", "14:00")
     write_json(STATE, posts)
     git_push_state()
-    return True, f"✅ {slot_name.upper()} APPROVED by {approver_name}!\n\n📅 Date: {entry.get('clean_date', target_key)}\n⏰ Scheduled for {pub_time} IST\n🌐 Platforms: Facebook, Instagram, Threads 🚀"
+
+    # If post is already due (past scheduled time), publish right away!
+    settings = read_json(ROOT / "settings.json", {})
+    now_ist = datetime.now(autopilot.IST)
+    publish_result_msg = ""
+    if autopilot.due(entry, settings, now_ist) and settings.get("publishing_enabled", False):
+        print(f"🚀 {target_key} is already due ({pub_time} IST) - publishing immediately...", flush=True)
+        try:
+            autopilot.process_publications(posts, settings, now_ist)
+            write_json(STATE, posts)
+            git_push_state()
+            fb_id = entry.get("fb", {}).get("id")
+            ig_id = entry.get("ig", {}).get("id")
+            threads_id = entry.get("threads", {}).get("id")
+            publish_result_msg = (
+                f"\n\n🚀 <b>PUBLISHED LIVE NOW!</b>\n"
+                f"• Facebook ID: <code>{fb_id or 'posted'}</code>\n"
+                f"• Instagram ID: <code>{ig_id or 'posted'}</code>\n"
+                f"• Threads ID: <code>{threads_id or 'posted'}</code>"
+            )
+        except Exception as pe:
+            print(f"Immediate publish warning: {pe}", flush=True)
+            publish_result_msg = f"\n\n⚠️ Publication note: {pe}"
+
+    return True, (
+        f"✅ <b>{slot_name.upper()} APPROVED by {approver_name}!</b>\n\n"
+        f"📅 Date: {entry.get('clean_date', target_key)}\n"
+        f"⏰ Scheduled Time: {pub_time} IST\n"
+        f"🌐 Platforms: Facebook, Instagram, Threads{publish_result_msg}"
+    )
 
 def reject_pending_post(posts, approver_name="Subha", target_key=None):
     entry = None
@@ -114,7 +130,7 @@ def reject_pending_post(posts, approver_name="Subha", target_key=None):
                 target_key = k
                 break
     if not entry:
-        return False, "⚠️ No pending post found to reject."
+        return False, "⚠️ No pending draft found to reject."
 
     entry["status"] = "rejected"
     entry["approved_at"] = None
@@ -122,7 +138,7 @@ def reject_pending_post(posts, approver_name="Subha", target_key=None):
     slot_name = entry.get("slot", "post").capitalize()
     write_json(STATE, posts)
     git_push_state()
-    return True, f"❌ {slot_name.upper()} REJECTED by {approver_name}. This post will not be published. (Tap Recreate if you want a fresh draft!)"
+    return True, f"❌ <b>{slot_name.upper()} REJECTED by {approver_name}.</b>\nThis post will not be published. (Reply 'recreate' if you want a fresh draft!)"
 
 def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
     approver_id = str(os.getenv("TG_APPROVER_ID", ""))
@@ -131,7 +147,7 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
+            if posts[k].get("status") in ("pending", "rejected", "needs_attention", "expired"):
                 entry = posts[k]
                 target_key = k
                 break
@@ -144,6 +160,11 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
     old_rev = entry.get("revision", 1) if entry else 1
     new_rev = old_rev + 1
 
+    # Clear generation error backoff so it generates immediately with zero wait
+    gen_errors = read_json(GEN_ERRORS, {})
+    gen_errors.pop(target_key, None)
+    write_json(GEN_ERRORS, gen_errors)
+
     if entry:
         entry["status"] = "rejected"
         write_json(STATE, posts)
@@ -151,8 +172,8 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
     slot_label = "🌞 AFTERNOON" if slot == "afternoon" else "🌙 EVENING"
     tg_api("sendMessage", {
         "chat_id": approver_id,
-        "text": f"🔄 RECREATING {slot_label} POST (Revision {new_rev}) with fresh live feed & Unsplash visuals... Generating now (15-20s) ⏳",
-        "reply_markup": get_mobile_keyboard()
+        "text": f"🔄 <b>RECREATING {slot_label} POST</b> (Revision {new_rev}) with fresh live feed & Unsplash visuals...\nGenerating now (15-20s) ⏳",
+        "parse_mode": "HTML"
     })
 
     import autopilot
@@ -161,7 +182,7 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
         new_entry = autopilot.create_post(target_key, settings, posts, revision=new_rev, slot=slot)
         write_json(STATE, posts)
         git_push_state()
-        return True, f"✨ New {slot.capitalize()} Carousel Revision {new_rev} generated and sent above! Tap [Approve] when ready. 🚀"
+        return True, f"✨ New {slot.capitalize()} Carousel Revision {new_rev} generated and sent above!\nReply 'approve' when ready. 🚀"
     except Exception as e:
         return False, f"⚠️ Error regenerating post: {e}"
 
@@ -170,14 +191,16 @@ def poll_once(offset=0):
     approver_id = str(os.getenv("TG_APPROVER_ID", "")).strip()
 
     try:
-        r = requests.get(f"https://api.telegram.org/bot{token}/getUpdates",
-                         params={"offset": offset, "timeout": 8, "allowed_updates": json.dumps(["callback_query", "message"])},
-                         timeout=12)
+        r = requests.get(
+            f"https://api.telegram.org/bot{token}/getUpdates",
+            params={"offset": offset, "timeout": 8, "allowed_updates": json.dumps(["message"])},
+            timeout=12
+        )
         res = r.json()
         if not res.get("ok"):
             return offset
     except Exception as e:
-        print(f"Polling warning: {e}", flush=True)
+        print(f"Polling network warning: {e}", flush=True)
         time.sleep(2)
         return offset
 
@@ -186,73 +209,17 @@ def poll_once(offset=0):
 
     for u in updates:
         offset = max(offset, int(u["update_id"]) + 1)
-        # Persist offset immediately
         write_json(TG_STATE, {"offset": offset})
 
-        # 1. Handle Inline Button Clicks
-        if "callback_query" in u:
-            cb = u["callback_query"]
-            cb_id = cb["id"]
-            user_id = str(cb.get("from", {}).get("id", "")).strip()
-            first_name = cb.get("from", {}).get("first_name", "Subha")
-            data = cb.get("data", "")
-            print(f"📥 Inline button clicked by {first_name} ({user_id}): data='{data}'", flush=True)
-
-            # Parse action and post_id from callback_data (e.g. approve:2026-10-24_afternoon:1)
-            parts = data.split(":")
-            action = parts[0]
-            target_key = parts[1] if len(parts) > 1 else None
-            rev_val = parts[2] if len(parts) > 2 else None
-
-            if action in ("approve", "test_approve"):
-                success, msg = approve_pending_post(posts, first_name, target_key=target_key)
-                # Show native modal alert dialog on phone screen!
-                slot_txt = ("Afternoon" if target_key and "afternoon" in target_key else ("Evening" if target_key and "evening" in target_key else "Post"))
-                alert_text = f"✅ {slot_txt} Post Approved!\nScheduled for publication."
-                tg_api("answerCallbackQuery", {"callback_query_id": cb_id, "text": alert_text, "show_alert": True})
-
-                if "message" in cb:
-                    chat_id = cb["message"]["chat"]["id"]
-                    msg_id = cb["message"]["message_id"]
-                    tg_api("editMessageReplyMarkup", {
-                        "chat_id": chat_id,
-                        "message_id": msg_id,
-                        "reply_markup": {"inline_keyboard": [[{"text": f"✅ {slot_txt} Approved & Scheduled", "callback_data": "done"}]]}
-                    })
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
-                print(f"[APPROVED via button] {target_key} by {first_name}", flush=True)
-
-            elif action in ("reject", "test_reject"):
-                success, msg = reject_pending_post(posts, first_name, target_key=target_key)
-                tg_api("answerCallbackQuery", {"callback_query_id": cb_id, "text": "❌ Post Rejected.", "show_alert": True})
-                if "message" in cb:
-                    chat_id = cb["message"]["chat"]["id"]
-                    msg_id = cb["message"]["message_id"]
-                    tg_api("editMessageReplyMarkup", {
-                        "chat_id": chat_id,
-                        "message_id": msg_id,
-                        "reply_markup": {"inline_keyboard": [[{"text": "❌ Rejected", "callback_data": "done"}]]}
-                    })
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
-                print(f"[REJECTED via button] {target_key} by {first_name}", flush=True)
-
-            elif action in ("regenerate", "recreate", "regen"):
-                tg_api("answerCallbackQuery", {"callback_query_id": cb_id, "text": "🔄 Recreating fresh draft...", "show_alert": True})
-                success, msg = recreate_and_send_post(posts, first_name, target_key=target_key)
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
-                print(f"[RECREATED via button] {target_key} by {first_name}", flush=True)
-
-            else:
-                tg_api("answerCallbackQuery", {"callback_query_id": cb_id, "text": "Action received! ✅", "show_alert": False})
-
-        # 2. Handle Text Messages and Mobile Keyboard Taps
-        elif "message" in u:
+        if "message" in u:
             m = u["message"]
             user_id = str(m.get("from", {}).get("id", "")).strip()
             first_name = m.get("from", {}).get("first_name", "Subha")
             text = m.get("text", "").strip()
-            print(f"📥 Message received from {first_name} ({user_id}): '{text}'", flush=True)
+            if not text:
+                continue
 
+            print(f"📥 Message from {first_name} ({user_id}): '{text}'", flush=True)
             lower_text = text.lower()
             today = datetime.now().date().isoformat()
 
@@ -268,49 +235,62 @@ def poll_once(offset=0):
                 target_key = f"{today}_{target_slot}"
             else:
                 for k in sorted(posts.keys(), reverse=True):
-                    if posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
+                    if posts[k].get("status") in ("pending", "needs_attention", "expired"):
                         target_key = k
                         break
 
             # Handle Actions
             if any(w in lower_text for w in ("approve", "yes", "ok", "publish", "1")):
                 success, msg = approve_pending_post(posts, first_name, target_key=target_key)
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
-                print(f"[APPROVED via text] {target_key} by {first_name}", flush=True)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+                print(f"[APPROVED] {target_key} by {first_name}", flush=True)
 
             elif any(w in lower_text for w in ("recreate", "regenerate", "new", "retry", "regen", "2")):
                 success, msg = recreate_and_send_post(posts, first_name, target_key=target_key)
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
-                print(f"[RECREATED via text] {target_key} by {first_name}", flush=True)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+                print(f"[RECREATED] {target_key} by {first_name}", flush=True)
 
             elif any(w in lower_text for w in ("reject", "no", "cancel", "3")):
                 success, msg = reject_pending_post(posts, first_name, target_key=target_key)
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
-                print(f"[REJECTED via text] {target_key} by {first_name}", flush=True)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+                print(f"[REJECTED] {target_key} by {first_name}", flush=True)
 
             elif any(w in lower_text for w in ("status", "check", "info")):
                 afternoon_st = posts.get(f"{today}_afternoon", {}).get("status", "not generated").upper()
                 evening_st = posts.get(f"{today}_evening", {}).get("status", "not generated").upper()
-                msg = (f"📊 <b>DAILY SCHEDULE STATUS ({today})</b>\n\n"
-                       f"🌞 <b>Afternoon Post (2:00 PM IST)</b>: {afternoon_st}\n"
-                       f"🌙 <b>Evening Post (8:00 PM IST)</b>: {evening_st}\n\n"
-                       "Tap a button below to approve or manage:")
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML", "reply_markup": get_mobile_keyboard()})
+                msg = (
+                    f"📊 <b>DAILY SCHEDULE STATUS ({today})</b>\n\n"
+                    f"🌞 <b>Afternoon Post (2:00 PM IST)</b>: {afternoon_st}\n"
+                    f"🌙 <b>Evening Post (8:00 PM IST)</b>: {evening_st}\n\n"
+                    "👉 Reply <b>approve</b>, <b>recreate</b>, or <b>reject</b>."
+                )
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
             else:
-                msg = ("👋 Hello! Use the mobile buttons below to approve or manage today's carousels:")
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "reply_markup": get_mobile_keyboard()})
+                msg = (
+                    "👋 <b>Choicematrix Autopilot Commands:</b>\n\n"
+                    "• Reply <b>approve</b> to approve the pending draft 🚀\n"
+                    "• Reply <b>approve afternoon</b> or <b>approve evening</b>\n"
+                    "• Reply <b>recreate</b> to generate a fresh new carousel 🔄\n"
+                    "• Reply <b>reject</b> to cancel the draft ❌\n"
+                    "• Reply <b>status</b> to see today's schedule 📊"
+                )
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
     return offset
 
 def main():
     load_env()
-    print("🚀 Telegram Real-Time Approval Daemon started.", flush=True)
+    print("🚀 Telegram Text-Only Real-Time Approval Daemon started.", flush=True)
     tg_state = read_json(TG_STATE, {"offset": 0})
     offset = tg_state.get("offset", 0)
-    print(f"Listening for approvals on offset {offset}...", flush=True)
+    print(f"Listening for text commands on offset {offset}...", flush=True)
     while True:
-        offset = poll_once(offset)
+        try:
+            offset = poll_once(offset)
+        except Exception as exc:
+            print(f"Daemon loop warning ({type(exc).__name__}): {exc}", flush=True)
+            time.sleep(3)
         time.sleep(1)
 
 if __name__ == "__main__":
