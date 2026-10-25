@@ -982,7 +982,10 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
     used_ids = set()
 
     with sync_playwright() as p:
-        browser = p.chromium.launch(executable_path=browser_exe, headless=True)
+        launch_args = {'headless': True}
+        if browser_exe:
+            launch_args['executable_path'] = browser_exe
+        browser = p.chromium.launch(**launch_args)
         page = browser.new_page(viewport={"width": 1080, "height": 1350})
 
         for idx, slide in enumerate(slides_data):
