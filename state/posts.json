@@ -531,7 +531,7 @@
       "search_query": "বাউল লো-ফাই বিটস ইন্সট্রুমেন্টাল"
     },
     "image_sha256": "b6c0f1080cd766be91b35a90f1b21266fe3a260c35b22c674c13adb5cb3eb37d",
-    "status": "publishing",
+    "status": "needs_attention",
     "approved_at": "2026-10-25T08:40:16.162359+00:00",
     "approval_hash": "1b53bdbbae7538537c2c0337c2c2519ad9dd574224f39445e88b9c8ebd381b13",
     "fb": {
@@ -548,9 +548,9 @@
       "error": "Meta 17841444108675574/media rejected request: Error validating access token: Session has expired on Sunday, 25-Oct-26 06:00:00 PDT. The current time is Sunday, 25-Oct-26 07:34:38 PDT."
     },
     "threads": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "17948057436357135",
+      "container": "17989009896113014",
       "attempted_at": "2026-10-25T14:34:38.798004+00:00"
     },
     "created_at": "2026-10-25T05:17:37.560607+00:00"
