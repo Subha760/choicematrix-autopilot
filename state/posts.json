@@ -539,5 +539,56 @@
       "container": null
     },
     "created_at": "2026-10-25T05:17:37.560607+00:00"
+  },
+  "2026-10-25_afternoon": {
+    "date": "2026-10-25_afternoon",
+    "clean_date": "2026-10-25",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Apple's Foldable Future Unlocked",
+    "subtitle": "Discover how Apple is proactively solving Safari's layout challenges for upcoming foldable phones, ensuring a seamless browsing experience.",
+    "caption": "🚀 Apple Preps for a Foldable Future!\n\n🔍 Apple is reportedly exploring solutions for Safari's user interface on the smaller, outer displays of potential future foldable iPhones. This timely development signals their proactive approach to adapting their core software for new form factors, ensuring a seamless user experience.\n\n💡 CORE TAKEAWAYS:\n• ⚡ 1. **Proactive Adaptation:** Apple is addressing UX challenges for foldable devices *before* they hit the market, emphasizing foresight.\n• 📊 2. **Enhanced Browsing:** The goal is to eliminate cramped layouts, making web content fully functional and beautiful on secondary screens.\n• 🎯 3. **Future-Proofing Safari:** This move showcases Apple's commitment to evolving its ecosystem for the next generation of mobile devices.\n\n🔥 WHY THIS MATTERS NOW: This isn't just a minor fix; it's a strategic move. As the foldable market heats up, Apple's early R&D ensures they can deliver a polished, intuitive experience right from the start, potentially setting new industry benchmarks for how web content adapts to diverse screen real estate. It's a strong indicator of their serious consideration of a foldable device.\n\n💬 Do you think Apple will release a foldable iPhone soon, and would this Safari fix make you more likely to get one? Let us know below!\n\n#Apple #FoldableiPhone #Safari #TechNews #UXDesign #MobileTech #FutureTech #Choicematrix\n\nReference: 9to5Mac — https://news.google.com/rss/articles/CBMisAFBVV95cUxOWFY2WG9JcHpQYnJfVFA4Ukk3VDNCSXpkNmxpY05qLXVxVm5IV1NSTVFRUlFSUzdnS3VXTDhYeGM4M1lBSFpZNG1Jdy1oT0h2eWtZNEpOdlF1VVdqZTVNM1ZsWVo3UDFrTllMVWh1MmZDektlYVFiY3JTb0V5LWVSaERia1pTYmVjLXZYbHEyc0ZhNU81a1NJenY4ZVFiSUlKSWtSS2lWUkhnNy13N3Y1Zg?oc=5\n\n🎵 Suggested Audio: Midnight City - M83 (Synthwave, Dream Pop, Cinematic)",
+    "category": "Global Breaking Tech",
+    "content_type": "practical",
+    "source": {
+      "label": "9to5Mac",
+      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxOWFY2WG9JcHpQYnJfVFA4Ukk3VDNCSXpkNmxpY05qLXVxVm5IV1NSTVFRUlFSUzdnS3VXTDhYeGM4M1lBSFpZNG1Jdy1oT0h2eWtZNEpOdlF1VVdqZTVNM1ZsWVo3UDFrTllMVWh1MmZDektlYVFiY3JTb0V5LWVSaERia1pTYmVjLXZYbHEyc0ZhNU81a1NJenY4ZVFiSUlKSWtSS2lWUkhnNy13N3Y1Zg?oc=5"
+    },
+    "image": "posts/2026-10-25_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-25_afternoon-v1-slide1.jpg",
+      "posts/2026-10-25_afternoon-v1-slide2.jpg",
+      "posts/2026-10-25_afternoon-v1-slide3.jpg",
+      "posts/2026-10-25_afternoon-v1-slide4.jpg",
+      "posts/2026-10-25_afternoon-v1-slide5.jpg",
+      "posts/2026-10-25_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": {
+      "title": "Midnight City",
+      "artist": "M83",
+      "vibe": "Synthwave, Dream Pop, Cinematic",
+      "search_query": "M83 Midnight City instrumental"
+    },
+    "image_sha256": "661c5b89689dd18d90446299901bfdcf54d96b795773776c2b979b0e6b538f33",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-25T10:08:17.826154+00:00"
   }
 }
