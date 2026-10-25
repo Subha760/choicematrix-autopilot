@@ -230,44 +230,148 @@ def get_evening_language(date_key):
     return "Hindi" if diff % 2 == 0 else "Bengali"
 
 
-def fetch_web_feed_topic(date_key=None, revision=1, recent_titles=None, feed_type="global", max_age_hours=36):
-    """Fetch real-time trending topics from dedicated Global, All-India, and West Bengal RSS feeds.
-    Strictly verifies publication timestamp (< max_age_hours) to ensure 100% latest, fresh news.
-    """
+WEEKDAY_TOPIC_MATRIX = {
+    0: {  # Monday
+        "theme": "Future Tech, AI & Tools",
+        "global": [
+            ("Tech & AI Horizons", "(AI breakthrough OR generative AI OR new tech tools OR robotics) when:2d", "en-US", "US:en"),
+            ("Consumer Tech & Smart Devices", "(Apple OR Google OR Nvidia OR smartphone innovation) when:2d", "en-US", "US:en")
+        ],
+        "india": [
+            ("डिजिटल भारत & AI तकनीक", "(भारत AI OR डिजिटल भारत OR Indian tech startups OR AI tools) when:2d", "hi", "IN:hi"),
+            ("स्मार्ट तकनीक & भारतीय नवाचार", "(स्मार्टफोन भारत OR भारतीय तकनीक नवाचार) when:2d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("আধুনিক প্রযুক্তি ও AI উদ্ভাবন", "(কলকাতা প্রযুক্তি OR পশ্চিমবঙ্গ বিজ্ঞান OR AI প্রযুক্তি) when:3d", "bn", "IN:bn"),
+            ("ডিজিটাল বাংলা ও স্মার্ট গ্যাজেট", "(স্মার্ট প্রযুক্তি OR নতুন গ্যাজেট OR ডিজিটাল উদ্যোগ) when:3d", "bn", "IN:bn")
+        ],
+        "angle": "a practical, insightful breakdown of the latest technology or AI trend shaping our future"
+    },
+    1: {  # Tuesday
+        "theme": "Smart Productivity, Focus & Daily Systems",
+        "global": [
+            ("Productivity & Brain Mastery", "(productivity hack OR deep work OR mental models OR habit building OR focus tips) when:3d", "en-US", "US:en"),
+            ("Modern Workflow & Time Systems", "(time management OR digital minimalism OR organization routines) when:3d", "en-US", "US:en")
+        ],
+        "india": [
+            ("सफलता के नियम & कार्यक्षमता", "(उत्पादकता टिप्स OR समय प्रबंधन OR सफलता की आदतें OR करियर में तरक्की) when:3d", "hi", "IN:hi"),
+            ("स्मार्ट जीवनशैली & अनुशासन", "(आत्म विकास OR कार्यकुशलता OR फोकस टिप्स) when:3d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("কর্মদক্ষতা ও সাফল্যের অভ্যাস", "(কর্মদক্ষতা OR সময় সচেতনতা OR একাগ্রতা ও সাফল্য OR কাজের সহজ নিয়ম) when:3d", "bn", "IN:bn"),
+            ("স্মার্ট জীবন ও আত্মবিকাশ", "(আত্মউন্নয়ন OR মানসিক একাগ্রতা OR সফল হওয়ার উপায়) when:3d", "bn", "IN:bn")
+        ],
+        "angle": "actionable daily systems, cognitive frameworks, and habit design to multiply focus and eliminate friction"
+    },
+    2: {  # Wednesday
+        "theme": "Science, Cosmos & Mysteries of Nature",
+        "global": [
+            ("Cosmos & Deep Science Mysteries", "(space discovery OR astronomy OR James Webb OR neuroscience OR ocean discovery) when:3d", "en-US", "US:en"),
+            ("Frontier Physics & Nature Wonders", "(quantum physics OR nature phenomena OR earth science breakthrough) when:3d", "en-US", "US:en")
+        ],
+        "india": [
+            ("इसरो & भारत का अंतरिक्ष विज्ञान", "(ISRO space mission OR भारत अंतरिक्ष OR भारतीय वैज्ञानिक चमत्कार OR गगनयान) when:3d", "hi", "IN:hi"),
+            ("प्रकृति & विज्ञान के रहस्य", "(ब्रह्मांड के रहस्य OR विज्ञान खोज भारत) when:3d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("মহাকাশ বিজ্ঞান ও গবেষণার রহস্য", "(মহাকাশ গবেষণা OR ভারতীয় বিজ্ঞান OR প্রকৃতির বিস্ময় OR ইসরো) when:3d", "bn", "IN:bn"),
+            ("বিজ্ঞানের চমক ও আবিষ্কার", "(বিজ্ঞান আবিষ্কার OR জ্যোতির্বিজ্ঞান OR বিস্ময়কর তথ্য) when:3d", "bn", "IN:bn")
+        ],
+        "angle": "a mind-expanding dive into a fascinating scientific discovery, cosmic event, or nature phenomenon"
+    },
+    3: {  # Thursday
+        "theme": "Health, Longevity, Nutrition & Mind",
+        "global": [
+            ("Longevity, Wellness & Biohacking", "(longevity science OR sleep optimization OR nutrition health OR metabolic health) when:3d", "en-US", "US:en"),
+            ("Mental Fitness & Modern Well-being", "(mental health wellness OR brain health science OR stress resilience) when:3d", "en-US", "US:en")
+        ],
+        "india": [
+            ("स्वास्थ्य, आयुर्वेद & आधुनिक वेलनेस", "(स्वस्थ जीवनशैली OR सही पोषण OR योग आयुर्वेद वेलनेस OR फिटनेस मंत्र) when:3d", "hi", "IN:hi"),
+            ("मानसिक शांति & संपूर्ण तंदुरुस्ती", "(मानसिक स्वास्थ्य OR तनाव मुक्ति OR सेहतमंद दिनचर्या) when:3d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("সুস্থ জীবনযাপন, পুষ্টি ও স্বাস্থ্য", "(সুস্থ জীবনযাপন OR পুষ্টি সচেতনতা OR ঘরোয়া স্বাস্থ্য টিপস OR ঋতুভিত্তিক যত্ন) when:3d", "bn", "IN:bn"),
+            ("মানসিক শান্তি ও দীর্ঘায়ু", "(মন ভালো রাখার উপায় OR মানসিক স্বাস্থ্য OR দৈনন্দিন সুস্থতা) when:3d", "bn", "IN:bn")
+        ],
+        "angle": "science-backed lifestyle secrets, nutrition habits, and wellness principles for vitality and energy"
+    },
+    4: {  # Friday
+        "theme": "Future Wealth, Startups & Entrepreneurship",
+        "global": [
+            ("Future Wealth & Global Startups", "(game changing startups OR business strategy OR creator economy OR future of work) when:3d", "en-US", "US:en"),
+            ("Fintech & Modern Investing Mindset", "(fintech innovation OR investing psychology OR smart money trends) when:3d", "en-US", "US:en")
+        ],
+        "india": [
+            ("भारतीय स्टार्टअप्स & बिजनेस सूत्र", "(Indian startups OR भारत यूनिकॉर्न OR नया बिजनेस आइडिया OR वित्तीय समझदारी) when:3d", "hi", "IN:hi"),
+            ("आत्मनिर्भर भारत & उद्यमिता", "(उद्यमिता सफलता OR मेक इन इंडिया स्टार्टअप) when:3d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("বাংলার উদ্যোগ ও স্বাবলম্বিতা", "(বাংলার উদ্যোক্তা OR নতুন ব্যবসা উদ্যোগ OR সৃজনশীল কাজ ও আয়) when:3d", "bn", "IN:bn"),
+            ("স্মার্ট ক্যারিয়ার ও ভবিষ্যৎ অর্থ", "(ক্যারিয়ার টিপস OR আর্থিক স্বাধীনতা OR বাংলার নতুন উদ্যোগ) when:3d", "bn", "IN:bn")
+        ],
+        "angle": "sharp business tactics, founder lessons, and modern wealth-building mental models"
+    },
+    5: {  # Saturday
+        "theme": "Culture, Heritage, Festivals & Stories",
+        "global": [
+            ("Living Culture, Architecture & Design", "(cultural heritage OR architectural marvels OR festival traditions OR living crafts) when:4d", "en-US", "US:en"),
+            ("Creative Arts & Cultural Horizons", "(world festivals OR cultural history OR artistic innovation) when:4d", "en-US", "US:en")
+        ],
+        "india": [
+            ("भारतीय संस्कृति, त्यौहार & गौरव", "(भारतीय संस्कृति OR त्यौहार उत्सव OR ऐतिहासिक धरोहर OR दिवाली होली पूजा) when:4d", "hi", "IN:hi"),
+            ("भारत की महान गाथा & विरासत", "(भारत का इतिहास OR प्राचीन मंदिर वास्तुकला OR भारतीय कला) when:4d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("বাংলার উৎসব, ঐতিহ্য ও সংস্কৃতি", "(দুর্গাপূজা OR কালীপূজা OR বাংলা সংস্কৃতি ঐতিহ্য OR টেরাকোটা মন্দির) when:4d", "bn", "IN:bn"),
+            ("সাহিত্য, শিল্পকলা ও বাংলার গর্ব", "(বাংলা সাহিত্য OR রবীন্দ্র নজরুল OR বাংলার কারুশিল্প ও মিষ্টি) when:4d", "bn", "IN:bn")
+        ],
+        "angle": "celebrating rich cultural roots, festive grandeur, architectural wonders, and living heritage"
+    },
+    6: {  # Sunday
+        "theme": "Human Wisdom, Life Paradoxes & Stories",
+        "global": [
+            ("Human Wisdom & Paradoxes of Life", "(human psychology insights OR philosophical lessons OR life paradoxes) when:4d", "en-US", "US:en"),
+            ("Fascinating Historical Insights", "(fascinating facts history OR timeless human wisdom) when:4d", "en-US", "US:en")
+        ],
+        "india": [
+            ("प्रेरणादायक कहानियाँ & जीवन दर्शन", "(प्रेरणादायक कहानी OR जीवन दर्शन सीख OR भारतीय महापुरुष विचार) when:4d", "hi", "IN:hi"),
+            ("अनोखे तथ्य & भारत की सीख", "(रोचक तथ्य भारत OR जीवन में सकारात्मकता) when:4d", "hi", "IN:hi")
+        ],
+        "bengal": [
+            ("রোমাঞ্চকর অজানা তথ্য ও জীবন দর্শন", "(অজানা ঐতিহাসিক তথ্য OR অনুপ্রেরণামূলক কাহিনী OR জীবনের চিরন্তন শিক্ষা) when:4d", "bn", "IN:bn"),
+            ("বাংলার স্মরণীয় মনীষী ও গল্প", "(বাংলার মনীষী OR ভাবনার নতুন আলো OR কালজয়ী গল্প) when:4d", "bn", "IN:bn")
+        ],
+        "angle": "soulful reflections, thought-provoking paradoxes, and inspiring real-life human stories"
+    }
+}
+
+
+def fetch_web_feed_topic(date_key=None, revision=1, recent_titles=None, feed_type="global", max_age_hours=48, weekday_idx=None):
+    """Fetch real-time trending topics across 7 rotating weekday pillars (Tech, Productivity, Science, Health, Wealth, Culture, Wisdom)."""
     import urllib.request
     import urllib.parse
     import xml.etree.ElementTree as ET
     import email.utils
-    from datetime import datetime, timezone
+    from datetime import datetime, timezone, date
 
     now = datetime.now(timezone.utc)
+    if weekday_idx is None:
+        if date_key:
+            try:
+                weekday_idx = date.fromisoformat(date_key.split("_")[0]).weekday()
+            except Exception:
+                weekday_idx = 0
+        else:
+            weekday_idx = datetime.now(IST).weekday()
 
-    # Dedicated priority feeds strictly filtered for recent items (< 24-48 hours)
-    feed_channels = {
-        "global": [
-            ("Global Breaking Tech", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en"),
-            ("AI & Deep Tech Innovations", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(AI breakthrough OR generative AI OR semiconductors OR frontier tech) when:1d") + "&hl=en-US&gl=US&ceid=US:en"),
-            ("Consumer Tech & Devices", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(Apple OR Google OR Nvidia OR smartphone innovation) when:1d") + "&hl=en-US&gl=US&ceid=US:en"),
-            ("Future Science & Frontiers", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(quantum computing OR clean energy tech OR space tech) when:1d") + "&hl=en-US&gl=US&ceid=US:en"),
-        ],
-        "india": [
-            ("India Tech & Space Innovations", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(India tech OR ISRO OR India space OR Indian startups OR Digital India) when:1d") + "&hl=en-IN&gl=IN&ceid=IN:en"),
-            ("Indian Startups & FinTech Hub", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(Indian startups OR UPI India OR fintech India OR India unicorn) when:1d") + "&hl=en-IN&gl=IN&ceid=IN:en"),
-            ("Digital Bharat & Mobility", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(EV India OR semiconductor India OR smartphone manufacturing India) when:1d") + "&hl=en-IN&gl=IN&ceid=IN:en"),
-            ("भारतीय तकनीक व स्टार्टअप्स", "https://news.google.com/rss/search?q=" + urllib.parse.quote("(भारत प्रौद्योगिकी OR इसरो OR भारतीय स्टार्टअप) when:2d") + "&hl=hi&gl=IN&ceid=IN:hi"),
-        ],
-        "bengal": [
-            ("Bengal Innovation, Tech & Education", "https://news.google.com/rss/search?q=" + urllib.parse.quote('("Kolkata" OR "West Bengal") (technology OR innovation OR patent OR research OR university OR startup OR education OR infrastructure) when:2d') + "&hl=en-IN&gl=IN&ceid=IN:en"),
-            ("Kolkata & Bengal Regional Breaking", "https://news.google.com/rss/search?q=" + urllib.parse.quote('("Kolkata" OR "West Bengal") when:1d') + "&hl=en-IN&gl=IN&ceid=IN:en"),
-            ("বাংলা উদ্ভাবন ও সমসাময়িক ধারা", "https://news.google.com/rss/search?q=" + urllib.parse.quote('(কলকাতা OR পশ্চিমবঙ্গ) (বিজ্ঞান OR প্রযুক্তি OR উদ্ভাবন OR শিক্ষা OR উন্নয়ন OR উদ্যোগ) when:2d') + "&hl=bn&gl=IN&ceid=IN:bn"),
-        ]
-    }
-
-    channels = feed_channels.get(feed_type, feed_channels["global"])
+    # Look up today's thematic channels from WEEKDAY_TOPIC_MATRIX
+    theme_info = WEEKDAY_TOPIC_MATRIX.get(weekday_idx, WEEKDAY_TOPIC_MATRIX[0])
+    channels = theme_info.get(feed_type, theme_info["global"])
     ordered_channels = channels[(revision - 1) % len(channels):] + channels[:(revision - 1) % len(channels)]
 
-    for category, feed_url in ordered_channels:
+    for category, query_str, hl, ceid in ordered_channels:
         try:
+            feed_url = f"https://news.google.com/rss/search?q={urllib.parse.quote(query_str)}&hl={hl}&gl=IN&ceid={ceid}"
             req = urllib.request.Request(feed_url, headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"})
             xml_data = urllib.request.urlopen(req, timeout=8).read()
             root = ET.fromstring(xml_data)
@@ -306,12 +410,14 @@ def fetch_web_feed_topic(date_key=None, revision=1, recent_titles=None, feed_typ
                     continue
 
                 valid_items.append({
+                    "theme": theme_info["theme"],
                     "category": category,
                     "headline": clean_title,
                     "source": source_name,
                     "url": link,
                     "pub_str": pub_str,
-                    "age_hours": pub_hours
+                    "age_hours": pub_hours,
+                    "angle": theme_info["angle"]
                 })
 
             if valid_items:
@@ -321,31 +427,29 @@ def fetch_web_feed_topic(date_key=None, revision=1, recent_titles=None, feed_typ
             print(f"Web feed fetch warning ({category}): {exc}")
             continue
 
-    # Secondary real-time fallback ensuring fresh news
+    # Secondary thematic fallback ensuring fresh trend coverage
     try:
-        fallback_queries = {
-            "global": ("Global Breaking Tech", "https://news.google.com/rss/headlines/section/topic/TECHNOLOGY?hl=en-US&gl=US&ceid=US:en"),
-            "india": ("India Tech Today", "https://news.google.com/rss/search?q=" + urllib.parse.quote("India technology when:1d") + "&hl=en-IN&gl=IN&ceid=IN:en"),
-            "bengal": ("Bengal Today", "https://news.google.com/rss/search?q=" + urllib.parse.quote('("Kolkata" OR "West Bengal") when:1d') + "&hl=en-IN&gl=IN&ceid=IN:en"),
-        }
-        cat_name, fallback_url = fallback_queries.get(feed_type, fallback_queries["global"])
+        fb_cat, fb_query, fb_hl, fb_ceid = channels[0]
+        fallback_url = f"https://news.google.com/rss/search?q={urllib.parse.quote(fb_query)}&hl={fb_hl}&gl=IN&ceid={fb_ceid}"
         req = urllib.request.Request(fallback_url, headers={"User-Agent": "Mozilla/5.0"})
         xml_data = urllib.request.urlopen(req, timeout=6).read()
         root = ET.fromstring(xml_data)
         for item in root.findall(".//item")[:10]:
             title = item.find("title").text if item.find("title") is not None else ""
             clean_title = title.rsplit(" - ", 1)[0] if " - " in title else title
-            source_name = title.rsplit(" - ", 1)[1] if " - " in title else "Live News"
+            source_name = title.rsplit(" - ", 1)[1] if " - " in title else "Live Trend"
             if clean_title and len(clean_title) > 10:
                 if recent_titles and any(similar(normalize(clean_title), normalize(t)) for t in recent_titles):
                     continue
                 return {
-                    "category": cat_name,
+                    "theme": theme_info["theme"],
+                    "category": fb_cat,
                     "headline": clean_title.strip(),
                     "source": source_name,
                     "url": item.find("link").text if item.find("link") is not None else "",
                     "pub_str": "Today",
-                    "age_hours": 2
+                    "age_hours": 2,
+                    "angle": theme_info["angle"]
                 }
     except Exception:
         pass
@@ -365,15 +469,16 @@ def choose_topic(date_key, revision=1, use_web=False, recent_titles=None, slot_t
         feed_key = "india" if language == "Hindi" else "bengal"
 
     if use_web:
-        web = fetch_web_feed_topic(clean_date, revision, recent_titles=recent_titles, feed_type=feed_key)
+        web = fetch_web_feed_topic(clean_date, revision, recent_titles=recent_titles, feed_type=feed_key, weekday_idx=day.weekday())
         if web:
             return {
                 "type": "practical",
+                "theme": web.get("theme", "Daily Trend"),
                 "category": web["category"],
                 "direction": web["headline"],
-                "angle": f"a timely, in-depth breakdown of today's breaking development ({web.get('pub_str', 'Today')})",
+                "angle": web.get("angle", f"a timely, in-depth breakdown of today's trend ({web.get('pub_str', 'Today')})"),
                 "source": {"label": web["source"], "url": web.get("url")} if web.get("url") else None,
-                "news_source": web.get("source", "Live Breaking News"),
+                "news_source": web.get("source", "Live Trending News"),
                 "pub_str": web.get("pub_str", "Today"),
                 "web_url": web.get("url"),
                 "language": language,
@@ -618,10 +723,25 @@ Angle: {slot_info['angle']}
 Audience: {settings['audience']}; Target Language: {language}.
 Style: {settings['content_style']}.
 
-CRITICAL NEWS TIMELINESS RULE:
-- This carousel MUST focus strictly on this fresh news development announced today: "{slot_info.get('direction', '')}".
-- Explain why this is happening NOW, the latest breakthrough or key decision, what it means for everyday people / the tech industry, and future impact.
-- Do NOT use outdated news or generic filler. All facts and takeaways must be fresh, timely, and high-impact.
+CRITICAL THEME & TOPIC DIVERSITY RULE:
+- Today's thematic pillar is: {slot_info.get('theme', 'Daily Trend')} ({slot_info.get('category', 'General')}).
+- Topic Headline / Trend: "{slot_info.get('direction', '')}".
+- Angle & Focus: {slot_info.get('angle', 'an insightful breakdown')}.
+- THEMATIC VISUAL & CONTENT RULES:
+  * If Culture / Festivals (e.g. Durga Puja, Kali Puja, Diwali, Indian heritage, architecture, traditional arts):
+    Celebrate the cultural grandeur, festive joy, history, and community spirit.
+    Slide 1 front image query MUST be an authentic cultural photograph (e.g. 'kumartuli maa durga idol sculpting kolkata' or 'diwali traditional diya oil lamp glowing golden hour').
+  * If Technology / AI Tools:
+    Explain practical applications, architecture, and real-world tools with high-tech / clean hardware visuals.
+  * If Health / Longevity / Wellness:
+    Provide science-backed habits, nutrition, and daily vitality routines with fresh organic lifestyle visuals.
+  * If Productivity / Mindset / Career:
+    Provide actionable frameworks, daily micro-systems, and time management strategies.
+  * If Startups / Business / Wealth:
+    Dissect business models, founder mindset, and modern wealth-building principles.
+  * If Science / Cosmos / Mysteries:
+    Bring out the awe-inspiring cosmic discoveries, astronomy, and universe wonders.
+- Do NOT use dry, boring news reports or generic filler. Deliver rich, substantial, highly engaging storytelling that stops users mid-scroll!
 
 {lang_spec}
 

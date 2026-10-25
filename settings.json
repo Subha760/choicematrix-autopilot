@@ -1,18 +1,18 @@
 {
   "brand": "Choicematrix",
-  "niche": "Mixed: learning, technology, productivity, creativity, and everyday life",
-  "audience": "Adults who enjoy useful, short, original educational and lifestyle ideas",
+  "niche": "Diverse daily rotating themes: Tech & AI, Productivity & Habits, Science & Space, Health & Longevity, Startups & Wealth, Culture & Festivals, Human Wisdom & Stories",
+  "audience": "Curious adults and young professionals seeking inspiring ideas, modern trends, actionable wisdom, and cultural pride",
   "language": "English",
   "slots": {
     "afternoon": {
-      "name": "Global Tech & Systems (English)",
+      "name": "Global Daily Thematic Trends (English)",
       "publish_time_ist": "14:00",
       "language": "English",
       "feed": "global",
       "style": "cyber_minimalist"
     },
     "evening": {
-      "name": "Regional Trends (Hindi / Bengali)",
+      "name": "Regional Daily Thematic Trends (Hindi / Bengali)",
       "publish_time_ist": "20:00",
       "feed": "regional",
       "style": "warm_editorial"
@@ -24,7 +24,7 @@
   "publish_time_evening_ist": "20:00",
   "approval_required": true,
   "publishing_enabled": true,
-  "content_style": "Human, friendly and visually clear; specific not clickbait; useful but not preachy",
+  "content_style": "Engaging, authentic, visually rich; specific and practical, not generic filler; culturally celebratory and deeply inspiring",
   "max_post_age_hours": 48,
   "manual_publish_only": false,
   "require_original_artwork": true,
