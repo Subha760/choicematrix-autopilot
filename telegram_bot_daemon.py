@@ -33,6 +33,8 @@ def load_env():
                 k, v = line.split("=", 1)
                 os.environ[k.strip().lstrip("\ufeff")] = v.strip()
 
+load_env()
+
 def read_json(path, default):
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -132,6 +134,9 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None, target_s
     entry["status"] = "approved"
     entry["approved_at"] = datetime.now(timezone.utc).isoformat()
     entry["approval_hash"] = autopilot.approval_digest(entry)
+    for p in ("fb", "ig", "threads"):
+        if entry.get(p, {}).get("status") != "published":
+            entry[p] = {"status": "not_started", "id": None, "container": None}
     slot_name = entry.get("slot", "post").capitalize()
     pub_time = entry.get("publish_time_ist", "14:00")
     write_json(STATE, posts)
