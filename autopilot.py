@@ -1593,7 +1593,7 @@ def image_art(date_key, revision, settings, item, slot="afternoon"):
 def public_url(relative_image_path):
     base = getenv("PUBLIC_BASE_URL")
     if not base:
-        full = getenv("GITHUB_REPOSITORY", True)
+        full = getenv("GITHUB_REPOSITORY") or "Subha760/choicematrix-autopilot"
         owner, repo = full.split("/", 1)
         base = f"https://raw.githubusercontent.com/{owner}/{repo}/main/docs"
     clean_path = str(relative_image_path).lstrip("/")
@@ -1903,11 +1903,28 @@ def threads_publish(entry):
                 url = f"https://graph.threads.net/v1.0/{threads_user}/threads"
                 r = requests.post(url, headers={"Authorization": f"Bearer {token}"},
                                   data={"media_type": "IMAGE", "image_url": public_url(img), "is_carousel_item": "true"}, timeout=45)
-                child_ids.append(r.json()["id"])
+                res_data = r.json()
+                if not res_data.get("id"):
+                    raise ValueError(f"Threads child upload error: {res_data}")
+                child_ids.append(res_data["id"])
+
+            # Wait for all child item containers to be FINISHED
+            for cid in child_ids:
+                for _ in range(12):
+                    st = requests.get(f"https://graph.threads.net/v1.0/{cid}",
+                                      headers={"Authorization": f"Bearer {token}"},
+                                      params={"fields": "status"}).json().get("status")
+                    if st == "FINISHED":
+                        break
+                    time.sleep(2)
+
             parent_url = f"https://graph.threads.net/v1.0/{threads_user}/threads"
             r = requests.post(parent_url, headers={"Authorization": f"Bearer {token}"},
                               data={"media_type": "CAROUSEL", "children": ",".join(child_ids), "text": caption}, timeout=45)
-            state["container"] = r.json()["id"]
+            parent_data = r.json()
+            if not parent_data.get("id"):
+                raise ValueError(f"Threads parent carousel error: {parent_data}")
+            state["container"] = parent_data["id"]
             state["status"] = "container_created"
     else:
         if not state.get("container"):
@@ -1963,19 +1980,20 @@ def durable_reserve(posts, entry, platform):
     entry[platform]["status"] = "attempting"
     entry[platform]["attempted_at"] = datetime.now(timezone.utc).isoformat()
     write_json(STATE, posts)
-    if os.getenv("GITHUB_ACTIONS", "").lower() != "true":
+    allow_local = os.getenv("ALLOW_LOCAL_PUBLISH", "false").lower() == "true"
+    if os.getenv("GITHUB_ACTIONS", "").lower() != "true" and not allow_local:
         raise RuntimeError("Publishing blocked outside GitHub Actions durable commit")
+    mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
+    git_bin = mingit if Path(mingit).exists() else "git"
     relative_state = STATE.relative_to(ROOT).as_posix()
-    subprocess.run(["git", "add", relative_state], cwd=ROOT, check=True, timeout=20)
-    subprocess.run(["git", "-c", "user.name=social-autopilot[bot]",
+    subprocess.run([git_bin, "-C", str(ROOT), "add", relative_state], check=True, timeout=20)
+    subprocess.run([git_bin, "-C", str(ROOT), "-c", "user.name=social-autopilot[bot]",
                     "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
                     "commit", "-m", f"chore: reserve {platform} {entry['date']} [skip ci]"],
-                   cwd=ROOT, check=True, timeout=20, capture_output=True)
-    branch = getenv("GITHUB_REF_NAME", True)
-    if not re.fullmatch(r"[a-zA-Z0-9_./-]+", branch) or branch.startswith("-"):
-        raise RuntimeError("Invalid checked-out branch for checkpoint")
-    subprocess.run(["git", "push", "origin", f"HEAD:{branch}"],
-                   cwd=ROOT, check=True, timeout=40, capture_output=True)
+                   check=True, timeout=20, capture_output=True)
+    branch = getenv("GITHUB_REF_NAME") or "main"
+    subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", f"HEAD:{branch}"],
+                   check=True, timeout=40, capture_output=True)
 
 
 def process_publications(posts, settings, now):
