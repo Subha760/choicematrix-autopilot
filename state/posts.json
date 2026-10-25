@@ -419,12 +419,13 @@
       "search_query": "lofi chill study"
     },
     "image_sha256": "41e28e634496bd85ac4fd907979ebccf150f4e7a51c2b9c31061f18b5e65d789",
-    "status": "approved",
+    "status": "publishing",
     "approved_at": "2026-10-24T17:34:23.463614+00:00",
     "approval_hash": "7bec6f2ee53b8d99081948e9ea1647044830b764334efd6f295db74e3403f025",
     "fb": {
-      "status": "not_started",
-      "id": null
+      "status": "attempting",
+      "id": null,
+      "attempted_at": "2026-10-25T11:05:17.186905+00:00"
     },
     "ig": {
       "status": "not_started",
@@ -572,9 +573,9 @@
       "search_query": "M83 Midnight City instrumental"
     },
     "image_sha256": "661c5b89689dd18d90446299901bfdcf54d96b795773776c2b979b0e6b538f33",
-    "status": "pending",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-10-25T11:05:16.715461+00:00",
+    "approval_hash": "e36bc634ef0610b40b343b1e7ee0da88269570e9b55d26bf4a3879c44aa1e0f1",
     "fb": {
       "status": "not_started",
       "id": null
