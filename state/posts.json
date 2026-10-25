@@ -479,14 +479,16 @@
     "approved_at": "2026-10-24T17:34:28.315154+00:00",
     "approval_hash": "a11f4b12e12613d5e7f6636ce108f6c53b6b8f350b37904dfc39f056fcad428b",
     "fb": {
-      "status": "attempting",
+      "status": "error",
       "id": null,
-      "attempted_at": "2026-10-25T11:06:11.382339+00:00"
+      "attempted_at": "2026-10-25T11:06:11.382339+00:00",
+      "error": "Meta 1279646595235354/photos rejected request: Error validating access token: Session has expired on Saturday, 24-Oct-26 11:00:00 PDT. The current time is Sunday, 25-Oct-26 04:06:17 PDT."
     },
     "ig": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-10-25T11:06:18.709379+00:00"
     },
     "threads": {
       "status": "not_started",
