@@ -582,17 +582,17 @@
       "search_query": "M83 Midnight City instrumental"
     },
     "image_sha256": "661c5b89689dd18d90446299901bfdcf54d96b795773776c2b979b0e6b538f33",
-    "status": "approved",
+    "status": "published",
     "approved_at": "2026-10-25T11:05:16.715461+00:00",
     "approval_hash": "e36bc634ef0610b40b343b1e7ee0da88269570e9b55d26bf4a3879c44aa1e0f1",
     "fb": {
-      "status": "not_started",
-      "id": null
+      "status": "published",
+      "id": "1279646595235354_122131773075465406"
     },
     "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "status": "published",
+      "id": "18230863318333822",
+      "container": "18121086524470290"
     },
     "threads": {
       "status": "published",
