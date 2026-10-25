@@ -2,8 +2,19 @@
 set -e
 
 echo "=========================================================="
-echo "🚀 Setting up Choicematrix Autopilot on Google Cloud VM"
+echo "🚀 Setting up Choicematrix Autopilot on Oracle Cloud VM"
 echo "=========================================================="
+
+# 0. Configure 4GB Swapfile to prevent OOM on 1GB RAM instances
+if [ ! -f /swapfile ]; then
+    echo "💾 Creating 4GB swap space to ensure smooth Playwright/Chromium operation..."
+    sudo fallocate -l 4G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=4096
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+    echo "✅ Swap configured: $(free -h | grep -i swap)"
+fi
 
 # 1. System packages
 echo "📦 Updating system packages..."
