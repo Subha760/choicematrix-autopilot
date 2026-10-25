@@ -531,12 +531,13 @@
       "search_query": "বাউল লো-ফাই বিটস ইন্সট্রুমেন্টাল"
     },
     "image_sha256": "b6c0f1080cd766be91b35a90f1b21266fe3a260c35b22c674c13adb5cb3eb37d",
-    "status": "approved",
+    "status": "publishing",
     "approved_at": "2026-10-25T08:40:16.162359+00:00",
     "approval_hash": "1b53bdbbae7538537c2c0337c2c2519ad9dd574224f39445e88b9c8ebd381b13",
     "fb": {
-      "status": "not_started",
-      "id": null
+      "status": "attempting",
+      "id": null,
+      "attempted_at": "2026-10-25T14:34:35.529932+00:00"
     },
     "ig": {
       "status": "not_started",
