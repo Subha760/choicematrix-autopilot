@@ -60,54 +60,98 @@ def resize_and_crop(photo: Image.Image, W: int, H: int) -> Image.Image:
     return photo.resize((W, H), Image.Resampling.LANCZOS)
 
 
-def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350) -> Image.Image | None:
+def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350, used_ids: set | None = None) -> Image.Image | None:
     """Fetch high-res photo from Unsplash matching query, with curated fallback."""
     UNSPLASH_CACHE.mkdir(parents=True, exist_ok=True)
     access_key = getenv("UNSPLASH_ACCESS_KEY")
-    cleaned_query = re.sub(r"[^\w\s]", "", query or "technology").strip() or "technology"
-    cache_key = hashlib.sha256(cleaned_query.lower().encode()).hexdigest()[:12]
-    cached_file = UNSPLASH_CACHE / f"{cache_key}.jpg"
-    if cached_file.exists():
+
+    # 1. Clean query of noise tags (e.g. 'STEP 01', 'HOT TREND', etc.)
+    raw_query = query or "technology"
+    cleaned = re.sub(r"\b(step\s*\d+|hot\s*trend|summary|connect|takeaway|breakdown)\b", "", raw_query, flags=re.IGNORECASE)
+    cleaned = re.sub(r"[^\w\s]", "", cleaned).strip()
+    if not cleaned or len(cleaned) < 3:
+        cleaned = "technology future"
+
+    cache_key = hashlib.sha256(cleaned.lower().encode()).hexdigest()[:12]
+    cached_file = UNSPLASH_CACHE / f"v2_{cache_key}.jpg"
+    if cached_file.exists() and (used_ids is None or len(used_ids) == 0):
         try:
             return Image.open(cached_file).convert("RGB")
         except Exception:
             pass
 
-    # 1. Try official Unsplash API if access key is present
-    if access_key:
-        try:
-            url = "https://api.unsplash.com/search/photos"
-            params = {"query": cleaned_query, "per_page": 1, "orientation": "portrait"}
-            headers = {"Authorization": f"Client-ID {access_key}"}
-            r = requests.get(url, params=params, headers=headers, timeout=6)
-            if r.status_code == 200:
-                results = r.json().get("results", [])
-                if results:
-                    img_url = results[0]["urls"].get("regular") or results[0]["urls"].get("small")
-                    img_data = requests.get(img_url, timeout=10).content
-                    photo = Image.open(io.BytesIO(img_data)).convert("RGB")
-                    processed = resize_and_crop(photo, W, H)
-                    try:
-                        processed.save(cached_file, "JPEG", quality=92)
-                    except Exception:
-                        pass
-                    return processed
-        except Exception as e:
-            print(f"Unsplash API search warning: {e}")
+    # 2. Candidate queries for graceful keyword relaxation
+    words = [w for w in cleaned.split() if len(w) > 2]
+    candidate_queries = [cleaned]
+    if len(words) > 3:
+        candidate_queries.append(" ".join(words[:3]))
+        candidate_queries.append(" ".join(words[-3:]))
+    if len(words) > 1:
+        candidate_queries.append(" ".join(words[:2]))
+    candidate_queries.append("modern technology future")
 
-    # 2. Curated high-res Unsplash photos mapped across topic categories
+    # 3. Try official Unsplash API if access key is present
+    if access_key:
+        for cq in candidate_queries:
+            try:
+                url = "https://api.unsplash.com/search/photos"
+                params = {"query": cq, "per_page": 10, "order_by": "relevant"}
+                headers = {"Authorization": f"Client-ID {access_key}"}
+                r = requests.get(url, params=params, headers=headers, timeout=6)
+                if r.status_code == 200:
+                    results = r.json().get("results", [])
+                    available = [p for p in results if used_ids is None or p.get("id") not in used_ids]
+                    if not available:
+                        available = results
+                    if available:
+                        best = max(available, key=lambda p: p.get("likes", 0))
+                        pid = best.get("id")
+                        if used_ids is not None and pid:
+                            used_ids.add(pid)
+                        img_url = best["urls"].get("regular") or best["urls"].get("small")
+                        img_data = requests.get(img_url, timeout=10).content
+                        photo = Image.open(io.BytesIO(img_data)).convert("RGB")
+                        processed = resize_and_crop(photo, W, H)
+                        try:
+                            processed.save(cached_file, "JPEG", quality=92)
+                        except Exception:
+                            pass
+                        return processed
+            except Exception as e:
+                print(f"Unsplash API search warning on '{cq}': {e}")
+
+    # 4. Curated high-res Unsplash photos mapped across topic categories
     CURATED_UNSPLASH = [
-        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1080&q=80",  # Tech / Circuit
-        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&q=80",  # AI / Neon Flow
-        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1080&q=80",  # Coding / Laptop
-        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1080&q=80",  # Cosmos / Space
-        "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=1080&q=80",  # Team / Startup
-        "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1080&q=80",  # India Monument / Heritage
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1080&q=80",  # Gadget / Audio
-        "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=1080&q=80",  # Green Energy
-        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1080&q=80",  # Strategy / Mindset
+        # Cyberpunk / AI / Tech / Microchips
+        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1080&q=85",
+        "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1080&q=85",
+        "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=1080&q=85",
+        "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1080&q=85",
+        "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1080&q=85",
+        "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1080&q=85",
+        "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=1080&q=85",
+        "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1080&q=85",
+        # India / Culture / Kolkata / Heritage
+        "https://images.unsplash.com/photo-1634015158905-de840be0c62c?w=1080&q=85",
+        "https://images.unsplash.com/photo-1593847794002-a67998d742fc?w=1080&q=85",
+        "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1080&q=85",
+        "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=1080&q=85",
+        "https://images.unsplash.com/photo-1605649487212-47bdab064df7?w=1080&q=85",
+        # Agriculture / Nature / Green Crops
+        "https://images.unsplash.com/photo-1560493676-04071c5f467b?w=1080&q=85",
+        "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1080&q=85",
+        "https://images.unsplash.com/photo-1537401845705-1a04003a2973?w=1080&q=85",
+        "https://images.unsplash.com/photo-1608424371207-ab70d9d68e80?w=1080&q=85",
+        # Health / Science / Biotech / Wellness
+        "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=1080&q=85",
+        "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=1080&q=85",
+        "https://images.unsplash.com/photo-1576086213369-97a306d36557?w=1080&q=85",
+        "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=1080&q=85",
+        # Global / Futuristic Concepts
+        "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1080&q=85",
+        "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1080&q=85"
     ]
-    idx = int(hashlib.sha256(cleaned_query.encode()).hexdigest()[:8], 16) % len(CURATED_UNSPLASH)
+    idx = int(hashlib.sha256(cleaned.encode()).hexdigest()[:8], 16) % len(CURATED_UNSPLASH)
     try:
         r = requests.get(CURATED_UNSPLASH[idx], timeout=8)
         if r.status_code == 200:
@@ -537,7 +581,7 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
 - Visual Title, subtitle, caption, all 6 slide headlines, and all slide body text MUST be written in Bengali script.
 - Provide an appropriate transliterated hashtag list (e.g. #KolkataTech #WestBengalInnovation #TechBangla #Choicematrix).
 - Recommend a real trending modern Bengali indie / Baul-Lo-Fi fusion / Rabindra fusion / Kolkata acoustic instrumental track (e.g. Baul Lo-Fi Beats, Somlata indie acoustic, Kolkata Lo-Fi chill).
-- Provide a targeted 'unsplash_query' (2-3 words, e.g., 'kolkata heritage architecture', 'bengal cultural art', 'modern kolkata city', 'reading library books').
+- Provide a targeted 'unsplash_query' in ENGLISH (3-5 evocative, cinematic words, e.g., 'kolkata heritage howrah bridge golden hour', 'kumartuli durga idol clay sculpting', 'rural bengal green jute farm').
 - Slide 6 CTA:
   headline: "তথ্যটি ভালো লেগেছে কি? 💡"
   body: "Follow @{brand.lower()} প্রতিদিনের সেরা টেক ট্রেন্ড, শিক্ষা ও উদ্ভাবনের আপডেটের জন্য! 🚀🔥✨\\n\\n📌 পোস্টটি সেভ করে রাখুন\\n↗️ বন্ধুদের সাথে শেয়ার করুন"
@@ -548,7 +592,7 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
 - Visual Title, subtitle, caption, all 6 slide headlines, and all slide body text MUST be written in Devanagari Hindi script.
 - Provide an appropriate transliterated hashtag list (e.g. #TechInHindi #DigitalIndia #IndiaTech #Choicematrix).
 - Recommend a real trending Indian indie / Bollywood acoustic / Coke Studio Bharat / Lo-Fi chill instrumental track (e.g. Prateek Kuhad vibe, Anuv Jain acoustic, Coke Studio Bharat, Indian Lo-Fi Beats, Acoustic Sitar chill).
-- Provide a targeted 'unsplash_query' (2-3 words, e.g., 'india modern technology', 'delhi mumbai tech hub', 'indian innovation lab', 'smartphone user desk').
+- Provide a targeted 'unsplash_query' in ENGLISH (3-5 evocative, cinematic words, e.g., 'india modern technology robotic lab', 'bengaluru tech campus futuristic', 'indian semiconductor innovation').
 - Slide 6 CTA:
   headline: "क्या यह जानकारी उपयोगी लगी? 💡"
   body: "@choicematrix को फॉलो करें रोज़ाना बेहतरीन टेक इनसाइट्स, स्मार्ट टिप्स और ट्रेंडिंग अपडेट्स के लिए! 🚀🔥✨\\n\\n📌 इस पोस्ट को सेव करें\\n↗️ दोस्तों के साथ शेयर करें"
@@ -557,7 +601,7 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
         lang_spec = f"""LANGUAGE: ENGLISH
 - Write in crisp, high-impact, globally relevant English.
 - Recommend a real trending global background audio track (title, artist, vibe, e.g. Synthwave, Lofi Fruits, M83, Deep Focus).
-- Provide a targeted 'unsplash_query' (2-3 words, e.g., 'artificial intelligence laboratory', 'workspace laptop coding', 'modern gadgets desk').
+- Provide a targeted 'unsplash_query' in ENGLISH (3-5 evocative, cinematic words, e.g., 'futuristic quantum computing processor glowing', 'cyberpunk high tech server datacenter', 'holographic user interface display').
 - Slide 6 CTA:
   headline: "FOUND THIS HELPFUL? 💡"
   body: "Follow @{brand.lower()} for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\\n\\n📌 Save this post for later\\n↗️ Share with a friend"
@@ -619,31 +663,36 @@ Return ONLY ONE valid JSON object with this exact structure:
       "tag": "HOT TREND",
       "headline": "Bold 3-6 Word Headline",
       "body": "Compelling 3-4 sentence overview breaking down the problem or opportunity.",
-      "swipe_prompt": "Swipe to explore ➡️"
+      "swipe_prompt": "Swipe to explore ➡️",
+      "image_query": "Targeted 3-4 word English visual query for cover photo (e.g. 'futuristic glowing smartphone display' or 'durga idol kumartuli celebration')"
     }},
     {{
       "slide_number": 2,
       "tag": "STEP 01",
       "headline": "The Core Foundation",
-      "body": "Detailed 4-6 sentence deep dive explaining the foundational mechanism, why traditional approaches fail, and what the new breakthrough does differently."
+      "body": "Detailed 4-6 sentence deep dive explaining the foundational mechanism, why traditional approaches fail, and what the new breakthrough does differently.",
+      "image_query": "Targeted 3-4 word English visual query for foundation concept (e.g. 'circuit board microchip glowing' or 'artisan sculpting clay sculpture')"
     }},
     {{
       "slide_number": 3,
       "tag": "STEP 02",
       "headline": "Actionable Implementation",
-      "body": "Comprehensive 4-6 sentence breakdown of the exact step-by-step process, tools, metrics, and workflows to apply immediately."
+      "body": "Comprehensive 4-6 sentence breakdown of the exact step-by-step process, tools, metrics, and workflows to apply immediately.",
+      "image_query": "Targeted 3-4 word English visual query for process/workflow (e.g. 'ai neural network glowing' or 'rural agriculture field green')"
     }},
     {{
       "slide_number": 4,
       "tag": "STEP 03",
       "headline": "Nuance & Pro Insights",
-      "body": "In-depth 4-6 sentence analysis of common pitfalls to avoid, insider optimizations, and high-leverage habits that multiply your results."
+      "body": "In-depth 4-6 sentence analysis of common pitfalls to avoid, insider optimizations, and high-leverage habits that multiply your results.",
+      "image_query": "Targeted 3-4 word English visual query for deep engineering or nuance (e.g. 'microchip processor circuit macro' or 'traditional weaving golden jute')"
     }},
     {{
       "slide_number": 5,
       "tag": "SUMMARY",
       "headline": "The Master Takeaway",
-      "body": "Full synthesized conclusion uniting the entire framework into a memorable, actionable takeaway ready to put into practice today."
+      "body": "Full synthesized conclusion uniting the entire framework into a memorable, actionable takeaway ready to put into practice today.",
+      "image_query": "Targeted 3-4 word English visual query for future vision/impact (e.g. 'futuristic city skyline night' or 'happy community gathering celebration')"
     }},
     {{
       "slide_number": 6,
@@ -888,15 +937,8 @@ def get_browser_executable():
 
 
 def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afternoon", browser_exe=None):
-    """Render pixel-perfect 1080x1350 carousel slides using Chromium HTML/CSS engine.
-    Ensures 100% correct typography, conjuncts (যুক্তাক্ষর), and vowel matras for Bengali & Hindi.
-    Displays clear, prominent, un-obscured foreground photos and architecture diagrams.
-    """
-    import base64
-    from io import BytesIO
-    from playwright.sync_api import sync_playwright
-
     clean_date = date_key.split("_")[0]
+    day = date.fromisoformat(clean_date)
     language = item.get("language", "English")
     slides_data = item.get("slides") or []
     if not slides_data:
@@ -907,13 +949,12 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
              "body": f"Follow @{settings['brand'].lower()} for more daily updates! 🚀🔥✨\n\n📌 Save this post\n↗️ Share with a friend"}
         ]
     total_slides = len(slides_data)
+    brand = settings.get("brand", "CHOICEMATRIX").upper()
     rendered_paths = []
-    brand = settings.get("brand", "Choicematrix").upper()
-    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Encode native Indic fonts if needed
+    # Fonts
     font_face_css = ""
-    font_family_css = "sans-serif"
+    font_family_css = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
     if language == "Bengali":
         f_b_path = ROOT / "fonts" / "NotoSansBengali-Bold.ttf"
         f_r_path = ROOT / "fonts" / "NotoSansBengali-Regular.ttf"
@@ -938,6 +979,7 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             font_family_css = "'NotoDevanagari', 'Nirmala UI', sans-serif"
 
     theme_pool = THEMES_CYBER if slot == "afternoon" else THEMES_WARM
+    used_ids = set()
 
     with sync_playwright() as p:
         browser = p.chromium.launch(executable_path=browser_exe, headless=True)
@@ -951,47 +993,46 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             body = slide.get("body", "")
             audio = item.get("recommended_audio") or {}
 
-            # Unsplash photo (slide-specific query for true variety)
+            # Unsplash photo (slide-specific query for true variety across all slides)
             slide_tag = slide.get("tag", "")
             slide_img_q = slide.get("image_query") or f"{item.get('unsplash_query', '')} {slide_tag}".strip()
-            bg_photo = fetch_unsplash_image(slide_img_q or item.get("title", "technology"), 1080, 1350)
-            bg_css = f"linear-gradient(180deg, rgb({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]}) 0%, rgb({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]}) 100%)"
+            bg_photo = fetch_unsplash_image(slide_img_q or item.get("title", "technology"), 1080, 1350, used_ids=used_ids)
             bg_b64 = None
             if bg_photo:
                 buf = BytesIO()
-                bg_photo.save(buf, format="JPEG", quality=88)
+                bg_photo.save(buf, format="JPEG", quality=90)
                 bg_b64 = base64.b64encode(buf.getvalue()).decode()
 
             accent_hex = f"#{theme['accent'][0]:02x}{theme['accent'][1]:02x}{theme['accent'][2]:02x}"
             accent_sec_hex = f"#{theme['accent_secondary'][0]:02x}{theme['accent_secondary'][1]:02x}{theme['accent_secondary'][2]:02x}"
-            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.85)"
-            border_css = f"rgba({theme['border'][0]}, {theme['border'][1]}, {theme['border'][2]}, 0.65)"
+            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.88)"
+            border_css = f"rgba({theme['border'][0]}, {theme['border'][1]}, {theme['border'][2]}, 0.70)"
             text_sec_css = f"rgb({theme['text_secondary'][0]}, {theme['text_secondary'][1]}, {theme['text_secondary'][2]})"
 
             if slot == "afternoon":
                 counter_str = f"{slide_num:02d} / {total_slides:02d}"
                 frame_html = f"""
-                <div style="width:100%; height:100%; border:2px solid {border_css}; position:relative; padding:20px;">
-                  <div style="position:absolute; top:-2px; left:-2px; width:34px; height:34px; border-top:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
-                  <div style="position:absolute; top:-2px; right:-2px; width:34px; height:34px; border-top:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
-                  <div style="position:absolute; bottom:-2px; left:-2px; width:34px; height:34px; border-bottom:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
-                  <div style="position:absolute; bottom:-2px; right:-2px; width:34px; height:34px; border-bottom:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
-                  <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:28px 34px;">
+                <div style="width:100%; height:100%; border:2px solid {border_css}; position:relative; padding:18px; backdrop-filter:blur(8px);">
+                  <div style="position:absolute; top:-2px; left:-2px; width:36px; height:36px; border-top:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
+                  <div style="position:absolute; top:-2px; right:-2px; width:36px; height:36px; border-top:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
+                  <div style="position:absolute; bottom:-2px; left:-2px; width:36px; height:36px; border-bottom:4px solid {accent_hex}; border-left:4px solid {accent_hex};"></div>
+                  <div style="position:absolute; bottom:-2px; right:-2px; width:36px; height:36px; border-bottom:4px solid {accent_hex}; border-right:4px solid {accent_hex};"></div>
+                  <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:26px 32px;">
                 """
                 frame_close = "</div></div>"
-                pill_style = f"background:{accent_hex}; color:#0a0f1a; border-radius:8px; padding:8px 24px; font-size:22px; font-weight:bold;"
-                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:26px 32px;"
+                pill_style = f"background:{accent_hex}; color:#0a0f1a; border-radius:8px; padding:8px 24px; font-size:20px; font-weight:bold;"
+                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:22px 28px;"
             else:
                 s_ind = to_indic_digits(f"{slide_num:02d}", language)
                 t_ind = to_indic_digits(f"{total_slides:02d}", language)
                 counter_str = f"{s_ind} / {t_ind}"
                 frame_html = f"""
-                <div style="width:100%; height:100%; border:3px solid {border_css}; border-radius:36px; padding:12px; position:relative;">
-                  <div style="width:100%; height:100%; border:1.5px solid {accent_hex}; border-radius:26px; padding:28px 34px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div style="width:100%; height:100%; border:3px solid {border_css}; border-radius:36px; padding:12px; position:relative; backdrop-filter:blur(8px);">
+                  <div style="width:100%; height:100%; border:1.5px solid {accent_hex}; border-radius:26px; padding:26px 32px; display:flex; flex-direction:column; justify-content:space-between;">
                 """
                 frame_close = "</div></div>"
-                pill_style = f"background:{accent_hex}; color:#241018; border-radius:24px; padding:8px 26px; font-size:22px; font-weight:bold;"
-                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:22px; padding:24px 30px;"
+                pill_style = f"background:{accent_hex}; color:#241018; border-radius:24px; padding:8px 26px; font-size:20px; font-weight:bold;"
+                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:22px; padding:22px 28px;"
 
             # Topic domain detection for diagrams and clear photo showcases
             is_tech_topic = (
@@ -1009,21 +1050,21 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 audio_line = ""
                 if audio.get("title"):
                     audio_prefix = "AUDIO" if slot == "afternoon" else ("অডিও" if language == "Bengali" else "ऑडियो")
-                    audio_line = f"""<div style="margin-top:12px; background:rgba(0,0,0,0.45); border:1px solid {accent_hex}; border-radius:12px; padding:8px 18px; font-size:19px; color:{accent_sec_hex};">
+                    audio_line = f"""<div style="margin-top:10px; background:rgba(0,0,0,0.45); border:1px solid {accent_hex}; border-radius:12px; padding:6px 16px; font-size:18px; color:{accent_sec_hex};">
                       🎵 {audio_prefix}: {audio.get('title')} • {audio.get('artist')} ({audio.get('vibe')})
                     </div>"""
 
-                # PROMINENT CLEAR HERO IMAGE (User requirement: un-obscured, crisp photo on front cover)
+                # PROMINENT 550px COVER HERO PHOTO
                 photo_window_html = ""
                 if bg_b64:
                     loc_badge = "📍 পশ্চিমবঙ্গ • আসল চিত্র" if language == "Bengali" else ("📍 भारत • लाइव अपडेट्स" if language == "Hindi" else "🌐 GLOBAL FRONTIER • LIVE")
                     ver_badge = "📸 আসল আলোকচিত্র" if language == "Bengali" else ("📸 वास्तविक चित्र" if language == "Hindi" else "📸 VERIFIED VISUAL")
                     photo_window_html = f"""
-                    <div style="width:100%; height:410px; border-radius:20px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 12px 30px rgba(0,0,0,0.65); position:relative; margin-bottom:14px;">
+                    <div style="width:100%; height:550px; border-radius:20px; overflow:hidden; border:2.5px solid {accent_hex}; box-shadow:0 16px 40px rgba(0,0,0,0.75); position:relative; margin-bottom:14px;">
                       <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
-                      <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:12px 20px; display:flex; justify-content:space-between; align-items:flex-end;">
-                        <div style="font-size:20px; font-weight:bold; color:{accent_hex};">{loc_badge}</div>
-                        <div style="font-size:15px; color:#ffffff; background:rgba(255,255,255,0.18); border:1px solid {accent_hex}; border-radius:10px; padding:4px 12px;">{ver_badge}</div>
+                      <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.88) 100%); padding:14px 22px; display:flex; justify-content:space-between; align-items:flex-end;">
+                        <div style="font-size:21px; font-weight:bold; color:{accent_hex};">{loc_badge}</div>
+                        <div style="font-size:15px; color:#ffffff; background:rgba(255,255,255,0.2); border:1px solid {accent_hex}; border-radius:10px; padding:4px 14px;">{ver_badge}</div>
                       </div>
                     </div>
                     """
@@ -1031,18 +1072,20 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                     body_font_size = "25px"
                 else:
                     card_body_style = card_style
-                    body_font_size = "31px"
+                    body_font_size = "30px"
 
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:12px 0;">
-                  <div style="color:{accent_hex}; font-size:22px; font-weight:bold; margin-bottom:8px;">{header_tag}</div>
-                  <div style="font-size:44px; font-weight:bold; line-height:1.24; margin-bottom:14px; color:#ffffff;">{headline}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:space-evenly; margin:8px 0;">
+                  <div>
+                    <div style="color:{accent_hex}; font-size:22px; font-weight:bold; margin-bottom:6px;">{header_tag}</div>
+                    <div style="font-size:45px; font-weight:bold; line-height:1.24; color:#ffffff;">{headline}</div>
+                  </div>
                   {photo_window_html}
                   <div style="{card_body_style}">
                     <div style="font-size:{body_font_size}; line-height:1.5; color:{text_sec_css};">{body}</div>
                     {audio_line}
                   </div>
-                  <div style="margin-top:14px; background:{accent_hex}; color:#1a0f28; font-size:23px; font-weight:bold; padding:14px 28px; border-radius:16px; text-align:center;">
+                  <div style="background:{accent_hex}; color:#1a0f28; font-size:23px; font-weight:bold; padding:14px 28px; border-radius:14px; text-align:center;">
                     {swipe_prompt}
                   </div>
                 </div>
@@ -1060,14 +1103,14 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                     b1, b2, b3 = "📌 Save this post to revisit anytime", "💬 Share your thoughts in the comments", "↗️ Send to someone who needs this!"
 
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:16px 0;">
-                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:10px;">{header_tag}</div>
-                  <div style="font-size:46px; font-weight:bold; line-height:1.24; margin-bottom:20px; color:#ffffff;">{headline}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:14px 0;">
+                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:8px;">{header_tag}</div>
+                  <div style="font-size:48px; font-weight:bold; line-height:1.24; margin-bottom:22px; color:#ffffff;">{headline}</div>
                   <div style="{card_style}">
-                    <div style="font-size:36px; font-weight:bold; color:{accent_hex}; margin-bottom:10px;">👉 FOLLOW @{brand}</div>
-                    <div style="font-size:23px; color:{text_sec_css}; margin-bottom:20px;">{sub_cta}</div>
-                    <hr style="border:none; border-top:1.5px solid {border_css}; margin:16px 0;">
-                    <div style="font-size:26px; line-height:1.9; color:#ffffff;">
+                    <div style="font-size:38px; font-weight:bold; color:{accent_hex}; margin-bottom:12px;">👉 FOLLOW @{brand}</div>
+                    <div style="font-size:23px; color:{text_sec_css}; margin-bottom:22px;">{sub_cta}</div>
+                    <hr style="border:none; border-top:1.5px solid {border_css}; margin:18px 0;">
+                    <div style="font-size:27px; line-height:1.95; color:#ffffff;">
                       <div>{b1}</div>
                       <div>{b2}</div>
                       <div>{b3}</div>
@@ -1076,88 +1119,105 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 </div>
                 """
             elif slide_num == 2 and is_tech_topic:
-                # Slide 2 for TECH: HOW IT WORKS ARCHITECTURAL WORKFLOW DIAGRAM
-                step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०१")
+                # Slide 2 for TECH: SHOW BOTH 280px PHOTO + 4-STEP PIPELINE DIAGRAM
+                step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०১")
                 wf_title = "⚙️ সিস্টেম আর্কিটেকচার ওয়ার্কফ্লো" if language == "Bengali" else ("⚙️ सिस्टम आर्किटेक्चर वर्कफ़्लो" if language == "Hindi" else "⚙️ SYSTEM ARCHITECTURE WORKFLOW")
                 live_tag = "লাইভ পাইপলাইন" if language == "Bengali" else ("लाइव पाइपलाइन" if language == "Hindi" else "LIVE PIPELINE")
+                tech_tag = "হার্ডওয়্যার ও আর্কিটেকচার" if language == "Bengali" else ("हार्डवेयर विश्लेषण" if language == "Hindi" else "HARDWARE ARCHITECTURE")
 
                 if language == "Bengali":
-                    s1_i, s1_t, s1_d = "🚀", "১. ডেটা ফ্রেমওয়ার্ক", "মডেল ইনপুট"
-                    s2_i, s2_t, s2_d = "⚡", "২. কোর প্রসেসর", "সুপারকম্পিউটিং"
-                    s3_i, s3_t, s3_d = "🧠", "৩. নিউরাল ক্লাস্টার", "ডিস্ট্রিবিউটেড মেশ"
-                    s4_i, s4_t, s4_d = "🎯", "৪. গ্লোবাল স্কেল", "বাস্তব প্রয়োগ"
+                    s1_i, s1_t, s1_d = "🚀", "১. ইনপুট", "ফ্রেমওয়ার্ক"
+                    s2_i, s2_t, s2_d = "⚡", "২. প্রসেসর", "সুপারকম্পিউটিং"
+                    s3_i, s3_t, s3_d = "🧠", "৩. ক্লাস্টার", "নিউরাল মেশ"
+                    s4_i, s4_t, s4_d = "🎯", "৪. স্কেল", "বাস্তব প্রয়োগ"
                 elif language == "Hindi":
-                    s1_i, s1_t, s1_d = "🚀", "१. डेटा व मॉडल", "इनपुट फ़्रेमवर्क"
-                    s2_i, s2_t, s2_d = "⚡", "२. सुपरकंप्यूटिंग", "क्लाउड प्रोसेसर"
-                    s3_i, s3_t, s3_d = "🧠", "३. न्यूरल क्लस्टर", "हाई-स्पीड मेश"
-                    s4_i, s4_t, s4_d = "🎯", "४. वैश्विक प्रभाव", "व्यावसायिक उपयोग"
+                    s1_i, s1_t, s1_d = "🚀", "१. इनपुट", "फ़्रेमवर्क"
+                    s2_i, s2_t, s2_d = "⚡", "२. प्रोसेसर", "क्लाउड कंप्यूटिंग"
+                    s3_i, s3_t, s3_d = "🧠", "३. क्लस्टर", "हाई-स्पीड मेश"
+                    s4_i, s4_t, s4_d = "🎯", "४. प्रभाव", "व्यावसायिक उपयोग"
                 else:
-                    s1_i, s1_t, s1_d = "🚀", "1. Startup App", "Model Weights"
-                    s2_i, s2_t, s2_d = "⚡", "2. Core Engine", "Quantum HPC"
-                    s3_i, s3_t, s3_d = "🧠", "3. AI Cluster", "Distributed Mesh"
-                    s4_i, s4_t, s4_d = "🎯", "4. Global Scale", "Commercial API"
+                    s1_i, s1_t, s1_d = "🚀", "1. App Input", "Weights"
+                    s2_i, s2_t, s2_d = "⚡", "2. Core Engine", "HPC Unit"
+                    s3_i, s3_t, s3_d = "🧠", "3. AI Cluster", "Neural Mesh"
+                    s4_i, s4_t, s4_d = "🎯", "4. Global Scale", "Real-Time API"
 
                 diagram_html = f"""
-                <div style="background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.08); border: 1.5px solid {accent_hex}; border-radius: 18px; padding: 20px 18px; margin-bottom: 20px;">
-                  <div style="font-size: 18px; font-weight: bold; color: {accent_hex}; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.08); border: 1.5px solid {accent_hex}; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px;">
+                  <div style="font-size: 16px; font-weight: bold; color: {accent_hex}; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                     <span>{wf_title}</span>
-                    <span style="font-size: 14px; color: {accent_sec_hex}; background: rgba(255, 255, 255, 0.1); border: 1px solid {accent_sec_hex}; border-radius: 8px; padding: 3px 10px;">{live_tag}</span>
+                    <span style="font-size: 13px; color: {accent_sec_hex}; background: rgba(255, 255, 255, 0.1); border: 1px solid {accent_sec_hex}; border-radius: 6px; padding: 2px 8px;">{live_tag}</span>
                   </div>
                   <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
-                      <div style="font-size: 24px;">{s1_i}</div>
-                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s1_t}</div>
-                      <div style="font-size: 12px; color: {text_sec_css}; margin-top: 2px;">{s1_d}</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.95); border: 1px solid {accent_hex}; border-radius: 10px; padding: 10px 4px; text-align: center;">
+                      <div style="font-size: 22px;">{s1_i}</div>
+                      <div style="font-size: 14px; font-weight: bold; color: #ffffff; margin-top: 3px;">{s1_t}</div>
+                      <div style="font-size: 11px; color: {text_sec_css}; margin-top: 2px;">{s1_d}</div>
                     </div>
-                    <div style="font-size: 18px; color: {accent_hex};">➔</div>
-                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_sec_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
-                      <div style="font-size: 24px;">{s2_i}</div>
-                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s2_t}</div>
-                      <div style="font-size: 12px; color: {accent_sec_hex}; margin-top: 2px;">{s2_d}</div>
+                    <div style="font-size: 16px; color: {accent_hex};">➔</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.95); border: 1px solid {accent_sec_hex}; border-radius: 10px; padding: 10px 4px; text-align: center;">
+                      <div style="font-size: 22px;">{s2_i}</div>
+                      <div style="font-size: 14px; font-weight: bold; color: #ffffff; margin-top: 3px;">{s2_t}</div>
+                      <div style="font-size: 11px; color: {accent_sec_hex}; margin-top: 2px;">{s2_d}</div>
                     </div>
-                    <div style="font-size: 18px; color: {accent_hex};">➔</div>
-                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
-                      <div style="font-size: 24px;">{s3_i}</div>
-                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s3_t}</div>
-                      <div style="font-size: 12px; color: {text_sec_css}; margin-top: 2px;">{s3_d}</div>
+                    <div style="font-size: 16px; color: {accent_hex};">➔</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.95); border: 1px solid {accent_hex}; border-radius: 10px; padding: 10px 4px; text-align: center;">
+                      <div style="font-size: 22px;">{s3_i}</div>
+                      <div style="font-size: 14px; font-weight: bold; color: #ffffff; margin-top: 3px;">{s3_t}</div>
+                      <div style="font-size: 11px; color: {text_sec_css}; margin-top: 2px;">{s3_d}</div>
                     </div>
-                    <div style="font-size: 18px; color: {accent_hex};">➔</div>
-                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.9); border: 1.5px solid {accent_hex}; border-radius: 12px; padding: 12px 6px; text-align: center;">
-                      <div style="font-size: 24px;">{s4_i}</div>
-                      <div style="font-size: 15px; font-weight: bold; color: #ffffff; margin-top: 4px;">{s4_t}</div>
-                      <div style="font-size: 12px; color: {text_sec_css}; margin-top: 2px;">{s4_d}</div>
+                    <div style="font-size: 16px; color: {accent_hex};">➔</div>
+                    <div style="flex: 1; background: rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.95); border: 1px solid {accent_hex}; border-radius: 10px; padding: 10px 4px; text-align: center;">
+                      <div style="font-size: 22px;">{s4_i}</div>
+                      <div style="font-size: 14px; font-weight: bold; color: #ffffff; margin-top: 3px;">{s4_t}</div>
+                      <div style="font-size: 11px; color: {text_sec_css}; margin-top: 2px;">{s4_d}</div>
                     </div>
                   </div>
                 </div>
                 """
+
+                photo_block = f"""
+                <div style="width:100%; height:280px; border-radius:18px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 10px 28px rgba(0,0,0,0.6); position:relative; margin-bottom:12px;">
+                  <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                  <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:8px 18px; display:flex; justify-content:space-between;">
+                    <div style="font-size:16px; font-weight:bold; color:{accent_hex};">🔬 {tech_tag}</div>
+                  </div>
+                </div>
+                """ if bg_b64 else ""
+
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:16px 0;">
-                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:10px;">{step_str}</div>
-                  <div style="font-size:44px; font-weight:bold; line-height:1.24; margin-bottom:18px; color:#ffffff;">{headline}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:space-evenly; margin:8px 0;">
+                  <div>
+                    <div style="color:{accent_hex}; font-size:22px; font-weight:bold; margin-bottom:6px;">{step_str}</div>
+                    <div style="font-size:44px; font-weight:bold; line-height:1.24; color:#ffffff;">{headline}</div>
+                  </div>
+                  {photo_block}
                   {diagram_html}
-                  <div style="{card_style}">
-                    <div style="font-size:27px; line-height:1.6; color:{text_sec_css};">{body}</div>
+                  <div style="background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:20px 26px;">
+                    <div style="font-size:25px; line-height:1.55; color:{text_sec_css};">{body}</div>
                   </div>
                 </div>
                 """
-            elif slide_num == 2 and not is_tech_topic and bg_b64:
-                # Slide 2 for CULTURE / NEWS / HEALTH: CLEAR PHOTO SHOWCASE
+            elif slide_num == 2 and not is_tech_topic:
+                # Slide 2 for CULTURE / NEWS / HEALTH: 380px CLEAR PHOTO SHOWCASE
                 step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०१")
                 loc_badge = "📍 পশ্চিমবঙ্গ • সমসাময়িক দৃশ্য" if language == "Bengali" else ("📍 भारत • प्रत्यक्ष दृश्य" if language == "Hindi" else "🌐 GROUND PERSPECTIVE")
                 ver_badge = "📸 আসল দৃশ্য" if language == "Bengali" else ("📸 वास्तविक दृश्य" if language == "Hindi" else "📸 VERIFIED")
                 photo_card_html = f"""
-                <div style="width:100%; height:300px; border-radius:18px; overflow:hidden; border:1.5px solid {accent_hex}; box-shadow:0 10px 24px rgba(0,0,0,0.5); position:relative; margin-bottom:18px;">
+                <div style="width:100%; height:380px; border-radius:20px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 12px 30px rgba(0,0,0,0.6); position:relative; margin-bottom:14px;">
                   <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
                   <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:10px 18px; display:flex; justify-content:space-between; align-items:flex-end;">
-                    <div style="font-size:18px; font-weight:bold; color:{accent_hex};">{loc_badge}</div>
-                    <div style="font-size:14px; color:#ffffff; background:rgba(255,255,255,0.18); border:1px solid {accent_hex}; border-radius:8px; padding:3px 10px;">{ver_badge}</div>
+                    <div style="font-size:19px; font-weight:bold; color:{accent_hex};">{loc_badge}</div>
+                    <div style="font-size:14px; color:#ffffff; background:rgba(255,255,255,0.2); border:1px solid {accent_hex}; border-radius:8px; padding:4px 12px;">{ver_badge}</div>
                   </div>
                 </div>
-                """
+                """ if bg_b64 else ""
+
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:14px 0;">
-                  <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:10px;">{step_str}</div>
-                  <div style="font-size:44px; font-weight:bold; line-height:1.24; margin-bottom:16px; color:#ffffff;">{headline}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:space-evenly; margin:8px 0;">
+                  <div>
+                    <div style="color:{accent_hex}; font-size:22px; font-weight:bold; margin-bottom:6px;">{step_str}</div>
+                    <div style="font-size:44px; font-weight:bold; line-height:1.24; color:#ffffff;">{headline}</div>
+                  </div>
                   {photo_card_html}
                   <div style="background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:22px 28px;">
                     <div style="font-size:26px; line-height:1.55; color:{text_sec_css};">{body}</div>
@@ -1165,6 +1225,7 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 </div>
                 """
             else:
+                # Slides 3, 4, 5: 320px PHOTO CARD + METRIC BADGE + TEXT CARD
                 if slot == "afternoon":
                     step_str = f"⚡ STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "✨ SUMMARY"
                 elif language == "Bengali":
@@ -1172,7 +1233,16 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 else:
                     step_str = f"⚡ चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "✨ निष्कर्ष"
 
-                # Visual chart or data badge for tech / news inspection
+                photo_card_html = f"""
+                <div style="width:100%; height:320px; border-radius:18px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 12px 30px rgba(0,0,0,0.6); position:relative; margin-bottom:12px;">
+                  <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
+                  <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:8px 18px; font-size:16px; font-weight:bold; color:{accent_hex};">
+                    🔍 {slide_img_q.upper()}
+                  </div>
+                </div>
+                """ if bg_b64 else ""
+
+                # Badge
                 badge_html = ""
                 custom_badge = slide.get("visual_badge")
                 if custom_badge and isinstance(custom_badge, dict):
@@ -1210,48 +1280,53 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
 
                 if b_type == "chart" or slot == "afternoon":
                     badge_html = f"""
-                    <div style="margin-bottom: 22px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 16px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="margin-bottom: 12px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 16px; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between;">
                       <div>
-                        <div style="font-size: 19px; font-weight: bold; color: {accent_hex}; letter-spacing: 0.8px;">{b_lbl}</div>
-                        <div style="font-size: 31px; font-weight: bold; color: #ffffff; margin-top: 4px;">{b_val}</div>
+                        <div style="font-size: 17px; font-weight: bold; color: {accent_hex}; letter-spacing: 0.8px;">{b_lbl}</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #ffffff; margin-top: 2px;">{b_val}</div>
                       </div>
-                      <svg width="140" height="54" viewBox="0 0 140 54">
+                      <svg width="130" height="46" viewBox="0 0 130 46">
                         <defs>
                           <linearGradient id="grad{slide_num}" x1="0%" y1="0%" x2="0%" y2="100%">
                             <stop offset="0%" stop-color="{accent_hex}" stop-opacity="0.45"/>
                             <stop offset="100%" stop-color="{accent_hex}" stop-opacity="0.0"/>
                           </linearGradient>
                         </defs>
-                        <path d="M0 45 Q 35 40, 70 22 T 140 8 L 140 54 L 0 54 Z" fill="url(#grad{slide_num})" />
-                        <path d="M0 45 Q 35 40, 70 22 T 140 8" fill="none" stroke="{accent_hex}" stroke-width="3" />
-                        <circle cx="140" cy="8" r="4.5" fill="{accent_sec_hex}" />
+                        <path d="M0 38 Q 32 32, 65 18 T 130 6 L 130 46 L 0 46 Z" fill="url(#grad{slide_num})" />
+                        <path d="M0 38 Q 32 32, 65 18 T 130 6" fill="none" stroke="{accent_hex}" stroke-width="2.8" />
+                        <circle cx="130" cy="6" r="4.5" fill="{accent_sec_hex}" />
                       </svg>
                     </div>
                     """
                 else:
                     icon_e = "🎭" if "শিল্প" in b_lbl or "নাট্য" in b_lbl else ("📍" if "পশ্চিমবঙ্গ" in b_lbl else "💡")
                     badge_html = f"""
-                    <div style="margin-bottom: 22px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 20px; padding: 18px 26px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="margin-bottom: 12px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 18px; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between;">
                       <div>
-                        <div style="font-size: 20px; font-weight: bold; color: {accent_hex};">{b_lbl}</div>
-                        <div style="font-size: 30px; font-weight: bold; color: #ffffff; margin-top: 4px;">{b_val}</div>
+                        <div style="font-size: 18px; font-weight: bold; color: {accent_hex};">{b_lbl}</div>
+                        <div style="font-size: 28px; font-weight: bold; color: #ffffff; margin-top: 2px;">{b_val}</div>
                       </div>
-                      <div style="font-size: 38px;">{icon_e}</div>
+                      <div style="font-size: 34px;">{icon_e}</div>
                     </div>
                     """
 
                 content_html = f"""
-                <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:20px 0;">
-                  <div style="color:{accent_hex}; font-size:24px; font-weight:bold; margin-bottom:14px;">{step_str}</div>
-                  <div style="font-size:46px; font-weight:bold; line-height:1.24; margin-bottom:20px; color:#ffffff;">{headline}</div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:space-evenly; margin:8px 0;">
+                  <div>
+                    <div style="color:{accent_hex}; font-size:22px; font-weight:bold; margin-bottom:6px;">{step_str}</div>
+                    <div style="font-size:44px; font-weight:bold; line-height:1.24; color:#ffffff;">{headline}</div>
+                  </div>
+                  {photo_card_html}
                   {badge_html}
-                  <div style="{card_style}">
-                    <div style="font-size:29px; line-height:1.65; color:{text_sec_css};">{body}</div>
+                  <div style="background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:20px 26px;">
+                    <div style="font-size:26px; line-height:1.55; color:{text_sec_css};">{body}</div>
                   </div>
                 </div>
                 """
 
             footer_tag = "GLOBAL TECH & SYSTEMS" if slot == "afternoon" else ("পশ্চিমবঙ্গ ইনোভেশন ও টেক ট্রেন্ড" if language == "Bengali" else "डिजिटल भारत व टेक ट्रेंड्स")
+
+            bg_css = f"linear-gradient(180deg, rgba({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]}, 0.88) 0%, rgba({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]}, 0.94) 100%), url('data:image/jpeg;base64,{bg_b64}') center/cover no-repeat" if bg_b64 else f"linear-gradient(180deg, rgb({theme['bg_top'][0]},{theme['bg_top'][1]},{theme['bg_top'][2]}) 0%, rgb({theme['bg_bot'][0]},{theme['bg_bot'][1]},{theme['bg_bot'][2]}) 100%)"
 
             slide_html = f"""<!DOCTYPE html>
 <html>
@@ -1272,12 +1347,12 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
 </head>
 <body>
   {frame_html}
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid {border_css}; padding-bottom:18px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid {border_css}; padding-bottom:16px;">
       <div style="{pill_style}">{tag}</div>
-      <div style="font-size:26px; font-weight:bold; color:{accent_sec_hex};">{counter_str}</div>
+      <div style="font-size:24px; font-weight:bold; color:{accent_sec_hex};">{counter_str}</div>
     </div>
     {content_html}
-    <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid {border_css}; padding-top:18px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-top:2px solid {border_css}; padding-top:16px;">
       <div style="font-size:24px; font-weight:bold; color:{accent_hex};">@{brand}</div>
       <div style="font-size:21px; color:{accent_sec_hex};">{footer_tag}</div>
     </div>
@@ -1638,6 +1713,8 @@ def create_post(date_key, settings, posts, revision=1, slot=None):
         "category": content["category"],
         "content_type": content["content_type"],
         "source": content["source"],
+        "slides": content.get("slides"),
+        "unsplash_query": content.get("unsplash_query"),
         "image": primary_image,
         "images": images,
         "recommended_audio": content.get("recommended_audio"),
