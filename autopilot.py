@@ -1699,10 +1699,10 @@ def send_preview(post, settings):
         f"{audio_info}"
         f"{post['caption']}\n\n"
         f"⏰ Scheduled for {publish_time} IST.\n\n"
-        "👉 Reply 'approve' (or 'approve {slot}') to publish 🚀\n"
-        "👉 Reply 'recreate' to generate a fresh new draft 🔄\n"
-        "👉 Reply 'reject' to cancel ❌\n"
-        "👉 Reply 'status' to check status 📊"
+        "👉 To Approve: Reply 'approve afternoon' or 'approve evening' (or 'approve') 🚀\n"
+        "👉 To Reject: Reply 'reject afternoon' or 'reject evening' (or 'reject') ❌\n"
+        "👉 To Recreate: Reply 'recreate afternoon' or 'recreate evening' (or 'recreate') 🔄\n"
+        "👉 To Check Status: Reply 'status' 📊"
     )
     telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000]})
 
@@ -1763,14 +1763,18 @@ def take_approvals(posts, settings, now=None):
             text = msg.get("text", "").strip().lower()
             if user_id == getenv("TG_APPROVER_ID", True) and text:
                 target_slot = None
-                if "evening" in text or "night" in text or "8pm" in text:
+                if any(w in text for w in ("evening", "evenig", "eve", "8pm", "evng", "night")):
                     target_slot = "evening"
-                elif "afternoon" in text or "day" in text or "2pm" in text:
+                elif any(w in text for w in ("afternoon", "after", "2pm", "day", "aft")):
                     target_slot = "afternoon"
 
                 pending_keys = []
                 for k in sorted(posts.keys(), reverse=True):
-                    if posts[k].get("status") == "pending":
+                    if any(w in text for w in ("reject", "no", "cancel")):
+                        status_ok = posts[k].get("status") in ("pending", "approved", "needs_attention", "expired")
+                    else:
+                        status_ok = posts[k].get("status") in ("pending", "needs_attention", "expired")
+                    if status_ok:
                         if target_slot is None or posts[k].get("slot") == target_slot:
                             pending_keys.append(k)
 

@@ -1,6 +1,10 @@
 """Real-time Telegram Approval & Interaction Daemon.
 - 100% Pure text command listener (Zero broken/frozen buttons!).
-- Commands supported: 'approve', 'approve afternoon', 'approve evening', 'recreate', 'reject', 'status'.
+- Commands supported:
+    - 'approve afternoon', 'approve evening', 'approve'
+    - 'reject afternoon', 'reject evening', 'reject', 'reject all'
+    - 'recreate afternoon', 'recreate evening', 'recreate'
+    - 'status'
 - Crash-proof 24/7 background loop with auto-reconnect on network timeout.
 - Instant live publication if approved post is already past its scheduled time.
 - Seamless automatic Git state sync to GitHub main.
@@ -66,7 +70,7 @@ def git_push_state():
     except Exception as exc:
         print(f"Git push state warning: {exc}", flush=True)
 
-def approve_pending_post(posts, approver_name="Subha", target_key=None):
+def approve_pending_post(posts, approver_name="Subha", target_key=None, target_slot=None):
     import autopilot
     entry = None
     if target_key and target_key in posts:
@@ -74,12 +78,14 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None):
     else:
         for k in sorted(posts.keys(), reverse=True):
             if posts[k].get("status") in ("pending", "needs_attention", "expired"):
-                entry = posts[k]
-                target_key = k
-                break
+                if target_slot is None or posts[k].get("slot") == target_slot:
+                    entry = posts[k]
+                    target_key = k
+                    break
 
     if not entry:
-        return False, "⚠️ No pending draft found to approve."
+        slot_label = f" {target_slot.capitalize()}" if target_slot else ""
+        return False, f"⚠️ No pending draft found to approve for{slot_label} post."
 
     entry["status"] = "approved"
     entry["approved_at"] = datetime.now(timezone.utc).isoformat()
@@ -119,44 +125,52 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None):
         f"🌐 Platforms: Facebook, Instagram, Threads{publish_result_msg}"
     )
 
-def reject_pending_post(posts, approver_name="Subha", target_key=None):
+def reject_pending_post(posts, approver_name="Subha", target_key=None, target_slot=None):
     entry = None
     if target_key and target_key in posts:
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "needs_attention", "expired"):
-                entry = posts[k]
-                target_key = k
-                break
+            if posts[k].get("status") in ("pending", "approved", "needs_attention", "expired"):
+                if target_slot is None or posts[k].get("slot") == target_slot:
+                    entry = posts[k]
+                    target_key = k
+                    break
+
     if not entry:
-        return False, "⚠️ No pending draft found to reject."
+        slot_label = f" {target_slot.capitalize()}" if target_slot else ""
+        return False, f"⚠️ No draft found to reject for{slot_label} post."
+
+    slot_name = entry.get("slot", "post").capitalize()
+    if entry.get("status") == "published":
+        return False, f"⚠️ {slot_name} has already been published live and cannot be cancelled."
 
     entry["status"] = "rejected"
     entry["approved_at"] = None
     entry["approval_hash"] = None
-    slot_name = entry.get("slot", "post").capitalize()
     write_json(STATE, posts)
     git_push_state()
-    return True, f"❌ <b>{slot_name.upper()} REJECTED by {approver_name}.</b>\nThis post will not be published. (Reply 'recreate' if you want a fresh draft!)"
+    return True, f"❌ <b>{slot_name.upper()} POST REJECTED by {approver_name}.</b>\nThis post will not be published.\n(Reply 'recreate {slot_name.lower()}' if you want a fresh new draft!)"
 
-def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
+def recreate_and_send_post(posts, approver_name="Subha", target_key=None, target_slot=None):
     approver_id = str(os.getenv("TG_APPROVER_ID", ""))
     entry = None
     if target_key and target_key in posts:
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "rejected", "needs_attention", "expired"):
-                entry = posts[k]
-                target_key = k
-                break
+            if posts[k].get("status") in ("pending", "rejected", "needs_attention", "expired", "approved"):
+                if target_slot is None or posts[k].get("slot") == target_slot:
+                    entry = posts[k]
+                    target_key = k
+                    break
 
+    today = datetime.now().date().isoformat()
     if not target_key:
-        today = datetime.now().date().isoformat()
-        target_key = f"{today}_afternoon"
+        slot_def = target_slot or "afternoon"
+        target_key = f"{today}_{slot_def}"
 
-    slot = entry.get("slot", "afternoon") if entry else ("evening" if "_evening" in target_key else "afternoon")
+    slot = entry.get("slot", "afternoon") if entry else ("evening" if "_evening" in target_key or target_slot == "evening" else "afternoon")
     old_rev = entry.get("revision", 1) if entry else 1
     new_rev = old_rev + 1
 
@@ -182,7 +196,7 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None):
         new_entry = autopilot.create_post(target_key, settings, posts, revision=new_rev, slot=slot)
         write_json(STATE, posts)
         git_push_state()
-        return True, f"✨ New {slot.capitalize()} Carousel Revision {new_rev} generated and sent above!\nReply 'approve' when ready. 🚀"
+        return True, f"✨ New {slot.capitalize()} Carousel Revision {new_rev} generated and sent above!\nReply 'approve {slot}' when ready. 🚀"
     except Exception as e:
         return False, f"⚠️ Error regenerating post: {e}"
 
@@ -223,38 +237,53 @@ def poll_once(offset=0):
             lower_text = text.lower()
             today = datetime.now().date().isoformat()
 
-            # Identify target slot
+            # Identify target slot (supports common abbreviations and misspellings like 'evenig')
             target_slot = None
-            if "afternoon" in lower_text or "2pm" in lower_text:
+            if any(w in lower_text for w in ("afternoon", "after", "2pm", "day", "aft")):
                 target_slot = "afternoon"
-            elif "evening" in lower_text or "8pm" in lower_text:
+            elif any(w in lower_text for w in ("evening", "evenig", "eve", "8pm", "evng", "night")):
                 target_slot = "evening"
 
-            target_key = None
-            if target_slot:
-                target_key = f"{today}_{target_slot}"
-            else:
-                for k in sorted(posts.keys(), reverse=True):
-                    if posts[k].get("status") in ("pending", "needs_attention", "expired"):
-                        target_key = k
-                        break
+            target_key = f"{today}_{target_slot}" if target_slot else None
 
-            # Handle Actions
-            if any(w in lower_text for w in ("approve", "yes", "ok", "publish", "1")):
-                success, msg = approve_pending_post(posts, first_name, target_key=target_key)
+            # 1. Reject All / Reject Both
+            if any(w in lower_text for w in ("reject all", "reject both", "cancel all", "cancel both")):
+                rej_count = 0
+                for s in ("afternoon", "evening"):
+                    sk = f"{today}_{s}"
+                    if sk in posts and posts[sk].get("status") in ("pending", "approved", "needs_attention", "expired"):
+                        posts[sk]["status"] = "rejected"
+                        posts[sk]["approved_at"] = None
+                        posts[sk]["approval_hash"] = None
+                        rej_count += 1
+                if rej_count > 0:
+                    write_json(STATE, posts)
+                    git_push_state()
+                    msg = f"❌ <b>BOTH AFTERNOON & EVENING POSTS REJECTED by {first_name}.</b>\nNeither post will be published today."
+                else:
+                    msg = "⚠️ No active drafts found to reject for today."
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[APPROVED] {target_key} by {first_name}", flush=True)
+                print(f"[REJECT ALL] by {first_name}", flush=True)
 
-            elif any(w in lower_text for w in ("recreate", "regenerate", "new", "retry", "regen", "2")):
-                success, msg = recreate_and_send_post(posts, first_name, target_key=target_key)
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[RECREATED] {target_key} by {first_name}", flush=True)
-
+            # 2. Reject Single Slot (e.g. 'reject afternoon', 'reject evening', 'reject evenig')
             elif any(w in lower_text for w in ("reject", "no", "cancel", "3")):
-                success, msg = reject_pending_post(posts, first_name, target_key=target_key)
+                success, msg = reject_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[REJECTED] {target_key} by {first_name}", flush=True)
+                print(f"[REJECTED] {target_key or target_slot} by {first_name}", flush=True)
 
+            # 3. Approve Single Slot (e.g. 'approve afternoon', 'approve evening', 'approve')
+            elif any(w in lower_text for w in ("approve", "yes", "ok", "publish", "1")):
+                success, msg = approve_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+                print(f"[APPROVED] {target_key or target_slot} by {first_name}", flush=True)
+
+            # 4. Recreate Single Slot (e.g. 'recreate afternoon', 'recreate evening')
+            elif any(w in lower_text for w in ("recreate", "regenerate", "new", "retry", "regen", "2")):
+                success, msg = recreate_and_send_post(posts, first_name, target_key=target_key, target_slot=target_slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+                print(f"[RECREATED] {target_key or target_slot} by {first_name}", flush=True)
+
+            # 5. Check Status
             elif any(w in lower_text for w in ("status", "check", "info")):
                 afternoon_st = posts.get(f"{today}_afternoon", {}).get("status", "not generated").upper()
                 evening_st = posts.get(f"{today}_evening", {}).get("status", "not generated").upper()
@@ -262,18 +291,23 @@ def poll_once(offset=0):
                     f"📊 <b>DAILY SCHEDULE STATUS ({today})</b>\n\n"
                     f"🌞 <b>Afternoon Post (2:00 PM IST)</b>: {afternoon_st}\n"
                     f"🌙 <b>Evening Post (8:00 PM IST)</b>: {evening_st}\n\n"
-                    "👉 Reply <b>approve</b>, <b>recreate</b>, or <b>reject</b>."
+                    "👉 Reply <b>approve afternoon</b> or <b>approve evening</b>\n"
+                    "👉 Reply <b>reject afternoon</b> or <b>reject evening</b>\n"
+                    "👉 Reply <b>recreate afternoon</b> or <b>recreate evening</b>"
                 )
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
+            # 6. Help / Default
             else:
                 msg = (
                     "👋 <b>Choicematrix Autopilot Commands:</b>\n\n"
-                    "• Reply <b>approve</b> to approve the pending draft 🚀\n"
-                    "• Reply <b>approve afternoon</b> or <b>approve evening</b>\n"
-                    "• Reply <b>recreate</b> to generate a fresh new carousel 🔄\n"
-                    "• Reply <b>reject</b> to cancel the draft ❌\n"
-                    "• Reply <b>status</b> to see today's schedule 📊"
+                    "• <b>approve afternoon</b> — Approve 2:00 PM English post 🚀\n"
+                    "• <b>approve evening</b> — Approve 8:00 PM Regional post 🚀\n"
+                    "• <b>reject afternoon</b> — Cancel 2:00 PM post ❌\n"
+                    "• <b>reject evening</b> — Cancel 8:00 PM post ❌\n"
+                    "• <b>recreate afternoon</b> / <b>recreate evening</b> — Generate fresh draft 🔄\n"
+                    "• <b>reject all</b> — Cancel both posts ❌\n"
+                    "• <b>status</b> — View schedule & status 📊"
                 )
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
