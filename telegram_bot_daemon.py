@@ -70,6 +70,48 @@ def git_push_state():
     except Exception as exc:
         print(f"Git push state warning: {exc}", flush=True)
 
+LAST_TOKEN_ALERT = 0
+
+def check_meta_token_health(force=False, reply_chat_id=None):
+    global LAST_TOKEN_ALERT
+    now = time.time()
+    if not force and (now - LAST_TOKEN_ALERT < 21600):  # 6 hours debounce
+        return True, "OK"
+    token = os.getenv("META_PAGE_TOKEN")
+    page_id = os.getenv("FB_PAGE_ID")
+    if not token or not page_id:
+        return False, "META_PAGE_TOKEN or FB_PAGE_ID missing in .env"
+    try:
+        r = requests.get(
+            f"https://graph.facebook.com/v26.0/{page_id}",
+            params={"fields": "id,name", "access_token": token},
+            timeout=10
+        )
+        res = r.json()
+        if not r.ok or "error" in res:
+            err = res.get("error", {})
+            msg = err.get("message", "Unknown error")
+            LAST_TOKEN_ALERT = now
+            alert = (
+                "🚨 <b>ACTION REQUIRED: Meta Access Token Expired!</b>\n\n"
+                f"<i>Error:</i> {msg[:200]}\n\n"
+                "Facebook & Instagram posts cannot publish until refreshed.\n\n"
+                "👉 <b>How to refresh in 1 minute:</b>\n"
+                "1. Open <a href=\"https://developers.facebook.com/tools/explorer/\">Meta Graph API Explorer</a>\n"
+                "2. Under <b>Meta App</b>, select <code>autopost</code>\n"
+                "3. Under <b>User or Page</b>, select <code>Choicematrix</code>\n"
+                "4. Click <b>Generate Access Token</b>\n"
+                "5. Open <a href=\"https://developers.facebook.com/tools/debug/accesstoken/\">Access Token Debugger</a>, paste token, click <b>Extend Access Token</b>\n"
+                "6. Update <code>META_PAGE_TOKEN</code> in your VM <code>.env</code>."
+            )
+            approver_id = reply_chat_id or os.getenv("TG_APPROVER_ID")
+            if approver_id:
+                tg_api("sendMessage", {"chat_id": approver_id, "text": alert, "parse_mode": "HTML", "disable_web_page_preview": True})
+            return False, msg
+        return True, f"Token active for Page {res.get('name')}"
+    except Exception as exc:
+        return False, str(exc)
+
 def approve_pending_post(posts, approver_name="Subha", target_key=None, target_slot=None):
     import autopilot
     entry = None
@@ -297,6 +339,13 @@ def poll_once(offset=0):
                 )
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
+                        # Check Token Status
+            elif any(w in lower_text for w in ("token", "meta token", "key", "keys")):
+                ok, detail = check_meta_token_health(force=True, reply_chat_id=approver_id)
+                if ok:
+                    tg_api("sendMessage", {"chat_id": approver_id, "text": f"✅ <b>Meta Page Token is ACTIVE & VALID!</b>\n\n{detail}", "parse_mode": "HTML"})
+                print(f"[TOKEN CHECK] by {first_name}: {ok}", flush=True)
+
             # 6. Help / Default
             else:
                 msg = (
@@ -307,7 +356,7 @@ def poll_once(offset=0):
                     "• <b>reject evening</b> — Cancel 8:00 PM post ❌\n"
                     "• <b>recreate afternoon</b> / <b>recreate evening</b> — Generate fresh draft 🔄\n"
                     "• <b>reject all</b> — Cancel both posts ❌\n"
-                    "• <b>status</b> — View schedule & status 📊"
+                    "• <b>status</b> — View schedule & status 📊\n• <b>token</b> — Check Meta API token health 🔑"
                 )
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
@@ -319,8 +368,13 @@ def main():
     tg_state = read_json(TG_STATE, {"offset": 0})
     offset = tg_state.get("offset", 0)
     print(f"Listening for text commands on offset {offset}...", flush=True)
+    last_health_check = 0
     while True:
         try:
+            now_ts = time.time()
+            if now_ts - last_health_check > 14400:  # Check every 4 hours
+                last_health_check = now_ts
+                check_meta_token_health(force=False)
             offset = poll_once(offset)
         except Exception as exc:
             print(f"Daemon loop warning ({type(exc).__name__}): {exc}", flush=True)

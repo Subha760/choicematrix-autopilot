@@ -1894,7 +1894,16 @@ def meta_request(method, endpoint, token, data=None):
         raise RuntimeError(f"AMBIGUOUS network error during {endpoint}: {type(exc).__name__}") from exc
     payload = response.json() if "json" in response.headers.get("Content-Type", "") else {}
     if not response.ok or "error" in payload:
-        message = payload.get("error", {}).get("message", f"HTTP {response.status_code}")
+        err = payload.get("error", {})
+        message = err.get("message", f"HTTP {response.status_code}")
+        if err.get("code") == 190 or "access token" in message.lower() or "session has expired" in message.lower():
+            alert_msg = (
+                "🚨 ACTION REQUIRED: Meta Access Token Expired!\n\n"
+                "Facebook and Instagram publishing stopped because your Meta token expired.\n"
+                "👉 Refresh at: https://developers.facebook.com/tools/explorer/\n"
+                "👉 Update META_PAGE_TOKEN in .env and restart daemon."
+            )
+            safe_notify(alert_msg)
         raise ValueError(f"Meta {endpoint} rejected request: {message[:240]}")
     return payload
 
