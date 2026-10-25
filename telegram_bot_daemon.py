@@ -207,8 +207,8 @@ def poll_once(offset=0):
     try:
         r = requests.get(
             f"https://api.telegram.org/bot{token}/getUpdates",
-            params={"offset": offset, "timeout": 8, "allowed_updates": json.dumps(["message"])},
-            timeout=12
+            params={"offset": offset, "timeout": 10, "allowed_updates": json.dumps(["message"])},
+            timeout=25
         )
         res = r.json()
         if not res.get("ok"):
