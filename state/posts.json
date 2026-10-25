@@ -541,15 +541,17 @@
       "error": "Meta 1279646595235354/photos rejected request: Error validating access token: Session has expired on Sunday, 25-Oct-26 06:00:00 PDT. The current time is Sunday, 25-Oct-26 07:34:36 PDT."
     },
     "ig": {
+      "status": "error",
+      "id": null,
+      "container": null,
+      "attempted_at": "2026-10-25T14:34:37.305721+00:00",
+      "error": "Meta 17841444108675574/media rejected request: Error validating access token: Session has expired on Sunday, 25-Oct-26 06:00:00 PDT. The current time is Sunday, 25-Oct-26 07:34:38 PDT."
+    },
+    "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-25T14:34:37.305721+00:00"
-    },
-    "threads": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-25T14:34:38.798004+00:00"
     },
     "created_at": "2026-10-25T05:17:37.560607+00:00"
   },
