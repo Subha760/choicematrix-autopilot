@@ -535,15 +535,14 @@
     "approved_at": "2026-10-25T08:40:16.162359+00:00",
     "approval_hash": "1b53bdbbae7538537c2c0337c2c2519ad9dd574224f39445e88b9c8ebd381b13",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122131881519465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-25T17:18:48.169099+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-25T17:19:02.690756+00:00"
     },
     "threads": {
       "status": "published",
