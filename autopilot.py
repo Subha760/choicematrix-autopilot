@@ -2266,16 +2266,26 @@ def durable_reserve(posts, entry, platform):
     mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
     git_bin = mingit if Path(mingit).exists() else "git"
     relative_state = STATE.relative_to(ROOT).as_posix()
+    branch = getenv("GITHUB_REF_NAME") or "main"
+
+    # Always pull remote changes with rebase before reservation commit & push
+    subprocess.run([git_bin, "-C", str(ROOT), "pull", "--rebase", "origin", branch],
+                   check=False, timeout=30, capture_output=True)
+
     subprocess.run([git_bin, "-C", str(ROOT), "add", relative_state, "docs/posts/"], check=True, timeout=20)
     subprocess.run([git_bin, "-C", str(ROOT), "-c", "user.name=social-autopilot[bot]",
                     "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
-                    "commit", "-m", f"chore: reserve {platform} {entry['date']} [skip ci]"],
+                    "commit", "--allow-empty", "-m", f"chore: reserve {platform} {entry['date']} [skip ci]"],
                    check=True, timeout=20, capture_output=True)
-    branch = getenv("GITHUB_REF_NAME") or "main"
-    subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", f"HEAD:{branch}"],
-                   check=True, timeout=40, capture_output=True)
 
-
+    res = subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", f"HEAD:{branch}"],
+                         timeout=40, capture_output=True)
+    if res.returncode != 0:
+        # Rebase once and retry push on contention
+        subprocess.run([git_bin, "-C", str(ROOT), "pull", "--rebase", "origin", branch],
+                       check=False, timeout=30, capture_output=True)
+        subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", f"HEAD:{branch}"],
+                       check=True, timeout=40, capture_output=True)
 def process_publications(posts, settings, now):
     if settings.get("approval_required") is not True:
         raise RuntimeError("Approval gate disabled: refusing all publishing")

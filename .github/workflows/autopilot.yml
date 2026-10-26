@@ -1,15 +1,13 @@
 name: Social Autopilot 24/7 (Choicematrix)
 
 on:
-  schedule:
-    # 09:00 IST = 03:30 UTC (Daily Drafts Generation for Both Slots & Telegram Previews)
-    - cron: '30 3 * * *'
-    # 14:00 IST = 08:30 UTC (Afternoon Post Publishing: English Global Tech @ 2 PM IST)
-    - cron: '30 8 * * *'
-    # 20:00 IST = 14:30 UTC (Evening Post Publishing: Bengali/Hindi Regional Trends @ 8 PM IST)
-    - cron: '30 14 * * *'
-    # Hourly Heartbeat (Check Telegram Approvals & Stale Post Expirations)
-    - cron: '*/15 * * * *'
+  # Automated 24/7 execution runs exclusively on the Oracle Cloud VM daemon.
+  # Schedule disabled here to prevent race conditions and duplicate publishing.
+  # schedule:
+  #   - cron: '30 3 * * *'
+  #   - cron: '30 8 * * *'
+  #   - cron: '30 14 * * *'
+  #   - cron: '*/15 * * * *'
   workflow_dispatch:
     inputs:
       manual_action:

@@ -387,6 +387,10 @@ def check_and_publish_due_posts():
         settings = read_json(ROOT / "settings.json", {})
         if not settings.get("publishing_enabled", False):
             return
+        mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
+        git_bin = mingit if Path(mingit).exists() else "git"
+        subprocess.run([git_bin, "-C", str(ROOT), "pull", "--rebase", "origin", "main"],
+                       check=False, timeout=20, capture_output=True)
         posts = read_json(STATE, {})
         now_ist = datetime.now(autopilot.IST)
         has_due = False
