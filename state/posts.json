@@ -700,15 +700,14 @@
     "approved_at": "2026-10-26T10:14:20.487887+00:00",
     "approval_hash": "1a704b08ccaa848438aae138ba8404488d0b23939283fed970a9ae81abcad76e",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122132129331465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-26T10:16:29.731159+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-26T10:16:47.529983+00:00"
     },
     "threads": {
       "status": "not_started",
