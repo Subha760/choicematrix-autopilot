@@ -808,13 +808,14 @@
       "posts/2026-10-26_evening-v1-slide6.jpg"
     ],
     "image_sha256": "8484ee2949e24e864466edad5b48c84d39969499563514ba5a3c7eae2d43b0b4",
-    "status": "approved",
+    "status": "publishing",
     "approved_at": "2026-10-26T11:54:09.179013+00:00",
     "approval_hash": "b9f36fc7726fa0c3bd20b32201266e5c28ace513761ffe6033cafe88bae57a68",
     "fb": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-10-26T14:30:15.031337+00:00"
     },
     "ig": {
       "status": "not_started",
