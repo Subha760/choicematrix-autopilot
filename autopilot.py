@@ -1852,6 +1852,17 @@ def create_post(date_key, settings, posts, revision=1, slot=None):
     }
     posts[date_key] = entry
     try:
+        mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
+        git_bin = mingit if Path(mingit).exists() else "git"
+        subprocess.run([git_bin, "-C", str(ROOT), "add", "docs/posts/", STATE.relative_to(ROOT).as_posix()], timeout=20, capture_output=True)
+        subprocess.run([git_bin, "-C", str(ROOT), "-c", "user.name=social-autopilot[bot]",
+                        "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
+                        "commit", "-m", f"chore: persist slides for {date_key} [skip ci]"], timeout=20, capture_output=True)
+        branch = os.getenv("GITHUB_REF_NAME") or "main"
+        subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", f"HEAD:{branch}"], timeout=35, capture_output=True)
+    except Exception as exc:
+        print(f"Git push slides warning: {exc}")
+    try:
         send_preview(entry, settings)
     except Exception:
         posts.pop(date_key, None)
@@ -2195,7 +2206,7 @@ def durable_reserve(posts, entry, platform):
     mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
     git_bin = mingit if Path(mingit).exists() else "git"
     relative_state = STATE.relative_to(ROOT).as_posix()
-    subprocess.run([git_bin, "-C", str(ROOT), "add", relative_state], check=True, timeout=20)
+    subprocess.run([git_bin, "-C", str(ROOT), "add", relative_state, "docs/posts/"], check=True, timeout=20)
     subprocess.run([git_bin, "-C", str(ROOT), "-c", "user.name=social-autopilot[bot]",
                     "-c", "user.email=41898282+github-actions[bot]@users.noreply.github.com",
                     "commit", "-m", f"chore: reserve {platform} {entry['date']} [skip ci]"],

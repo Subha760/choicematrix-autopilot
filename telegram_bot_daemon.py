@@ -66,7 +66,7 @@ def git_push_state():
         mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
         git_bin = mingit if Path(mingit).exists() else "git"
         subprocess.run([git_bin, "-C", str(ROOT), "pull", "--rebase", "origin", "main"], timeout=20, capture_output=True)
-        subprocess.run([git_bin, "-C", str(ROOT), "add", "state/posts.json", "state/generation-attempts.json"], timeout=15, capture_output=True)
+        subprocess.run([git_bin, "-C", str(ROOT), "add", "docs/posts/", "state/posts.json", "state/generation-attempts.json"], timeout=20, capture_output=True)
         subprocess.run([git_bin, "-C", str(ROOT), "commit", "-m", "chore: sync approval state [skip ci]"], timeout=15, capture_output=True)
         subprocess.run([git_bin, "-C", str(ROOT), "push", "origin", "main"], check=True, timeout=25, capture_output=True)
         print("📡 Synced approval state to GitHub main!", flush=True)
