@@ -10,6 +10,7 @@
 - Seamless automatic Git state sync to GitHub main.
 """
 import os
+import re
 import json
 import time
 import requests
@@ -121,7 +122,7 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None, target_s
         entry = posts[target_key]
     else:
         for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "needs_attention", "expired"):
+            if posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
                 if target_slot is None or posts[k].get("slot") == target_slot:
                     entry = posts[k]
                     target_key = k
@@ -298,7 +299,7 @@ def poll_once(offset=0):
                 rej_count = 0
                 for s in ("afternoon", "evening"):
                     sk = f"{today}_{s}"
-                    if sk in posts and posts[sk].get("status") in ("pending", "approved", "needs_attention", "expired"):
+                    if sk in posts and posts[sk].get("status") in ("pending", "approved", "needs_attention", "expired", "rejected"):
                         posts[sk]["status"] = "rejected"
                         posts[sk]["approved_at"] = None
                         posts[sk]["approval_hash"] = None
@@ -312,20 +313,20 @@ def poll_once(offset=0):
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
                 print(f"[REJECT ALL] by {first_name}", flush=True)
 
-            # 2. Reject Single Slot (e.g. 'reject afternoon', 'reject evening', 'reject evenig')
-            elif any(w in lower_text for w in ("reject", "no", "cancel", "3")):
-                success, msg = reject_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
-                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[REJECTED] {target_key or target_slot} by {first_name}", flush=True)
-
-            # 3. Approve Single Slot (e.g. 'approve afternoon', 'approve evening', 'approve')
-            elif any(w in lower_text for w in ("approve", "yes", "ok", "publish", "1")):
+            # 2. Approve Single Slot (Check APPROVE before reject; word boundaries protect 'afternoon')
+            elif any(w in lower_text for w in ("approve", "publish", "accept", "✅")) or re.search(r'\b(yes|ok|1)\b', lower_text):
                 success, msg = approve_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
                 print(f"[APPROVED] {target_key or target_slot} by {first_name}", flush=True)
 
+            # 3. Reject Single Slot (Use word boundary for 'no' so it never matches inside 'afternoon')
+            elif any(w in lower_text for w in ("reject", "cancel", "decline", "❌")) or re.search(r'\b(no|3)\b', lower_text):
+                success, msg = reject_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+                print(f"[REJECTED] {target_key or target_slot} by {first_name}", flush=True)
+
             # 4. Recreate Single Slot (e.g. 'recreate afternoon', 'recreate evening')
-            elif any(w in lower_text for w in ("recreate", "regenerate", "new", "retry", "regen", "2")):
+            elif any(w in lower_text for w in ("recreate", "regenerate", "retry", "regen", "🔄")) or re.search(r'\b(new|2)\b', lower_text):
                 success, msg = recreate_and_send_post(posts, first_name, target_key=target_key, target_slot=target_slot)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
                 print(f"[RECREATED] {target_key or target_slot} by {first_name}", flush=True)
