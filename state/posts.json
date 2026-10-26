@@ -696,7 +696,7 @@
       "search_query": "Starlight Muse"
     },
     "image_sha256": "c88fb8e0448426ffa1d918c386651bece8dd107ed9e1f3c1b6aeb376934dc513",
-    "status": "publishing",
+    "status": "published",
     "approved_at": "2026-10-26T10:14:20.487887+00:00",
     "approval_hash": "1a704b08ccaa848438aae138ba8404488d0b23939283fed970a9ae81abcad76e",
     "fb": {
@@ -710,9 +710,9 @@
       "attempted_at": "2026-10-26T10:16:47.529983+00:00"
     },
     "threads": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18018298847745267",
+      "container": "17989206717113014",
       "attempted_at": "2026-10-26T10:17:41.822209+00:00"
     },
     "created_at": "2026-10-26T03:30:41.799078+00:00"
