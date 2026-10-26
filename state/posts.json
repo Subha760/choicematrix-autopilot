@@ -807,10 +807,10 @@
       "posts/2026-10-26_evening-v1-slide5.jpg",
       "posts/2026-10-26_evening-v1-slide6.jpg"
     ],
-    "image_sha256": "f45ba4f5c487d40df7c620660436555f0483eda6b28ffb3d3e9078211031cd37",
+    "image_sha256": "8484ee2949e24e864466edad5b48c84d39969499563514ba5a3c7eae2d43b0b4",
     "status": "approved",
     "approved_at": "2026-10-26T03:32:25.302764+00:00",
-    "approval_hash": "1c0c0527655f1888409bd15dc94b9f2790f8c4480ea52271e0be6e41337147ed",
+    "approval_hash": "b9f36fc7726fa0c3bd20b32201266e5c28ace513761ffe6033cafe88bae57a68",
     "fb": {
       "status": "not_started",
       "id": null,

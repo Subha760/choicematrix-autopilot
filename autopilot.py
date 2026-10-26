@@ -985,6 +985,36 @@ THEMES_CYBER = [
         "bg_top": (10, 22, 40), "bg_bot": (22, 48, 82), "card_bg": (28, 58, 96),
         "accent": (56, 189, 248), "accent_secondary": (0, 255, 210),
         "text_primary": (255, 255, 255), "text_secondary": (215, 230, 255), "border": (45, 85, 140)
+    },
+    {
+        "name": "Cosmic Nebula",
+        "bg_top": (8, 8, 24), "bg_bot": (18, 14, 48), "card_bg": (26, 20, 64),
+        "accent": (192, 132, 252), "accent_secondary": (250, 204, 21),
+        "text_primary": (255, 255, 255), "text_secondary": (224, 215, 250), "border": (70, 50, 120)
+    },
+    {
+        "name": "Neon Crimson",
+        "bg_top": (22, 10, 18), "bg_bot": (42, 16, 30), "card_bg": (48, 20, 36),
+        "accent": (244, 63, 94), "accent_secondary": (251, 146, 60),
+        "text_primary": (255, 255, 255), "text_secondary": (254, 205, 215), "border": (105, 35, 65)
+    },
+    {
+        "name": "Stealth Obsidian",
+        "bg_top": (12, 14, 18), "bg_bot": (20, 24, 30), "card_bg": (28, 34, 42),
+        "accent": (163, 230, 53), "accent_secondary": (226, 232, 240),
+        "text_primary": (255, 255, 255), "text_secondary": (203, 213, 225), "border": (55, 65, 80)
+    },
+    {
+        "name": "Quantum Teal",
+        "bg_top": (6, 20, 26), "bg_bot": (12, 38, 48), "card_bg": (16, 48, 62),
+        "accent": (45, 212, 191), "accent_secondary": (251, 191, 36),
+        "text_primary": (255, 255, 255), "text_secondary": (204, 251, 241), "border": (28, 75, 92)
+    },
+    {
+        "name": "Solaris Plasma",
+        "bg_top": (24, 12, 10), "bg_bot": (46, 20, 14), "card_bg": (54, 24, 18),
+        "accent": (249, 115, 22), "accent_secondary": (253, 224, 71),
+        "text_primary": (255, 255, 255), "text_secondary": (254, 215, 170), "border": (110, 48, 28)
     }
 ]
 
@@ -1018,6 +1048,36 @@ THEMES_WARM = [
         "bg_top": (35, 20, 35), "bg_bot": (65, 25, 45), "card_bg": (50, 20, 40),
         "accent": (251, 146, 60), "accent_secondary": (254, 240, 138),
         "text_primary": (255, 255, 255), "text_secondary": (254, 225, 210), "border": (110, 42, 65)
+    },
+    {
+        "name": "Marigold Festive",
+        "bg_top": (44, 14, 18), "bg_bot": (74, 22, 22), "card_bg": (58, 18, 20),
+        "accent": (251, 191, 36), "accent_secondary": (244, 63, 94),
+        "text_primary": (255, 255, 255), "text_secondary": (254, 230, 210), "border": (130, 40, 35)
+    },
+    {
+        "name": "Vedic Ochre",
+        "bg_top": (36, 20, 14), "bg_bot": (60, 32, 20), "card_bg": (48, 26, 16),
+        "accent": (249, 115, 22), "accent_secondary": (253, 224, 71),
+        "text_primary": (255, 255, 255), "text_secondary": (254, 235, 220), "border": (108, 52, 28)
+    },
+    {
+        "name": "Kashmir Blossom",
+        "bg_top": (32, 14, 28), "bg_bot": (54, 20, 44), "card_bg": (44, 18, 36),
+        "accent": (244, 114, 182), "accent_secondary": (251, 191, 36),
+        "text_primary": (255, 255, 255), "text_secondary": (251, 225, 240), "border": (92, 34, 76)
+    },
+    {
+        "name": "Sundarban Jade",
+        "bg_top": (14, 28, 22), "bg_bot": (22, 48, 36), "card_bg": (18, 40, 30),
+        "accent": (52, 211, 153), "accent_secondary": (251, 191, 36),
+        "text_primary": (255, 255, 255), "text_secondary": (209, 250, 229), "border": (38, 82, 60)
+    },
+    {
+        "name": "Murshidabad Silk",
+        "bg_top": (28, 12, 36), "bg_bot": (50, 18, 60), "card_bg": (40, 16, 48),
+        "accent": (234, 179, 8), "accent_secondary": (216, 180, 254),
+        "text_primary": (255, 255, 255), "text_secondary": (243, 225, 255), "border": (85, 30, 95)
     }
 ]
 
@@ -1117,8 +1177,8 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
 
             accent_hex = f"#{theme['accent'][0]:02x}{theme['accent'][1]:02x}{theme['accent'][2]:02x}"
             accent_sec_hex = f"#{theme['accent_secondary'][0]:02x}{theme['accent_secondary'][1]:02x}{theme['accent_secondary'][2]:02x}"
-            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.88)"
-            border_css = f"rgba({theme['border'][0]}, {theme['border'][1]}, {theme['border'][2]}, 0.70)"
+            card_bg_css = f"rgba({theme['card_bg'][0]}, {theme['card_bg'][1]}, {theme['card_bg'][2]}, 0.82)"
+            border_css = f"rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.45)"
             text_sec_css = f"rgb({theme['text_secondary'][0]}, {theme['text_secondary'][1]}, {theme['text_secondary'][2]})"
 
             if slot == "afternoon":
@@ -1132,8 +1192,8 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                   <div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:space-between; padding:26px 32px;">
                 """
                 frame_close = "</div></div>"
-                pill_style = f"background:{accent_hex}; color:#0a0f1a; border-radius:8px; padding:8px 24px; font-size:20px; font-weight:bold;"
-                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:18px; padding:22px 28px;"
+                pill_style = f"background:{accent_hex}; color:#080c14; border-radius:10px; padding:8px 24px; font-size:20px; font-weight:bold; letter-spacing:1px; box-shadow:0 4px 14px rgba(0,0,0,0.4);"
+                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:20px; padding:24px 30px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:0 20px 45px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);"
             else:
                 s_ind = to_indic_digits(f"{slide_num:02d}", language)
                 t_ind = to_indic_digits(f"{total_slides:02d}", language)
@@ -1143,8 +1203,8 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                   <div style="width:100%; height:100%; border:1.5px solid {accent_hex}; border-radius:26px; padding:26px 32px; display:flex; flex-direction:column; justify-content:space-between;">
                 """
                 frame_close = "</div></div>"
-                pill_style = f"background:{accent_hex}; color:#241018; border-radius:24px; padding:8px 26px; font-size:20px; font-weight:bold;"
-                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:22px; padding:22px 28px;"
+                pill_style = f"background:{accent_hex}; color:#1e0c14; border-radius:24px; padding:8px 26px; font-size:20px; font-weight:bold; letter-spacing:0.8px; box-shadow:0 4px 14px rgba(0,0,0,0.4);"
+                card_style = f"background:{card_bg_css}; border:1.5px solid {border_css}; border-radius:24px; padding:24px 30px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); box-shadow:0 20px 45px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.14);"
 
             # Topic domain detection for diagrams and clear photo showcases
             is_tech_topic = (
