@@ -1157,9 +1157,14 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
         browser = p.chromium.launch(**launch_args)
         page = browser.new_page(viewport={"width": 1080, "height": 1350})
 
+        weekday = day.weekday()
+        # Distinct rotating theme per day, slot, and revision:
+        base_theme_idx = (weekday * 2 + (0 if slot == "afternoon" else 1) + (revision - 1)) % len(theme_pool)
+
         for idx, slide in enumerate(slides_data):
             slide_num = slide.get("slide_number", idx + 1)
-            theme = theme_pool[idx % len(theme_pool)]
+            theme_idx = (base_theme_idx + (idx % 2)) % len(theme_pool)
+            theme = theme_pool[theme_idx]
             tag = slide.get("tag", "HOT TOPIC").upper()
             headline = slide.get("headline", "")
             body = slide.get("body", "")
@@ -1586,7 +1591,9 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
                     "text_primary": (255, 255, 255), "text_secondary": (245, 230, 250), "border": (95, 30, 95)
                 }
         else:
-            theme_idx = (day.toordinal() + revision - 1 + idx) % len(theme_pool)
+            weekday = day.weekday()
+            base_theme_idx = (weekday * 2 + (0 if slot == "afternoon" else 1) + (revision - 1)) % len(theme_pool)
+            theme_idx = (base_theme_idx + (idx % 2)) % len(theme_pool)
             theme = theme_pool[theme_idx]
 
         slide_tag = slide.get("tag", "")
