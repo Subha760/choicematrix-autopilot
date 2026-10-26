@@ -696,12 +696,13 @@
       "search_query": "Starlight Muse"
     },
     "image_sha256": "c88fb8e0448426ffa1d918c386651bece8dd107ed9e1f3c1b6aeb376934dc513",
-    "status": "rejected",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-10-26T10:14:20.487887+00:00",
+    "approval_hash": "1a704b08ccaa848438aae138ba8404488d0b23939283fed970a9ae81abcad76e",
     "fb": {
       "status": "not_started",
-      "id": null
+      "id": null,
+      "container": null
     },
     "ig": {
       "status": "not_started",
