@@ -812,14 +812,16 @@
     "approved_at": "2026-10-26T11:54:09.179013+00:00",
     "approval_hash": "b9f36fc7726fa0c3bd20b32201266e5c28ace513761ffe6033cafe88bae57a68",
     "fb": {
-      "status": "published",
-      "id": "1279646595235354_122132198127465406"
+      "status": "attempting",
+      "id": null,
+      "container": null,
+      "attempted_at": "2026-10-26T14:30:15.031337+00:00"
     },
     "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-26T14:30:29.678136+00:00"
+      "attempted_at": "2026-10-26T14:30:30.207401+00:00"
     },
     "threads": {
       "status": "not_started",
