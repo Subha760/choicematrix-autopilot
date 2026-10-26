@@ -704,15 +704,16 @@
       "id": "1279646595235354_122132129331465406"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18134518144664263",
+      "container": "18121255916470290",
       "attempted_at": "2026-10-26T10:16:47.529983+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-10-26T10:17:41.822209+00:00"
     },
     "created_at": "2026-10-26T03:30:41.799078+00:00"
   },
