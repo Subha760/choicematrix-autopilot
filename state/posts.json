@@ -816,12 +816,13 @@
       "search_query": "Hanita Bhambri Khoj"
     },
     "image_sha256": "f051a6dffcf6bece4c50e9d290a9b8a9e2a1d49707d32ef5d538479ba1f68f37",
-    "status": "pending",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-10-26T03:32:25.302764+00:00",
+    "approval_hash": "edbe1e73af36319e38e6c594c987676f73b90ec0794d4af2b48bd24ec923dd50",
     "fb": {
       "status": "not_started",
-      "id": null
+      "id": null,
+      "container": null
     },
     "ig": {
       "status": "not_started",
