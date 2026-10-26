@@ -475,27 +475,23 @@
       "search_query": "Anuv Jain Kaisi Ye Pehli acoustic"
     },
     "image_sha256": "d5a472cceae5e96d6ae023336892b2b76ff9c99bec6045461f9d4b3d8002b6cc",
-    "status": "needs_attention",
-    "approved_at": "2026-10-24T17:34:28.315154+00:00",
+    "status": "approved",
+    "approved_at": "2026-10-26T03:32:46.237328+00:00",
     "approval_hash": "a11f4b12e12613d5e7f6636ce108f6c53b6b8f350b37904dfc39f056fcad428b",
     "fb": {
-      "status": "error",
+      "status": "not_started",
       "id": null,
-      "attempted_at": "2026-10-25T11:06:11.382339+00:00",
-      "error": "Meta 1279646595235354/photos rejected request: Error validating access token: Session has expired on Saturday, 24-Oct-26 11:00:00 PDT. The current time is Sunday, 25-Oct-26 04:06:17 PDT."
+      "container": null
     },
     "ig": {
-      "status": "error",
+      "status": "not_started",
       "id": null,
-      "container": null,
-      "attempted_at": "2026-10-25T11:06:18.709379+00:00",
-      "error": "Meta 17841444108675574/media rejected request: Error validating access token: Session has expired on Saturday, 24-Oct-26 11:00:00 PDT. The current time is Sunday, 25-Oct-26 04:06:28 PDT."
+      "container": null
     },
     "threads": {
-      "status": "attempting",
+      "status": "not_started",
       "id": null,
-      "container": null,
-      "attempted_at": "2026-10-25T11:06:28.978157+00:00"
+      "container": null
     },
     "created_at": "2026-10-24T16:36:21.500419+00:00"
   },
