@@ -5,8 +5,10 @@ Only original text and locally drawn, people-free JPEG artwork are generated.
 """
 from __future__ import annotations
 
+import base64
 import hashlib
 import io
+from io import BytesIO
 import json
 import os
 import random
@@ -544,18 +546,7 @@ def validate_ai_copy(item, posts, slot):
         raise RuntimeError("Too close to a previous title/caption; no new preview sent")
     if slot["type"] == "sourced" and not slot.get("source"):
         raise RuntimeError("Factual posts must use a source selected by code, never AI")
-    if "recommended_audio" not in item or not isinstance(item.get("recommended_audio"), dict):
-        item["recommended_audio"] = {
-            "title": "Neon Horizons",
-            "artist": "Synthwave Collective",
-            "vibe": "Focus / Tech Flow",
-            "search_query": "Neon Horizons Synthwave"
-        }
-    else:
-        for k in ("title", "artist", "vibe"):
-            val = item["recommended_audio"].get(k)
-            if not isinstance(val, str) or not val.strip():
-                item["recommended_audio"][k] = "Trending Tech Focus"
+    item.pop("recommended_audio", None)
     return item
 
 
@@ -685,7 +676,6 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
 - Write the entire content in natural, engaging, grammatically correct BENGALI (বাংলা).
 - Visual Title, subtitle, caption, all 6 slide headlines, and all slide body text MUST be written in Bengali script.
 - Provide an appropriate transliterated hashtag list (e.g. #KolkataTech #WestBengalInnovation #TechBangla #Choicematrix).
-- Recommend a real trending modern Bengali indie / Baul-Lo-Fi fusion / Rabindra fusion / Kolkata acoustic instrumental track (e.g. Baul Lo-Fi Beats, Somlata indie acoustic, Kolkata Lo-Fi chill).
 - Provide a targeted 'unsplash_query' in ENGLISH (3-5 evocative, cinematic words, e.g., 'kolkata heritage howrah bridge golden hour', 'kumartuli durga idol clay sculpting', 'rural bengal green jute farm').
 - Slide 6 CTA:
   headline: "তথ্যটি ভালো লেগেছে কি? 💡"
@@ -696,7 +686,6 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
 - Write the entire content in natural, conversational, fluent HINDI (हिंदी).
 - Visual Title, subtitle, caption, all 6 slide headlines, and all slide body text MUST be written in Devanagari Hindi script.
 - Provide an appropriate transliterated hashtag list (e.g. #TechInHindi #DigitalIndia #IndiaTech #Choicematrix).
-- Recommend a real trending Indian indie / Bollywood acoustic / Coke Studio Bharat / Lo-Fi chill instrumental track (e.g. Prateek Kuhad vibe, Anuv Jain acoustic, Coke Studio Bharat, Indian Lo-Fi Beats, Acoustic Sitar chill).
 - Provide a targeted 'unsplash_query' in ENGLISH (3-5 evocative, cinematic words, e.g., 'india modern technology robotic lab', 'bengaluru tech campus futuristic', 'indian semiconductor innovation').
 - Slide 6 CTA:
   headline: "क्या यह जानकारी उपयोगी लगी? 💡"
@@ -705,7 +694,6 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
     else:
         lang_spec = f"""LANGUAGE: ENGLISH
 - Write in crisp, high-impact, globally relevant English.
-- Recommend a real trending global background audio track (title, artist, vibe, e.g. Synthwave, Lofi Fruits, M83, Deep Focus).
 - Provide a targeted 'unsplash_query' in ENGLISH (3-5 evocative, cinematic words, e.g., 'futuristic quantum computing processor glowing', 'cyberpunk high tech server datacenter', 'holographic user interface display').
 - Slide 6 CTA:
   headline: "FOUND THIS HELPFUL? 💡"
@@ -840,11 +828,7 @@ Return ONLY ONE valid JSON object with this exact structure:
     item["source"] = slot_info.get("source")
     if slot_info.get("source"):
         item["caption"] += f"\n\nReference: {slot_info['source']['label']} — {slot_info['source']['url']}"
-    audio = item.get("recommended_audio")
-    if audio and isinstance(audio, dict) and audio.get("title"):
-        audio_line = f"\n\n🎵 Suggested Audio: {audio.get('title')} - {audio.get('artist')} ({audio.get('vibe')})"
-        if audio_line not in item["caption"] and len(item["caption"]) + len(audio_line) < 1800:
-            item["caption"] += audio_line
+    item.pop("recommended_audio", None)
     return item
 
 
@@ -1101,6 +1085,11 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
     theme_pool = THEMES_CYBER if slot == "afternoon" else THEMES_WARM
     used_ids = set()
 
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        return None
+
     with sync_playwright() as p:
         launch_args = {'headless': True}
         if browser_exe:
@@ -1171,11 +1160,6 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 header_tag = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ অন্তর্দৃষ্টি" if language == "Bengali" else "आज का विशेष विश्लेषण")
                 swipe_prompt = slide.get("swipe_prompt") or ("Swipe to explore ➡️" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন ➡️" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें ➡️"))
                 audio_line = ""
-                if audio.get("title"):
-                    audio_prefix = "AUDIO" if slot == "afternoon" else ("অডিও" if language == "Bengali" else "ऑडियो")
-                    audio_line = f"""<div style="margin-top:10px; background:rgba(0,0,0,0.45); border:1px solid {accent_hex}; border-radius:12px; padding:6px 16px; font-size:18px; color:{accent_sec_hex};">
-                      🎵 {audio_prefix}: {audio.get('title')} • {audio.get('artist')} ({audio.get('vibe')})
-                    </div>"""
 
                 # PROMINENT 550px COVER HERO PHOTO
                 photo_window_html = ""
@@ -1498,7 +1482,9 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
     browser_exe = get_browser_executable()
     if browser_exe:
         try:
-            return render_carousel_slides_chrome(date_key, revision, settings, item, slot=slot, browser_exe=browser_exe)
+            res = render_carousel_slides_chrome(date_key, revision, settings, item, slot=slot, browser_exe=browser_exe)
+            if res:
+                return res
         except Exception as exc:
             print(f"Chromium render warning ({exc}), falling back to PIL: {exc}")
 
@@ -1634,12 +1620,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
                 draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
                 by += 46
 
-            if audio.get("title"):
-                audio_title_clean = str(audio.get("title", ""))[:28]
-                audio_artist_clean = str(audio.get("artist", ""))[:22]
-                draw.rounded_rectangle((70, H - 325, W - 70, H - 265), radius=16, fill=theme["card_bg"], outline=theme["accent_secondary"], width=2)
-                draw.text((105, H - 308), f"🎵 AUDIO: {audio_title_clean} • {audio_artist_clean}", font=font(21, bold=True, language=language), fill=theme["accent_secondary"])
-                draw.text((W - 270, H - 308), str(audio.get("vibe", "Trending"))[:16].upper(), font=font(19, bold=False, language=language), fill=theme["text_secondary"])
+
 
             swipe_y = H - 235
             draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 85), radius=22, fill=theme["accent"])
@@ -1897,10 +1878,7 @@ def send_preview(post, settings):
         with file.open("rb") as image_file:
             telegram("sendPhoto", {"chat_id": chat, "caption": f"DAILY DRAFT • {post_id}"}, {"photo": image_file})
 
-    audio = post.get("recommended_audio")
     audio_info = ""
-    if audio and isinstance(audio, dict) and audio.get("title"):
-        audio_info = f"🎵 RECOMMENDED AUDIO: {audio.get('title')} — {audio.get('artist')} ({audio.get('vibe')})\n\n"
 
     publish_time = post.get("publish_time_ist") or settings.get("publish_time_ist", "14:00")
     full_text = (
@@ -2128,16 +2106,8 @@ def threads_publish(entry):
     state = entry["threads"]
     images = entry.get("images") or [entry["image"]]
     caption = entry["caption"]
-    audio = entry.get("recommended_audio")
-    audio_suffix = ""
-    if audio and isinstance(audio, dict) and audio.get("title"):
-        audio_suffix = f"\n\n🎵 Audio: {audio.get('title')} - {audio.get('artist')}"
-
     if len(caption) > 500:
-        max_body = 496 - len(audio_suffix)
-        caption = caption[:max_body].rstrip() + "..." + audio_suffix
-    elif audio_suffix and audio_suffix not in caption and len(caption) + len(audio_suffix) <= 500:
-        caption = caption + audio_suffix
+        caption = caption[:496].rstrip() + "..."
 
     if len(images) > 1:
         if not state.get("container"):
