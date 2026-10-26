@@ -48,11 +48,24 @@ def write_json(path, data):
     tmp.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     tmp.replace(path)
 
+MAIN_KEYBOARD = {
+    "keyboard": [
+        [{"text": "✅ Approve Afternoon"}, {"text": "✅ Approve Evening"}],
+        [{"text": "🔄 Recreate Afternoon"}, {"text": "🔄 Recreate Evening"}],
+        [{"text": "📊 Check Status"}, {"text": "❌ Reject All"}]
+    ],
+    "resize_keyboard": True,
+    "is_persistent": True
+}
+
 def tg_api(method, payload=None):
     token = os.getenv("TG_BOT_TOKEN")
     url = f"https://api.telegram.org/bot{token}/{method}"
+    p = payload.copy() if payload else {}
+    if method == "sendMessage" and "reply_markup" not in p:
+        p["reply_markup"] = MAIN_KEYBOARD
     try:
-        r = requests.post(url, json=payload or {}, timeout=30)
+        r = requests.post(url, json=p, timeout=30)
         res = r.json()
         if not res.get("ok"):
             print(f"⚠️ Telegram API response for {method}: {res}", flush=True)
@@ -368,6 +381,31 @@ def poll_once(offset=0):
 
     return offset
 
+def check_and_publish_due_posts():
+    try:
+        import autopilot
+        settings = read_json(ROOT / "settings.json", {})
+        if not settings.get("publishing_enabled", False):
+            return
+        posts = read_json(STATE, {})
+        now_ist = datetime.now(autopilot.IST)
+        has_due = False
+        for date_key, entry in sorted(posts.items()):
+            if entry.get("status") in ("approved", "publishing") and entry.get("approved_at"):
+                try:
+                    if autopilot.due(entry, settings, now_ist) and autopilot.eligible_for_publication(entry, settings, now_ist):
+                        has_due = True
+                        break
+                except Exception:
+                    continue
+        if has_due:
+            print("🚀 Daemon detected approved post due for publication! Executing publish...", flush=True)
+            autopilot.process_publications(posts, settings, now_ist)
+            write_json(STATE, posts)
+            git_push_state()
+    except Exception as exc:
+        print(f"Daemon publish check warning: {exc}", flush=True)
+
 def main():
     load_env()
     print("🚀 Telegram Text-Only Real-Time Approval Daemon started.", flush=True)
@@ -375,12 +413,16 @@ def main():
     offset = tg_state.get("offset", 0)
     print(f"Listening for text commands on offset {offset}...", flush=True)
     last_health_check = 0
+    last_due_check = 0
     while True:
         try:
             now_ts = time.time()
             if now_ts - last_health_check > 14400:  # Check every 4 hours
                 last_health_check = now_ts
                 check_meta_token_health(force=False)
+            if now_ts - last_due_check > 30:  # Check for due approved posts every 30s
+                last_due_check = now_ts
+                check_and_publish_due_posts()
             offset = poll_once(offset)
         except Exception as exc:
             print(f"Daemon loop warning ({type(exc).__name__}): {exc}", flush=True)

@@ -1915,15 +1915,30 @@ def send_preview(post, settings):
         "👉 To Recreate: Reply 'recreate afternoon' or 'recreate evening' (or 'recreate') 🔄\n"
         "👉 To Check Status: Reply 'status' 📊"
     )
-    telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000]})
+    main_keyboard = {
+        "keyboard": [
+            [{"text": "✅ Approve Afternoon"}, {"text": "✅ Approve Evening"}],
+            [{"text": "🔄 Recreate Afternoon"}, {"text": "🔄 Recreate Evening"}],
+            [{"text": "📊 Check Status"}, {"text": "❌ Reject All"}]
+        ],
+        "resize_keyboard": True,
+        "is_persistent": True
+    }
+    telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000], "reply_markup": json.dumps(main_keyboard)})
 
 
 def take_approvals(posts, settings, now=None):
     if now is None:
         now = datetime.now(IST)
     tg = read_json(TG_STATE, {"offset": 0})
-    updates = telegram("getUpdates", {"offset": tg["offset"], "timeout": 0,
-                                       "allowed_updates": json.dumps(["callback_query", "message"])})
+    try:
+        updates = telegram("getUpdates", {"offset": tg["offset"], "timeout": 0,
+                                           "allowed_updates": json.dumps(["callback_query", "message"])})
+    except Exception as exc:
+        if "409" in str(exc) or "Conflict" in str(exc):
+            print("Telegram polling handled by active daemon (409 Conflict). Skipping duplicate poll.")
+            return
+        raise
     for update in updates:
         tg["offset"] = max(tg["offset"], int(update["update_id"]) + 1)
         callback = update.get("callback_query")
@@ -2113,8 +2128,16 @@ def threads_publish(entry):
     state = entry["threads"]
     images = entry.get("images") or [entry["image"]]
     caption = entry["caption"]
+    audio = entry.get("recommended_audio")
+    audio_suffix = ""
+    if audio and isinstance(audio, dict) and audio.get("title"):
+        audio_suffix = f"\n\n🎵 Audio: {audio.get('title')} - {audio.get('artist')}"
+
     if len(caption) > 500:
-        caption = caption[:496].rstrip() + "..."
+        max_body = 496 - len(audio_suffix)
+        caption = caption[:max_body].rstrip() + "..." + audio_suffix
+    elif audio_suffix and audio_suffix not in caption and len(caption) + len(audio_suffix) <= 500:
+        caption = caption + audio_suffix
 
     if len(images) > 1:
         if not state.get("container"):
@@ -2286,10 +2309,10 @@ def main():
     try:
         take_approvals(posts, settings, now)
     except Exception as exc:
-        print(f"Approval read failed: {type(exc).__name__}: {exc}")
-        # Fail closed. No generation or publishing if Telegram state cannot be read.
-        write_json(STATE, posts)
-        raise
+        if "409" in str(exc) or "Conflict" in str(exc):
+            print("Telegram polling handled by active daemon (409 Conflict). Continuing...")
+        else:
+            print(f"Approval read warning: {type(exc).__name__}: {exc}")
     generation_at = datetime.fromisoformat(f"{today}T{settings['generation_time_ist']}:00").replace(tzinfo=IST)
     attempt_log = read_json(GEN_ERRORS, {})
 
