@@ -818,15 +818,17 @@
       "attempted_at": "2026-10-26T14:30:15.031337+00:00"
     },
     "ig": {
+      "status": "ambiguous",
+      "id": null,
+      "container": null,
+      "attempted_at": "2026-10-26T14:30:30.207401+00:00",
+      "error": "Command '['git', '-C', '/home/ubuntu/choicematrix-autopilot', 'push', 'origin', 'HEAD:main']' returned non-zero exit status 1."
+    },
+    "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-26T14:30:30.207401+00:00"
-    },
-    "threads": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-26T14:30:32.943231+00:00"
     },
     "created_at": "2026-10-26T03:31:17.282124+00:00"
   }
