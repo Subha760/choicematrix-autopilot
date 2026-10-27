@@ -1041,15 +1041,14 @@
     "approved_at": "2026-10-27T05:18:17.636135+00:00",
     "approval_hash": "89ca193265d2045b1d8c9e623b62007676f60b9d3d16353eca96fdb9cdba8209",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122132556711465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-27T14:30:02.566945+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-27T14:30:22.885986+00:00"
     },
     "threads": {
       "status": "not_started",
