@@ -928,15 +928,14 @@
     "approved_at": "2026-10-27T03:34:18.336138+00:00",
     "approval_hash": "5d888ae69d4df35015f17c80428c96fae06f65778b674a68c26d1870cc2259a1",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122132458983465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-27T08:30:06.259252+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-27T08:30:21.126549+00:00"
     },
     "threads": {
       "status": "not_started",
