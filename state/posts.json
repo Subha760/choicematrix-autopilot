@@ -1057,5 +1057,228 @@
       "attempted_at": "2026-10-27T14:31:13.017161+00:00"
     },
     "created_at": "2026-10-27T05:17:30.406023+00:00"
+  },
+  "2026-10-28_afternoon": {
+    "date": "2026-10-28_afternoon",
+    "clean_date": "2026-10-28",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "The Universe's Oldest Ring",
+    "subtitle": "JWST reveals a cosmic ring from 2 billion years post-Big Bang, rewriting our understanding of early galaxy collisions.",
+    "caption": "🚀 THE COSMIC RING THAT REWROTE HISTORY\n\n🔍 WHAT HAPPENED TODAY: James Webb Space Telescope has identified the most distant ring galaxy ever observed. This ancient structure formed just 2 billion years after the Big Bang, hinting at a rare and violent collision in the infant universe. It’s not just a pretty picture; it’s a time capsule of cosmic violence.\n\n💡 CORE TAKEAWAYS:\n• ⚡ 1. **Collision Dynamics:** The ring wasn't born, it was forged. A high-speed impact between galaxies triggered a shockwave that compressed gas, igniting a spiral of star formation we can still see today.\n• 📊 2. **JWST’s Power:** Hubble could only see the glow. JWST’s infrared capabilities pierced the cosmic dust, allowing us to date this event with unprecedented precision to the early universe.\n• 🎯 3. **Galactic Evolution:** This discovery proves that major structural changes in galaxies happen earlier and more frequently than previous models suggested, accelerating the timeline of cosmic maturity.\n\n🔥 WHY THIS MATTERS NOW: We often view the universe as static and slow. This discovery reminds us that the cosmos is a dynamic, chaotic, and violent place where order emerges from destruction. It challenges our assumptions about how quickly complex structures can form.\n\n💬 CALL TO ACTION: If you could witness one cosmic event live, what would it be? The birth of a star or the collision of galaxies? Tell us below! 👇\n\n#Choicematrix #JWST #Cosmos #Astronomy #SpaceScience\n\nReference: Live Science — https://news.google.com/rss/articles/CBMi6gFBVV95cUxOX3NkOHEyT1p0bFVqckRxZk1CVEdlS3pJNl9hM1k4eEF5bGYtdnVDbmh1Y0ZoejRnQzNRRTJKVlZGd0hnRWxrOW9nNFpXSnlzejhlMzk1VEFqYTZjMm5PZzhVcC15emlYNjlVNTlQYUp2RnRrN0l6Z2w4cHJHa1pQUW9ISmlZODQ5dExQQ2h5T0tfSGFWQlN3WWdLQWo0blR3aWxrOXc5UHlhWC1GTTRnRnprYzg1ek5NLThySmZQdUV6Z18xUHZVWHg0eEQ2ejF1Y2poM09WVlJhdl85Z0FyeHpOS1hmUDFKaFE?oc=5",
+    "category": "Cosmos & Deep Science Mysteries",
+    "content_type": "practical",
+    "source": {
+      "label": "Live Science",
+      "url": "https://news.google.com/rss/articles/CBMi6gFBVV95cUxOX3NkOHEyT1p0bFVqckRxZk1CVEdlS3pJNl9hM1k4eEF5bGYtdnVDbmh1Y0ZoejRnQzNRRTJKVlZGd0hnRWxrOW9nNFpXSnlzejhlMzk1VEFqYTZjMm5PZzhVcC15emlYNjlVNTlQYUp2RnRrN0l6Z2w4cHJHa1pQUW9ISmlZODQ5dExQQ2h5T0tfSGFWQlN3WWdLQWo0blR3aWxrOXc5UHlhWC1GTTRnRnprYzg1ek5NLThySmZQdUV6Z18xUHZVWHg0eEQ2ejF1Y2poM09WVlJhdl85Z0FyeHpOS1hmUDFKaFE?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "The Universe's Oldest Ring",
+        "body": "Imagine a structure so old it predates the Sun by 10 billion years. James Webb has just spotted the most distant ring galaxy ever, formed just 2 billion years after the Big Bang. This isn't just a photo; it's a forensic report of a cosmic collision that shaped the early universe. Swipe to uncover how a violent crash created this perfect circle of light.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "deep space galaxy ring"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "The Collision Mechanism",
+        "body": "Most galaxies are elliptical or spiral, but ring galaxies are rare anomalies. This specific ring was likely created by a 'dry merger,' where two gas-rich galaxies collided at high velocity. The impact sent a shockwave rippling through the interstellar medium, compressing hydrogen gas into dense clumps. These clumps ignited into massive star-forming regions, creating the glowing ring we see today. It’s a perfect example of cosmic chaos creating geometric order.",
+        "image_query": "galaxy collision simulation",
+        "visual_badge": {
+          "label": "🕰️ TIME MARKER",
+          "value": "2 Billion Years Post-Big Bang",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "JWST's Infrared Edge",
+        "body": "Why couldn't Hubble see this clearly? The expanding universe stretches light to longer wavelengths, a phenomenon called redshift. JWST’s infrared instruments are specifically designed to cut through this haze and the dust that obscures early galaxies. By analyzing the spectral fingerprints of the gas, scientists could determine the exact age and velocity of the colliding bodies. This technology allows us to peer back to a time when the universe was still a turbulent, young place, revealing details previously hidden by cosmic fog.",
+        "image_query": "james webb telescope space",
+        "visual_badge": {
+          "label": "🔭 TECH ADVANTAGE",
+          "value": "Infrared Penetration Power",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "Rewriting Cosmic Timelines",
+        "body": "This discovery challenges the 'standard' model of galaxy evolution, which suggested complex structures took longer to form. Finding such a mature ring so early implies that galactic interactions were more frequent and intense in the early universe than we thought. It suggests that the 'fast track' to galaxy maturity is common, not rare. For astronomers, this means recalibrating simulations of how the first stars and black holes grew. It’s a reminder that our current understanding is just the tip of the iceberg.",
+        "image_query": "astronomer data analysis screen",
+        "visual_badge": {
+          "label": "📊 MODEL SHIFT",
+          "value": "Accelerated Galaxy Maturity",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "Order From Chaos",
+        "body": "The universe is not a silent, static void; it is a dynamic engine of creation through destruction. This ring galaxy is a monument to a violent past, now frozen in time for us to observe. It teaches us that complexity often emerges from chaos, and that the tools we build (like JWST) allow us to read the history of existence itself. Keep your eyes on the sky; the universe is telling stories we are only just learning to hear.",
+        "image_query": "starry night sky awe",
+        "visual_badge": {
+          "label": "🌌 KEY INSIGHT",
+          "value": "Complexity Emerges From Collision",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "deep space nebula galaxy",
+    "image": "posts/2026-10-28_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-28_afternoon-v1-slide1.jpg",
+      "posts/2026-10-28_afternoon-v1-slide2.jpg",
+      "posts/2026-10-28_afternoon-v1-slide3.jpg",
+      "posts/2026-10-28_afternoon-v1-slide4.jpg",
+      "posts/2026-10-28_afternoon-v1-slide5.jpg",
+      "posts/2026-10-28_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "ba0494a8d668ec7dcaced02586837dd534a484d298852d255d6ef61d9b659680",
+    "status": "approved",
+    "approved_at": "2026-10-28T03:36:00.777059+00:00",
+    "approval_hash": "367a83f568996697b847db80fed15c7b66d065abd2ab76f3f3a046957ec8a6a2",
+    "fb": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-28T03:30:26.268834+00:00"
+  },
+  "2026-10-28_evening": {
+    "date": "2026-10-28_evening",
+    "clean_date": "2026-10-28",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Hindi",
+    "revision": 1,
+    "title": "भारत की अंतरिक्ष क्रांति का नया अध्याय!",
+    "subtitle": "ISRO का महत्वाकांक्षी प्लान: 4 लॉन्च पैड से अंतरिक्ष में भारत की धमक!",
+    "caption": "🚀 भारत की अंतरिक्ष क्रांति!\n🔍 ISRO ने अपने भविष्य के लिए एक बड़ा प्लान साझा किया है - भारत जल्द ही 4 लॉन्च पैड से अंतरिक्ष में उड़ान भरेगा! यह कदम देश को वैश्विक अंतरिक्ष मानचित्र पर एक नई पहचान देगा, जिससे अंतरिक्ष अन्वेषण में हमारी क्षमताएं कई गुना बढ़ जाएंगी।\n💡 कोर टेकअवेज़:\n• ⚡ अधिक लॉन्च: नए लॉन्च पैड से ISRO एक साथ कई मिशन लॉन्च कर पाएगा, जिससे अंतरिक्ष में भारत की उपस्थिति और भी मजबूत होगी।\n• 📊 रणनीतिक महत्व: यह विस्तार गगनयान जैसे मानव मिशनों, छोटे उपग्रहों और पुन: प्रयोज्य रॉकेटों के विकास के लिए महत्वपूर्ण है, जो भारत की आत्मनिर्भरता को बढ़ावा देगा।\n• 🎯 वैश्विक हब: भारत निजी क्षेत्र और अंतर्राष्ट्रीय सहयोग के लिए एक प्रमुख अंतरिक्ष लॉन्च हब बनने की ओर अग्रसर है, जिससे आर्थिक अवसर पैदा होंगे।\n🔥 यह सिर्फ लॉन्च पैड का विस्तार नहीं, बल्कि भारत की वैज्ञानिक क्षमता, नवाचार और वैश्विक नेतृत्व का प्रतीक है। यह हमें ब्रह्मांड के रहस्यों को सुलझाने और मानव जाति के भविष्य को आकार देने में मदद करेगा, साथ ही नई पीढ़ियों को प्रेरित भी करेगा।\n💬 आपके अनुसार, भारत की अंतरिक्ष यात्रा का सबसे रोमांचक पहलू क्या है? हमें कमेंट्स में बताएं!\n#ISRO #SpaceIndia #Gaganyaan #Choicematrix #IndianSpaceMission #ScienceInHindi #भारतकागौरव #अंतरिक्षविज्ञान\n\nReference: AajTak — https://news.google.com/rss/articles/CBMiqgFBVV95cUxQRFkyamNQM2tiYWpVWE9iWTB2Uk1aNWxlU3h3WjNWSFNVVERFWk9BSExkZ2djcTE0dEx2c19YSlNhV0xXdTVBeDJLVWI3a0tOOGNBUWRVajBjblllTGprSmdEX0ZuMnRaLVRqVDVrM0JVNXd6RU5rNjJHTEVybFZzNTZEallCY2RnTHlGYXJTM3VGb1JZZlctX3VUYmMweXdEZV96TFpiLW1Fd9IBrwFBVV95cUxOcVNmQWYtUDhIRWtpNGxhOEpITDhEVkVLdWp0U2NheUZLLUZBZHJKeFFuQjR6Tkd6UVJqbGFSd2prUG5YaFBGOFhGcW9tZkpyTWY1OXRyRFpQTlllM1BXcEkxM1FYaFVxV0ltc3ByVHNpYkxsVHk2amd4UXo2SGkxY3NlMTRNMXFjYUY1UVE0Yl96eG1naHF1c1RCMnVhcTVLRk1TODNMck0tU1ZxYjNr?oc=5",
+    "category": "इसरो & भारत का अंतरिक्ष विज्ञान",
+    "content_type": "practical",
+    "source": {
+      "label": "AajTak",
+      "url": "https://news.google.com/rss/articles/CBMiqgFBVV95cUxQRFkyamNQM2tiYWpVWE9iWTB2Uk1aNWxlU3h3WjNWSFNVVERFWk9BSExkZ2djcTE0dEx2c19YSlNhV0xXdTVBeDJLVWI3a0tOOGNBUWRVajBjblllTGprSmdEX0ZuMnRaLVRqVDVrM0JVNXd6RU5rNjJHTEVybFZzNTZEallCY2RnTHlGYXJTM3VGb1JZZlctX3VUYmMweXdEZV96TFpiLW1Fd9IBrwFBVV95cUxOcVNmQWYtUDhIRWtpNGxhOEpITDhEVkVLdWp0U2NheUZLLUZBZHJKeFFuQjR6Tkd6UVJqbGFSd2prUG5YaFBGOFhGcW9tZkpyTWY1OXRyRFpQTlllM1BXcEkxM1FYaFVxV0ltc3ByVHNpYkxsVHk2amd4UXo2SGkxY3NlMTRNMXFjYUY1UVE0Yl96eG1naHF1c1RCMnVhcTVLRk1TODNMck0tU1ZxYjNr?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "भारत की अंतरिक्ष क्रांति का नया अध्याय!",
+        "body": "इसरो ने अपने महत्वाकांक्षी प्लान का खुलासा किया है, जिसके तहत भारत जल्द ही 4 लॉन्च पैड से अंतरिक्ष में उड़ान भरेगा। यह कदम देश की अंतरिक्ष क्षमताओं को अभूतपूर्व ऊंचाइयों पर ले जाएगा और हमें वैश्विक अंतरिक्ष मानचित्र पर एक प्रमुख खिलाड़ी के रूप में स्थापित करेगा। यह सिर्फ एक योजना नहीं, बल्कि भारत के वैज्ञानिक गौरव और भविष्य की ओर एक विशाल छलांग है।",
+        "swipe_prompt": "आगे जानें भारत के इस बड़े प्लान के बारे में ➡️",
+        "image_query": "Indian space rocket launch night"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "क्यों 4 लॉन्च पैड की ज़रूरत?",
+        "body": "वर्तमान में, भारत के पास मुख्य रूप से श्रीहरिकोटा में दो लॉन्च पैड हैं, जिनमें से एक मानव मिशन के लिए तैयार किया जा रहा है। बढ़ती हुई मांग, गगनयान जैसे जटिल मिशन और पुन: प्रयोज्य रॉकेटों के परीक्षण के लिए अधिक इंफ्रास्ट्रक्चर की आवश्यकता है। चार लॉन्च पैड से इसरो एक साथ कई मिशनों को संभाल पाएगा, जिससे लॉन्च फ्रीक्वेंसी बढ़ेगी और विभिन्न रॉकेटों के लिए विशिष्ट सुविधाएं मिलेंगी।",
+        "visual_badge": {
+          "label": "🚀 वर्तमान क्षमता",
+          "value": "2 लॉन्च पैड",
+          "type": "badge"
+        },
+        "image_query": "ISRO mission control center futuristic"
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "मिशनों में आएगी अभूतपूर्व तेज़ी",
+        "body": "नए लॉन्च पैड से इसरो की लॉन्च क्षमताओं में क्रांतिकारी बदलाव आएगा। इससे न केवल गगनयान जैसे मानव अंतरिक्ष अभियानों को गति मिलेगी, बल्कि छोटे उपग्रहों को लॉन्च करने वाले SSLV रॉकेटों और भविष्य के पुन: प्रयोज्य लॉन्च वाहनों के लिए भी समर्पित सुविधाएँ मिलेंगी। यह विस्तार भारत को निजी अंतरिक्ष कंपनियों और अंतर्राष्ट्रीय ग्राहकों के लिए एक आकर्षक लॉन्च डेस्टिनेशन बना देगा, जिससे अंतरिक्ष अर्थव्यवस्था को बढ़ावा मिलेगा।",
+        "visual_badge": {
+          "label": "🎯 लक्ष्य",
+          "value": "अधिक लॉन्च, कम समय",
+          "type": "chart"
+        },
+        "image_query": "multiple space rockets on launch pads"
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "अंतरिक्ष में भारत का बढ़ता दबदबा",
+        "body": "यह विस्तार सिर्फ तकनीकी उन्नयन नहीं, बल्कि भारत की रणनीतिक महत्वाकांक्षा का प्रतीक है। चार लॉन्च पैड के साथ, भारत वैश्विक अंतरिक्ष क्षेत्र में अपनी स्थिति मजबूत करेगा, जो भू-राजनीतिक और आर्थिक दोनों दृष्टि से महत्वपूर्ण है। इससे स्वदेशी प्रौद्योगिकी का विकास होगा, हजारों नई नौकरियां पैदा होंगी, और भारत अंतरिक्ष अनुसंधान व अन्वेषण में अग्रणी भूमिका निभाएगा। यह आत्मनिर्भरता की दिशा में एक बड़ा कदम है।",
+        "visual_badge": {
+          "label": "📈 अनुमानित वृद्धि",
+          "value": "अंतरिक्ष अर्थव्यवस्था में",
+          "type": "chart"
+        },
+        "image_query": "Indian space scientist working futuristic lab"
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "अंतरिक्ष महाशक्ति के रूप में भारत",
+        "body": "इसरो का यह महत्वाकांक्षी प्लान भारत को 21वीं सदी की अंतरिक्ष महाशक्ति बनाने की दिशा में एक निर्णायक कदम है। यह हमें ब्रह्मांड के रहस्यों को गहराई से समझने, नई तकनीकों का विकास करने और मानव जाति के भविष्य के लिए मार्ग प्रशस्त करने की शक्ति देगा। यह सिर्फ रॉकेट लॉन्च करने से कहीं बढ़कर है; यह सांस्कृतिक गौरव, वैज्ञानिक नवाचार और आने वाली पीढ़ियों के लिए असीमित प्रेरणा का प्रतीक है।",
+        "visual_badge": {
+          "label": "🇮🇳 राष्ट्रीय गौरव",
+          "value": "अंतरिक्ष में नया अध्याय",
+          "type": "badge"
+        },
+        "image_query": "futuristic India space exploration"
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "क्या यह जानकारी उपयोगी लगी? 💡",
+        "body": "@choicematrix को फॉलो करें रोज़ाना बेहतरीन टेक इनसाइट्स, स्मार्ट टिप्स और ट्रेंडिंग अपडेट्स के लिए! 🚀🔥✨\n\n📌 इस पोस्ट को सेव करें\n↗️ दोस्तों के साथ शेयर करें"
+      }
+    ],
+    "unsplash_query": "Indian space technology innovation",
+    "image": "posts/2026-10-28_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-28_evening-v1-slide1.jpg",
+      "posts/2026-10-28_evening-v1-slide2.jpg",
+      "posts/2026-10-28_evening-v1-slide3.jpg",
+      "posts/2026-10-28_evening-v1-slide4.jpg",
+      "posts/2026-10-28_evening-v1-slide5.jpg",
+      "posts/2026-10-28_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "4b0f72cc8e742036efc9628cec412222d32f8ba72c64c7169c29a81acd7069c2",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-28T03:31:01.277043+00:00"
   }
 }
