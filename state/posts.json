@@ -1267,15 +1267,14 @@
     "approved_at": "2026-10-28T03:36:05.338334+00:00",
     "approval_hash": "dc379d28054c7d0d4c05024f9a15817ded6c46fcf7b6f5157fb5969e63afffdd",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122133022731465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-28T14:30:17.049599+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-28T14:30:33.512505+00:00"
     },
     "threads": {
       "status": "not_started",
