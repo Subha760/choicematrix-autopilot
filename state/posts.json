@@ -1154,19 +1154,22 @@
     "approved_at": "2026-10-28T03:36:00.777059+00:00",
     "approval_hash": "367a83f568996697b847db80fed15c7b66d065abd2ab76f3f3a046957ec8a6a2",
     "fb": {
-      "status": "published",
-      "id": "1279646595235354_122132933151465406"
-    },
-    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-28T08:30:17.460950+00:00"
+      "attempted_at": "2026-10-28T08:30:02.968921+00:00"
+    },
+    "ig": {
+      "status": "published",
+      "id": "18119048615069435",
+      "container": "18121557410470290",
+      "attempted_at": "2026-10-28T08:30:14.600860+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-10-28T08:30:50.565462+00:00"
     },
     "created_at": "2026-10-28T03:30:26.268834+00:00"
   },
