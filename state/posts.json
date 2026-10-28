@@ -1268,18 +1268,19 @@
     "approval_hash": "dc379d28054c7d0d4c05024f9a15817ded6c46fcf7b6f5157fb5969e63afffdd",
     "fb": {
       "status": "published",
-      "id": "1279646595235354_122133022737465406"
+      "id": "1279646595235354_122133022731465406"
     },
     "ig": {
+      "status": "published",
+      "id": "18171804442462912",
+      "container": "18121603490470290",
+      "attempted_at": "2026-10-28T14:30:33.512505+00:00"
+    },
+    "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-28T14:30:33.918907+00:00"
-    },
-    "threads": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-28T14:31:13.233348+00:00"
     },
     "created_at": "2026-10-28T03:31:01.277043+00:00"
   }
