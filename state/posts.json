@@ -1283,5 +1283,223 @@
       "attempted_at": "2026-10-28T14:31:13.233348+00:00"
     },
     "created_at": "2026-10-28T03:31:01.277043+00:00"
+  },
+  "2026-10-29_afternoon": {
+    "date": "2026-10-29_afternoon",
+    "clean_date": "2026-10-29",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Unlock Your Longevity Potential",
+    "subtitle": "Discover the science-backed secrets to vitality and energy, inspired by cutting-edge whole-health platforms.",
+    "caption": "🚀 **THE LONGEVITY REVOLUTION IS HERE!**\n\n🔍 **WHAT HAPPENED TODAY**: Euvita Health just launched its nationwide whole-health and longevity platform, signalling a massive shift towards accessible, personalized wellness. This isn't just about living longer; it's about optimizing every aspect of your health to live vibrantly, backed by cutting-edge science and integrated care.\n\n💡 **CORE TAKEAWAYS**:\n• ⚡ **Personalized Pathways**: Moving beyond one-size-fits-all, towards tailored health plans based on your unique biology.\n• 📊 **Data-Driven Vitality**: Leveraging biomarkers and lifestyle data to optimize energy, mood, and physical performance.\n• 🎯 **Proactive Prevention**: Shifting focus from treating illness to preventing it, empowering you with actionable daily habits.\n\n🔥 **WHY THIS MATTERS NOW**: With platforms like Euvita making advanced longevity insights mainstream, you no longer need to guess. The tools and knowledge for peak vitality are within reach, allowing you to proactively design a life filled with sustained energy and robust health. This is your moment to embrace a future where optimal well-being is the norm.\n\n💬 **What's ONE longevity habit you're excited to try or already practice? Share below!**\n\n#Longevity #Wellness #Biohacking #HealthTech #Choicematrix #EuvitaHealth #FutureOfHealth\n\nReference: PR Newswire — https://news.google.com/rss/articles/CBMiwwFBVV95cUxOZ002b3Qwbk9NYXlEMS1UMGhSWWVhWkp6elZ4Qlk1Y25hbEJjYTl1Y202VG9pZ0V1TjRHbUc0c3hNWThvY3kxVzZhSWtGZW1udTBDc2libkxKcHVCWVZLblh4dWR0ZmpNS2I1QnFtWF9nUTBOdFk0elNQcG14QUs5Si1TTU1JZFF2bmpueEdNTHRmZmpHVXRKUEo5N1VWUDg3cjhZYzZ0V01ZM29naWI3Yi0xWk1GRlBETjNfWlpScDJPV2M?oc=5",
+    "category": "Longevity, Wellness & Biohacking",
+    "content_type": "practical",
+    "source": {
+      "label": "PR Newswire",
+      "url": "https://news.google.com/rss/articles/CBMiwwFBVV95cUxOZ002b3Qwbk9NYXlEMS1UMGhSWWVhWkp6elZ4Qlk1Y25hbEJjYTl1Y202VG9pZ0V1TjRHbUc0c3hNWThvY3kxVzZhSWtGZW1udTBDc2libkxKcHVCWVZLblh4dWR0ZmpNS2I1QnFtWF9nUTBOdFk0elNQcG14QUs5Si1TTU1JZFF2bmpueEdNTHRmZmpHVXRKUEo5N1VWUDg3cjhZYzZ0V01ZM29naWI3Yi0xWk1GRlBETjNfWlpScDJPV2M?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "The New Era of Vitality",
+        "body": "Imagine a life where peak energy and robust health are your daily reality. The launch of nationwide whole-health platforms like Euvita Health is transforming how we approach well-being, moving from reactive care to proactive longevity. This shift empowers you to leverage science-backed strategies, personalize your wellness journey, and unlock your full potential for sustained vitality. It's about designing a life where you don't just exist, but thrive.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "vibrant healthy lifestyle"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "Personalized Nutrition Science",
+        "body": "The foundation of true longevity lies in understanding your unique nutritional needs. Generic diets often fail because they ignore individual biochemistry, genetics, and gut microbiome. Modern platforms leverage advanced diagnostics to create personalized eating plans, optimizing nutrient intake for energy, cellular health, and disease prevention. This means identifying specific foods that fuel your body best, reducing inflammation, and boosting metabolic efficiency.",
+        "image_query": "personalized nutrition plan",
+        "visual_badge": {
+          "label": "🧬 BIOMARKER FOCUS",
+          "value": "Tailored Diet Plans",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "Optimized Movement & Recovery",
+        "body": "Beyond just exercise, longevity demands intelligent movement and adequate recovery. This involves integrating varied physical activities – strength, flexibility, cardio – that are precisely matched to your body's capabilities and goals. Equally crucial is prioritizing sleep hygiene and active recovery techniques like stretching or meditation. These elements work synergistically to repair cells, reduce stress hormones, and build resilience, ensuring your body functions optimally day in and day out.",
+        "image_query": "person stretching outdoors",
+        "visual_badge": {
+          "label": "🧘‍♀️ RECOVERY INDEX",
+          "value": "8-Hour Quality Sleep",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "Mind-Body Harmony Hacks",
+        "body": "True vitality is incomplete without mental and emotional well-being. Modern longevity principles emphasize biohacking the mind through practices like mindfulness, gratitude journaling, and targeted cognitive exercises. These techniques reduce chronic stress, enhance focus, and improve emotional regulation, which are critical for cellular longevity and overall resilience. Cultivating a positive mindset and strong social connections significantly impacts your biological age and daily energy levels.",
+        "image_query": "mindful meditation nature",
+        "visual_badge": {
+          "label": "🧠 COGNITIVE BOOST",
+          "value": "Stress Reduction >30%",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "Your Blueprint for Lasting Energy",
+        "body": "Integrating science-backed nutrition, optimized movement, and profound mind-body practices forms your personal blueprint for lasting energy and vitality. It's about making informed choices daily, not grand gestures annually. Embrace the power of personalized insights, consistent small habits, and a holistic approach to wellness. This isn't just about extending life; it's about enriching every moment with purpose, health, and an abundance of energy.",
+        "image_query": "energetic healthy individuals",
+        "visual_badge": {
+          "label": "📈 VITALITY SCORE",
+          "value": "Holistic Well-being",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "vibrant healthy lifestyle",
+    "image": "posts/2026-10-29_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-29_afternoon-v1-slide1.jpg",
+      "posts/2026-10-29_afternoon-v1-slide2.jpg",
+      "posts/2026-10-29_afternoon-v1-slide3.jpg",
+      "posts/2026-10-29_afternoon-v1-slide4.jpg",
+      "posts/2026-10-29_afternoon-v1-slide5.jpg",
+      "posts/2026-10-29_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "f81418df3448e17960a6c91e85f2be38c9762b8173ace116339b165458de8908",
+    "status": "approved",
+    "approved_at": "2026-10-29T03:36:09.528765+00:00",
+    "approval_hash": "b26d3153756c99c047d34a2b642deefcd5143e33da43c4dba3e5b905cdd554b0",
+    "fb": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-29T03:30:37.881066+00:00"
+  },
+  "2026-10-29_evening": {
+    "date": "2026-10-29_evening",
+    "clean_date": "2026-10-29",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 1,
+    "title": "দৈনন্দিন নড়াচড়ায় সুস্থ জীবন",
+    "subtitle": "আলাদা করে ব্যায়াম নয়, প্রতিদিনের ছোট ছোট নড়াচড়ার মাধ্যমে কীভাবে সুস্থ ও দীর্ঘায়ু হবেন, জানুন!",
+    "caption": "🚀 **সক্রিয় থাকুন, সুস্থ থাকুন!**\n🔍 **আজকের খবর:** চ্যানেল 24-এর সাম্প্রতিক প্রতিবেদন অনুযায়ী, শুধু জিমে ঘাম ঝরানোই সুস্থ থাকার একমাত্র উপায় নয়। আমাদের দৈনন্দিন জীবনের ছোট ছোট নড়াচড়াই দীর্ঘায়ু ও মানসিক শান্তির চাবিকাঠি।\n💡 **মূল শিক্ষা:**\n• ⚡ ১. শারীরিক ও মানসিক সুস্থতার জন্য আলাদা করে কঠিন ব্যায়ামের চেয়ে নিয়মিত নড়াচড়া বেশি কার্যকর।\n• 📊 ২. প্রতিদিনের কাজকর্মে সক্রিয় থাকা বিপাকক্রিয়া উন্নত করে, রক্ত ​​সঞ্চালন বাড়ায় এবং মনকে সতেজ রাখে।\n• 🎯 ৩. ছোট ছোট অভ্যাস যেমন সিঁড়ি ব্যবহার, হাঁটাচলার মিটিং, বা বাগান করা আপনার জীবনযাত্রায় বড় পরিবর্তন আনতে পারে।\n🔥 **কেন এটি গুরুত্বপূর্ণ:** আধুনিক কর্মব্যস্ত জীবনে আমরা প্রায়শই নড়াচড়া ভুলে যাই। এই বিজ্ঞান-ভিত্তিক পদ্ধতি আমাদের শেখায় কীভাবে সহজ উপায়ে সুস্থ ও প্রাণবন্ত জীবন যাপন করা যায়। এটি কেবল শারীরিক সুস্থতা নয়, মানসিক শান্তিরও পথ।\n💬 **আপনার কী মনে হয়? আপনি কীভাবে আপনার দৈনন্দিন নড়াচড়া বাড়ান? কমেন্টে জানান! 👇**\n#Choicematrix #সুস্থজীবন #দৈনন্দিননড়াচড়া #মানসিকশান্তি #দীর্ঘায়ু #স্বাস্থ্যটিপস\n\nReference: Channel 24 — https://news.google.com/rss/articles/CBMiqAVBVV95cUxNSzNjMjRHOXExa2RMZC1yVmlIczZUVUUtTDByYUdqRnFjR0dMN2xSMF83WDFvN0IxVDlIWm1UTWtIODlyaF9YVUZrNmdlMDgybTN3YWMxTmdsQkV0aDFidWNtMHVGNVBwSEc3d3N3WGlCZXdoT0VFbklSMXBTQjVtLV95UWVMZHhIZWNzVTc1RDZRV0MyMnMyLWhvSW82bEdlVmc4TDMtTHAzMEIzUFhLVXlFN1BJYVpZeU5aNlh0OGRRYkRKUFdnZjRkT0hxVDNBVDh5T1dGci02NTQ0SXJVU2dFZk9GbmdRTDl2Q01Rc1RmcTYxdHNqQXhvZ3dxVDZPV1BSSGJEbzh3MVo3dGFMMjFKS3RqN0tJdUxuejF6S0V0b3VDbkxva3V0QW1iM1Z0M3l6T1pHazQ4X21VVy1fS0d3ZmVCQmN4Y3BOU0pWU1VwdXRwZ0lhTDJueE5kUG9Zb1Z3bGNoby1OblpUeGRDd1Q0dkV2anRoWXgwdDF1b0NDMXpHTVNEdzF5cERLOG43amxQSlJXT1U0MVBDQzNZTExRS1ZldS1JQVlQbXpVaWdTOHEySjlBVzJrZjRMTWsyTWd5cEg2WlRUajZpUkJJVUV5TkNVVm1PQmRsZml0RGR4WC14Z0twakMyeDBlMm00TC1tNEpFR0F0V21oWmhSYmZ0LXZpR0Q3cmJsV3BJR0JzMENyNk1mTGdSU0ZZb3hleEV5cTBET3JneHpjakg4MEpGWU5HaE9fanhsd013emlueVZoOU9GTWMxMzhoN243WUg2d2FOMVdpcm84TTF5SENGLUg2bWQ3OVhFUTdzX2s0RThFZHoxNEt0aEljeFlxb2swZUZtbzRjMjhLYXFPMDh0dkxySHRiTzZFMnFWQ0JCY1JUd0F6dg?oc=5",
+    "category": "মানসিক শান্তি ও দীর্ঘায়ু",
+    "content_type": "practical",
+    "source": {
+      "label": "Channel 24",
+      "url": "https://news.google.com/rss/articles/CBMiqAVBVV95cUxNSzNjMjRHOXExa2RMZC1yVmlIczZUVUUtTDByYUdqRnFjR0dMN2xSMF83WDFvN0IxVDlIWm1UTWtIODlyaF9YVUZrNmdlMDgybTN3YWMxTmdsQkV0aDFidWNtMHVGNVBwSEc3d3N3WGlCZXdoT0VFbklSMXBTQjVtLV95UWVMZHhIZWNzVTc1RDZRV0MyMnMyLWhvSW82bEdlVmc4TDMtTHAzMEIzUFhLVXlFN1BJYVpZeU5aNlh0OGRRYkRKUFdnZjRkT0hxVDNBVDh5T1dGci02NTQ0SXJVU2dFZk9GbmdRTDl2Q01Rc1RmcTYxdHNqQXhvZ3dxVDZPV1BSSGJEbzh3MVo3dGFMMjFKS3RqN0tJdUxuejF6S0V0b3VDbkxva3V0QW1iM1Z0M3l6T1pHazQ4X21VVy1fS0d3ZmVCQmN4Y3BOU0pWU1VwdXRwZ0lhTDJueE5kUG9Zb1Z3bGNoby1OblpUeGRDd1Q0dkV2anRoWXgwdDF1b0NDMXpHTVNEdzF5cERLOG43amxQSlJXT1U0MVBDQzNZTExRS1ZldS1JQVlQbXpVaWdTOHEySjlBVzJrZjRMTWsyTWd5cEg2WlRUajZpUkJJVUV5TkNVVm1PQmRsZml0RGR4WC14Z0twakMyeDBlMm00TC1tNEpFR0F0V21oWmhSYmZ0LXZpR0Q3cmJsV3BJR0JzMENyNk1mTGdSU0ZZb3hleEV5cTBET3JneHpjakg4MEpGWU5HaE9fanhsd013emlueVZoOU9GTWMxMzhoN243WUg2d2FOMVdpcm84TTF5SENGLUg2bWQ3OVhFUTdzX2s0RThFZHoxNEt0aEljeFlxb2swZUZtbzRjMjhLYXFPMDh0dkxySHRiTzZFMnFWQ0JCY1JUd0F6dg?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "ব্যায়াম নয়, সুস্থতা প্রতিদিন!",
+        "body": "আমরা প্রায়শই ভাবি, সুস্থ থাকতে হলে জিমে গিয়ে কঠিন ব্যায়াম করতেই হবে। কিন্তু বিজ্ঞান বলছে ভিন্ন কথা! আলাদা করে সময় বের করে ব্যায়াম করার বদলে, দৈনন্দিন জীবনে ছোট ছোট নড়াচড়াই আপনাকে এনে দিতে পারে দীর্ঘায়ু ও মানসিক শান্তি। এটি আপনার শরীরের প্রতিটি কোষকে সতেজ রাখে।",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "happy active elderly couple walking park"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "কেন দৈনন্দিন নড়াচড়া?",
+        "body": "দীর্ঘক্ষণ বসে থাকার অভ্যাস আমাদের শরীরের জন্য নীরব ঘাতক। এটি বিপাকক্রিয়া ধীর করে, রক্তে শর্করার মাত্রা বাড়ায় এবং হৃদরোগের ঝুঁকি বাড়ায়। নিয়মিত, হালকা নড়াচড়া এই সমস্যাগুলির সমাধান করে। এটি রক্ত ​​সঞ্চালন উন্নত করে, পেশি সতেজ রাখে এবং মানসিক চাপ কমিয়ে মনকে শান্ত রাখে, যা দীর্ঘায়ুর জন্য অপরিহার্য।",
+        "image_query": "person stretching office window",
+        "visual_badge": {
+          "label": "গবেষণার ফল",
+          "value": "৩০% সুস্থতা বৃদ্ধি",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "সহজ অভ্যাস, বড় প্রভাব",
+        "body": "আপনার জীবনযাত্রায় নড়াচড়া যোগ করা কঠিন কিছু নয়। লিফটের বদলে সিঁড়ি ব্যবহার করুন, সহকর্মীদের সাথে হেঁটে মিটিং করুন, বা ফোন করার সময় পায়চারি করুন। প্রতি এক ঘণ্টা পরপর ২-৫ মিনিটের জন্য উঠে দাঁড়ান এবং স্ট্রেচ করুন। এমনকি রান্না বা বাগান করার মতো গৃহস্থালীর কাজও আপনাকে সক্রিয় রাখতে পারে।",
+        "image_query": "person climbing stairs office",
+        "visual_badge": {
+          "label": "লক্ষ্য রাখুন",
+          "value": "৮০০০ কদম দৈনিক",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "ভুল এড়িয়ে চলুন, সেরা ফল পান",
+        "body": "শুধুমাত্র স্টেপ কাউন্টের ওপর নির্ভর করবেন না। আপনার শরীরের কথা শুনুন এবং বিশ্রাম দিন যখন প্রয়োজন। তাড়াহুড়ো করে অতিরিক্ত নড়াচড়া না করে ধারাবাহিকতা বজায় রাখুন। পর্যাপ্ত জল পান করুন এবং নড়াচড়ার সময় সঠিক ভঙ্গিমা অনুশীলন করুন, যা আঘাত প্রতিরোধে সাহায্য করবে। বিভিন্ন ধরনের নড়াচড়া আপনার শরীরকে আরও শক্তিশালী করবে।",
+        "image_query": "mindful woman drinking water",
+        "visual_badge": {
+          "label": "গুরুত্বপূর্ণ টিপস",
+          "value": "নিয়মিত জলপান",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "সুস্থ জীবনের মূলমন্ত্র",
+        "body": "সুস্থ জীবন কেবল কঠিন ব্যায়ামের ফল নয়, এটি প্রতিদিনের সচেতন নড়াচড়ার একটি ফলস্বরূপ। প্রতিটি ক্ষুদ্র পদক্ষেপ, প্রতিটি দাঁড়ানো বা হাঁটা আপনার দীর্ঘায়ু ও সুস্থতার দিকে একটি বড় পদক্ষেপ। আপনার জীবনযাত্রায় সক্রিয়তাকে অন্তর্ভুক্ত করুন এবং অনুভব করুন আপনার শরীর ও মন কীভাবে সতেজ ও প্রাণবন্ত হয়ে উঠছে।",
+        "image_query": "happy diverse community walking park"
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "তথ্যটি ভালো লেগেছে কি? 💡",
+        "body": "Follow @choicematrix প্রতিদিনের সেরা টেক ট্রেন্ড, শিক্ষা ও উদ্ভাবনের আপডেটের জন্য! 🚀🔥✨\n\n📌 পোস্টটি সেভ করে রাখুন\n↗️ বন্ধুদের সাথে শেয়ার করুন"
+      }
+    ],
+    "unsplash_query": "daily healthy lifestyle movement",
+    "image": "posts/2026-10-29_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-29_evening-v1-slide1.jpg",
+      "posts/2026-10-29_evening-v1-slide2.jpg",
+      "posts/2026-10-29_evening-v1-slide3.jpg",
+      "posts/2026-10-29_evening-v1-slide4.jpg",
+      "posts/2026-10-29_evening-v1-slide5.jpg",
+      "posts/2026-10-29_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "e68b9a30a8a610e126cd7f2eb306427640d5583db9b4e2bf79d0616f0a47a5e6",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-29T03:31:13.699268+00:00"
   }
 }
