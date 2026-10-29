@@ -1390,9 +1390,10 @@
       "attempted_at": "2026-10-29T08:30:19.947558+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-10-29T08:30:30.805547+00:00"
     },
     "created_at": "2026-10-29T03:30:37.881066+00:00"
   },
