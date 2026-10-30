@@ -1607,9 +1607,10 @@
       "attempted_at": "2026-10-30T08:30:14.810374+00:00"
     },
     "ig": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-10-30T08:30:29.371009+00:00"
     },
     "threads": {
       "status": "not_started",
