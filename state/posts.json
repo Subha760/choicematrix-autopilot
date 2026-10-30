@@ -1484,26 +1484,24 @@
     ],
     "recommended_audio": null,
     "image_sha256": "e68b9a30a8a610e126cd7f2eb306427640d5583db9b4e2bf79d0616f0a47a5e6",
-    "status": "needs_attention",
+    "status": "published",
     "approved_at": "2026-10-29T03:36:14.685172+00:00",
     "approval_hash": "896e1b4cc1ddf4f24755cf32b62741925acec5c9e2ee453dea9172c21853ca17",
     "fb": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
-      "attempted_at": "2026-10-29T14:30:08.499894+00:00"
+      "status": "published",
+      "id": "1279646595235354_122133403101465406"
     },
     "ig": {
       "status": "published",
-      "id": "17919276474533052",
-      "container": "18121775789470290",
-      "attempted_at": "2026-10-29T14:30:15.679533+00:00"
+      "id": "18094561709484875",
+      "container": "18121775813470290",
+      "attempted_at": "2026-10-29T14:30:24.090781+00:00"
     },
     "threads": {
       "status": "published",
-      "id": "18097095608422517",
-      "container": "17989866990113014",
-      "attempted_at": "2026-10-29T14:30:58.794641+00:00"
+      "id": "18067745852685820",
+      "container": "17989867002113014",
+      "attempted_at": "2026-10-29T14:31:03.325166+00:00"
     },
     "created_at": "2026-10-29T03:31:13.699268+00:00"
   }
