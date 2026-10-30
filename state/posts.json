@@ -1716,15 +1716,14 @@
     "approved_at": "2026-10-30T03:58:04.057413+00:00",
     "approval_hash": "9344bff6c54b2198bb21a0c8930e5595fba555804a788b787361463426511257",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122133751479465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-30T14:30:02.756025+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-30T14:30:18.770381+00:00"
     },
     "threads": {
       "status": "not_started",
