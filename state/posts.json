@@ -1823,7 +1823,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "9e550fcd95f3870e78420cc2db4860c017ac33886b5ae50561fa879b7f81376f",
-    "status": "approved",
+    "status": "rejected",
     "approved_at": "2026-10-31T04:10:44.005400+00:00",
     "approval_hash": "a612784c26e7805b7f8d181e1e8a69841405073be38abcba85e1dbd2a3f76dc9",
     "fb": {
