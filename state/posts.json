@@ -1597,7 +1597,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "75ab932cef2e72d6f69c5e653ac6b2f1c766719d5bdcdbc5efb4c6d48dc45abc",
-    "status": "needs_attention",
+    "status": "rejected",
     "approved_at": "2026-10-30T03:57:59.099444+00:00",
     "approval_hash": "7e5b94d868f001617bae6c4de4285ce0c4a6747065172239df9378363075da0c",
     "fb": {
@@ -1732,5 +1732,116 @@
       "attempted_at": "2026-10-30T14:30:59.071701+00:00"
     },
     "created_at": "2026-10-30T03:30:58.556643+00:00"
+  },
+  "2026-10-31_evening": {
+    "date": "2026-10-31_evening",
+    "clean_date": "2026-10-31",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 1,
+    "title": "প্রণমহি বঙ্গমাতা: মুখানৃত্যের জাদু",
+    "subtitle": "বাংলার প্রাচীন তান্ত্রিক মুখানৃত্যের রহস্য, ঐতিহ্য ও পুনরুজ্জীবনের গল্প জানুন।",
+    "caption": "🚀 বাংলার গোপন শিল্প: তান্ত্রিক মুখানৃত্য!\n\n🔍 প্রথম আলো'র প্রতিবেদন অনুযায়ী, বাংলার এক বিস্মৃতপ্রায় কিন্তু জীবন্ত ঐতিহ্য, তান্ত্রিক মুখানৃত্য, আজও তার নিজস্ব মহিমায় উজ্জ্বল। এই রহস্যময় শিল্পরূপ আমাদের সাংস্কৃতিক ইতিহাসের এক গুরুত্বপূর্ণ অংশ, যা প্রজন্মের পর প্রজন্ম ধরে বাংলার আত্মাকে বহন করে চলেছে।\n\n💡 কোর টেকঅ্যাওয়েস:\n• ⚡️ ১. প্রাচীন বাংলার তান্ত্রিক সাধনার সাথে মুখানৃত্যের গভীর যোগসূত্র।\n• 📊 ২. প্রতিটি মুখোশের পেছনে লুকিয়ে আছে এক সমৃদ্ধ পৌরাণিক গল্প ও প্রতীকী অর্থ।\n• 🎯 ৩. আধুনিকতার চ্যালেঞ্জ সত্ত্বেও এই শিল্পকে বাঁচিয়ে রাখতে চলছে নিরন্তর প্রচেষ্টা।\n\n🔥 এই ঐতিহ্যবাহী শিল্প শুধুমাত্র একটি নৃত্যশৈলী নয়, এটি আমাদের শিকড়ের প্রতিচ্ছবি। একে বাঁচিয়ে রাখা মানে আমাদের নিজস্ব সংস্কৃতিকে ভবিষ্যতের কাছে তুলে ধরা, যা আমাদের পরিচয়কে আরও সুদৃঢ় করে।\n\n💬 আপনি কি কখনও এমন কোনো ঐতিহ্যবাহী শিল্প দেখেছেন যা আপনাকে মুগ্ধ করেছে? মন্তব্য করে জানান!\n\n#Choicematrix #বাংলারঐতিহ্য #মুখানৃত্য #তান্ত্রিকশিল্প #সংস্কৃতি\n\nReference: প্রথম আলো — https://news.google.com/rss/articles/CBMiZEFVX3lxTE5xTEFfRFNwY1VqcHpmMTlsRVBVVkYwaVdOMk9IdzJkdFdmRHBqS0RHa1RxVzlGQXJFb25VMTdSTEF3dDhYckVNeC1zYWdDRlVBSmRRMmR2VV9TZElIbFBJMmM0SU7SAXJBVV95cUxPLW1NMFZ1OFMyZ3YxUUs5cWtiUWRaUmZaWmNVd01Pa1d3b0lvRzlmbUkxZUwyQkNkSXFjZ3hnRzdNOXJ2TW9HZWNCZHBvbk1HMXhIb3UtWlIxWlc3QlNvWm9DYl9vNHh5TDVfUm54SEJhQkE?oc=5",
+    "category": "বাংলার উৎসব, ঐতিহ্য ও সংস্কৃতি",
+    "content_type": "practical",
+    "source": {
+      "label": "প্রথম আলো",
+      "url": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5xTEFfRFNwY1VqcHpmMTlsRVBVVkYwaVdOMk9IdzJkdFdmRHBqS0RHa1RxVzlGQXJFb25VMTdSTEF3dDhYckVNeC1zYWdDRlVBSmRRMmR2VV9TZElIbFBJMmM0SU7SAXJBVV95cUxPLW1NMFZ1OFMyZ3YxUUs5cWtiUWRaUmZaWmNVd01Pa1d3b0lvRzlmbUkxZUwyQkNkSXFjZ3hnRzdNOXJ2TW9HZWNCZHBvbk1HMXhIb3UtWlIxWlc3QlNvWm9DYl9vNHh5TDVfUm54SEJhQkE?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "প্রণমহি বঙ্গমাতা: মুখানৃত্যের জাদু",
+        "body": "প্রাচীন বঙ্গভূমির এক রহস্যময়, জীবন্ত ঐতিহ্য হলো তান্ত্রিক মুখানৃত্য। এটি কেবল একটি পারফরম্যান্স নয়, বরং আধ্যাত্মিকতা, শিল্পকলা এবং সংস্কৃতির এক অসাধারণ মেলবন্ধন। মুখোশের আড়ালে লুকিয়ে আছে শত শত বছরের পুরনো গল্প, দেব-দেবী ও লোকবিশ্বাসের অনুরণন। এই নৃত্যশৈলী আমাদের সমৃদ্ধ সাংস্কৃতিক শিকড়কে তুলে ধরে, যা আজও তার স্বকীয় মহিমায় উজ্জ্বল।",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "bengal tantric mask dance performer"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "তন্ত্র ও ঐতিহ্যের মেলবন্ধন",
+        "body": "তান্ত্রিক মুখানৃত্যের শেকড় প্রোথিত আছে প্রাচীন বাংলার তন্ত্র সাধনা ও লৌকিক ঐতিহ্যে। এটি মূলত দেব-দেবী ও পৌরাণিক চরিত্রদের আরাধনা ও গল্প বলার একটি মাধ্যম। এই নৃত্যশৈলী শুধুমাত্র বিনোদন নয়, বরং সমাজের আধ্যাত্মিক বিশ্বাস, লোককথা এবং ঐতিহাসিক ঘটনাপ্রবাহকে প্রজন্ম থেকে প্রজন্মান্তরে পৌঁছে দেওয়ার এক শক্তিশালী মাধ্যম হিসেবে কাজ করে। এর প্রতিটি পদক্ষেপ ও মুখোশের পেছনে লুকিয়ে আছে গভীর প্রতীকী অর্থ।",
+        "image_query": "ancient bengali tantra art",
+        "visual_badge": {
+          "label": "📍 উৎস",
+          "value": "প্রাচীন বঙ্গভূমি",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "শিল্পের রূপ ও পরিবেশনা",
+        "body": "এই শিল্পের মূল আকর্ষণ হলো এর মুখোশ (মুখা) নির্মাণ এবং পরিবেশনার জটিল প্রক্রিয়া। শিল্পীরা অত্যন্ত যত্নের সাথে মাটি, কাঠ বা কাগজের মণ্ড দিয়ে প্রতীকী মুখোশ তৈরি করেন, যা বিভিন্ন দেব-দেবী বা প্রাণীর রূপ ধারণ করে। কঠোর প্রশিক্ষণপ্রাপ্ত নর্তকরা এই মুখোশ পরিধান করে বিশেষ ছন্দে, মুদ্রা ও ভঙ্গিমায় নৃত্য পরিবেশন করেন। এর মাধ্যমে পৌরাণিক কাহিনী জীবন্ত হয়ে ওঠে, যা দর্শকদের এক অন্য জগতে নিয়ে যায়।",
+        "image_query": "bengali mask making artisan",
+        "visual_badge": {
+          "label": "🎨 শৈল্পিক উপাদান",
+          "value": "মুখা ও মুদ্রা",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "টিকে থাকার সংগ্রাম ও পুনরুজ্জীবন",
+        "body": "আধুনিকতার আগ্রাসন ও পৃষ্ঠপোষকতার অভাবে তান্ত্রিক মুখানৃত্য আজ এক কঠিন পরীক্ষার সম্মুখীন। তবে, বাংলার বিভিন্ন স্থানে এখনও কিছু নিবেদিতপ্রাণ শিল্পী এই ঐতিহ্যকে বাঁচিয়ে রাখতে আপ্রাণ চেষ্টা করে চলেছেন। সাংস্কৃতিক সংস্থা ও সরকারি উদ্যোগের মাধ্যমে এই শিল্পকে নতুন করে তুলে ধরার প্রচেষ্টা চলছে। কর্মশালা, প্রদর্শনী এবং প্রচারের মাধ্যমে এই অনন্য শিল্পরূপকে ভবিষ্যতের জন্য সংরক্ষণ করাই এখন প্রধান লক্ষ্য।",
+        "image_query": "traditional bengali artists workshop",
+        "visual_badge": {
+          "label": "📈 বর্তমান অবস্থা",
+          "value": "পুনরুজ্জীবনের পথে",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "আমাদের গর্ব, আমাদের ঐতিহ্য",
+        "body": "তান্ত্রিক মুখানৃত্য শুধু একটি নৃত্যশৈলী নয়, এটি আমাদের গর্ব, আমাদের আত্মপরিচয়ের এক গুরুত্বপূর্ণ অংশ। এই ঐতিহ্যবাহী শিল্প আমাদের পূর্বপুরুষদের জ্ঞান, বিশ্বাস এবং সৃজনশীলতার এক অমূল্য নিদর্শন। একে বাঁচিয়ে রাখা মানে আমাদের নিজস্ব সাংস্কৃতিক ঐতিহ্যকে সমৃদ্ধ করা এবং নতুন প্রজন্মের কাছে এর মূল্য তুলে ধরা। আসুন, আমরা সকলে মিলে এই জীবন্ত ঐতিহ্যকে সম্মান করি এবং এর প্রচার ও প্রসারে অংশ নিই।",
+        "image_query": "bengali cultural festival vibrant",
+        "visual_badge": {
+          "label": "💡 বার্তা",
+          "value": "ঐতিহ্য বাঁচান",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "তথ্যটি ভালো লেগেছে কি? 💡",
+        "body": "Follow @choicematrix প্রতিদিনের সেরা টেক ট্রেন্ড, শিক্ষা ও উদ্ভাবনের আপডেটের জন্য! 🚀🔥✨\n\n📌 পোস্টটি সেভ করে রাখুন\n↗️ বন্ধুদের সাথে শেয়ার করুন"
+      }
+    ],
+    "unsplash_query": "bengali traditional mask dance vibrant",
+    "image": "posts/2026-10-31_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-10-31_evening-v1-slide1.jpg",
+      "posts/2026-10-31_evening-v1-slide2.jpg",
+      "posts/2026-10-31_evening-v1-slide3.jpg",
+      "posts/2026-10-31_evening-v1-slide4.jpg",
+      "posts/2026-10-31_evening-v1-slide5.jpg",
+      "posts/2026-10-31_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "dd9f70a67963c07467bfb02157a7efba929767b4a140bd086477558b31313432",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-10-31T03:30:54.980941+00:00"
   }
 }
