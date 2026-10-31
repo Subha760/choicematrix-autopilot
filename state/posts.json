@@ -1597,7 +1597,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "5075098768cb266860dd125ac0c8f350300ce473a34bac5ad6eb67b9b0e2f6c1",
-    "status": "publishing",
+    "status": "published",
     "approved_at": "2026-10-31T04:08:26.421677+00:00",
     "approval_hash": "6845796dd853f0312217b81e01b59236e07725627f65db2850789fb0cc86846c",
     "fb": {
@@ -1611,9 +1611,9 @@
       "attempted_at": "2026-10-31T04:08:47.202251+00:00"
     },
     "threads": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18415820032083162",
+      "container": "17990128668113014",
       "attempted_at": "2026-10-31T04:09:28.842497+00:00"
     },
     "created_at": "2026-10-31T04:04:08.788353+00:00"
