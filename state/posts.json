@@ -1601,15 +1601,14 @@
     "approved_at": "2026-10-31T04:08:26.421677+00:00",
     "approval_hash": "6845796dd853f0312217b81e01b59236e07725627f65db2850789fb0cc86846c",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122133925065465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-31T04:08:29.404258+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-31T04:08:47.202251+00:00"
     },
     "threads": {
       "status": "not_started",
