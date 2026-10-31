@@ -130,20 +130,25 @@ def check_meta_token_health(force=False, reply_chat_id=None):
 
 def approve_pending_post(posts, approver_name="Subha", target_key=None, target_slot=None):
     import autopilot
+    today = datetime.now(autopilot.IST).date().isoformat()
     entry = None
     if target_key and target_key in posts:
         entry = posts[target_key]
     else:
-        for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
-                if target_slot is None or posts[k].get("slot") == target_slot:
-                    entry = posts[k]
-                    target_key = k
-                    break
+        if target_slot and f"{today}_{target_slot}" in posts:
+            target_key = f"{today}_{target_slot}"
+            entry = posts[target_key]
+        else:
+            for k in sorted(posts.keys(), reverse=True):
+                if k.startswith(today) and posts[k].get("status") in ("pending", "needs_attention", "expired", "rejected"):
+                    if target_slot is None or posts[k].get("slot") == target_slot:
+                        entry = posts[k]
+                        target_key = k
+                        break
 
     if not entry:
         slot_label = f" {target_slot.capitalize()}" if target_slot else ""
-        return False, f"⚠️ No pending draft found to approve for{slot_label} post."
+        return False, f"⚠️ No draft found to approve for today's{slot_label} post.\n(Reply 'recreate{slot_label.lower()}' to generate one!)"
 
     entry["status"] = "approved"
     entry["approved_at"] = datetime.now(timezone.utc).isoformat()
@@ -187,20 +192,26 @@ def approve_pending_post(posts, approver_name="Subha", target_key=None, target_s
     )
 
 def reject_pending_post(posts, approver_name="Subha", target_key=None, target_slot=None):
+    import autopilot
+    today = datetime.now(autopilot.IST).date().isoformat()
     entry = None
     if target_key and target_key in posts:
         entry = posts[target_key]
     else:
-        for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "approved", "needs_attention", "expired"):
-                if target_slot is None or posts[k].get("slot") == target_slot:
-                    entry = posts[k]
-                    target_key = k
-                    break
+        if target_slot and f"{today}_{target_slot}" in posts:
+            target_key = f"{today}_{target_slot}"
+            entry = posts[target_key]
+        else:
+            for k in sorted(posts.keys(), reverse=True):
+                if k.startswith(today) and posts[k].get("status") in ("pending", "approved", "needs_attention", "expired"):
+                    if target_slot is None or posts[k].get("slot") == target_slot:
+                        entry = posts[k]
+                        target_key = k
+                        break
 
     if not entry:
         slot_label = f" {target_slot.capitalize()}" if target_slot else ""
-        return False, f"⚠️ No draft found to reject for{slot_label} post."
+        return False, f"⚠️ No draft found to reject for today's{slot_label} post."
 
     slot_name = entry.get("slot", "post").capitalize()
     if entry.get("status") == "published":
@@ -214,24 +225,15 @@ def reject_pending_post(posts, approver_name="Subha", target_key=None, target_sl
     return True, f"❌ <b>{slot_name.upper()} POST REJECTED by {approver_name}.</b>\nThis post will not be published.\n(Reply 'recreate {slot_name.lower()}' if you want a fresh new draft!)"
 
 def recreate_and_send_post(posts, approver_name="Subha", target_key=None, target_slot=None):
+    import autopilot
     approver_id = str(os.getenv("TG_APPROVER_ID", ""))
-    entry = None
-    if target_key and target_key in posts:
-        entry = posts[target_key]
-    else:
-        for k in sorted(posts.keys(), reverse=True):
-            if posts[k].get("status") in ("pending", "rejected", "needs_attention", "expired", "approved"):
-                if target_slot is None or posts[k].get("slot") == target_slot:
-                    entry = posts[k]
-                    target_key = k
-                    break
+    today = datetime.now(autopilot.IST).date().isoformat()
 
-    today = datetime.now().date().isoformat()
+    slot = target_slot or ("evening" if target_key and "_evening" in target_key else "afternoon")
     if not target_key:
-        slot_def = target_slot or "afternoon"
-        target_key = f"{today}_{slot_def}"
+        target_key = f"{today}_{slot}"
 
-    slot = entry.get("slot", "afternoon") if entry else ("evening" if "_evening" in target_key or target_slot == "evening" else "afternoon")
+    entry = posts.get(target_key)
     old_rev = entry.get("revision", 1) if entry else 1
     new_rev = old_rev + 1
 
@@ -251,7 +253,6 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None, target
         "parse_mode": "HTML"
     })
 
-    import autopilot
     settings = read_json(ROOT / "settings.json", {})
     try:
         new_entry = autopilot.create_post(target_key, settings, posts, revision=new_rev, slot=slot)
@@ -296,7 +297,8 @@ def poll_once(offset=0):
 
             print(f"📥 Message from {first_name} ({user_id}): '{text}'", flush=True)
             lower_text = text.lower()
-            today = datetime.now().date().isoformat()
+            import autopilot
+            today = datetime.now(autopilot.IST).date().isoformat()
 
             # Identify target slot (supports common abbreviations and misspellings like 'evenig')
             target_slot = None

@@ -2336,7 +2336,17 @@ def process_publications(posts, settings, now):
         if all_published:
             entry["status"] = "published"
             platform_str = "Facebook, Instagram" + (" and Threads" if getenv("THREADS_USER_ID") else "")
-            safe_notify(f"✅ Published on {platform_str} ({date_key}).")
+            fb_id = entry.get("fb", {}).get("id")
+            ig_id = entry.get("ig", {}).get("id")
+            threads_id = entry.get("threads", {}).get("id")
+            safe_notify(
+                f"🚀 <b>PUBLISHED LIVE ON {platform_str.upper()}!</b>\n\n"
+                f"📅 Slot: <code>{date_key}</code>\n"
+                f"📌 Title: <b>{entry.get('title', '')}</b>\n\n"
+                f"• Facebook ID: <code>{fb_id or 'posted'}</code>\n"
+                f"• Instagram ID: <code>{ig_id or 'posted'}</code>\n"
+                f"• Threads ID: <code>{threads_id or 'posted'}</code>"
+            )
         elif any_failed:
             entry["status"] = "needs_attention"
         # If IG or Threads processing is ongoing, keep 'publishing' for the next cycle.
