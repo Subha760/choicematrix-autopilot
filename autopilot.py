@@ -471,7 +471,9 @@ def choose_topic(date_key, revision=1, use_web=False, recent_titles=None, slot_t
         feed_key = "india" if language == "Hindi" else "bengal"
 
     if use_web:
-        web = fetch_web_feed_topic(clean_date, revision, recent_titles=recent_titles, feed_type=feed_key, weekday_idx=day.weekday())
+        # When revision > 1, shift weekday pillar so recreate never picks the same topic pillar!
+        effective_weekday = (day.weekday() + (revision - 1) * 2) % 7
+        web = fetch_web_feed_topic(clean_date, revision, recent_titles=recent_titles, feed_type=feed_key, weekday_idx=effective_weekday)
         if web:
             return {
                 "type": "practical",
@@ -667,6 +669,11 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
     use_web = settings.get("use_live_web_feed", False)
     clean_date = date_key.split("_")[0]
     recent = [p.get("title", "") for _, p in sorted(posts.items())[-60:]]
+    curr_post = posts.get(date_key) or {}
+    if curr_post.get("title"):
+        recent.append(curr_post.get("title"))
+    if curr_post.get("direction"):
+        recent.append(curr_post.get("direction"))
     slot_info = choose_topic(clean_date, revision, use_web=use_web, recent_titles=recent, slot_type=slot)
     brand = settings.get("brand", "Choicematrix")
     language = slot_info.get("language", "English")
@@ -899,27 +906,35 @@ def similar(a, b):
     return bool(a == b or difflib.SequenceMatcher(None, a, b).ratio() > 0.82)
 
 
-def font(size, bold=True, language="English"):
-    families = []
-    if language == "Bengali":
-        families = [
-            str(ROOT / "fonts" / ("NotoSansBengali-Bold.ttf" if bold else "NotoSansBengali-Regular.ttf")),
-            "C:\\Windows\\Fonts\\Nirmala.ttc",
-            "/usr/share/fonts/truetype/noto/NotoSansBengali-Bold.ttf"
-        ]
-    elif language == "Hindi":
-        families = [
-            str(ROOT / "fonts" / ("NotoSansDevanagari-Bold.ttf" if bold else "NotoSansDevanagari-Regular.ttf")),
-            "C:\\Windows\\Fonts\\Nirmala.ttc",
-            "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Bold.ttf"
-        ]
-    else:
-        families = [
-            "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-            "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf",
-            "C:\\Windows\\Fonts\\arialbd.ttf" if bold else "C:\\Windows\\Fonts\\arial.ttf",
-            "C:\\Windows\\Fonts\\segoeuib.ttf" if bold else "C:\\Windows\\Fonts\\segoeui.ttf",
-        ]
+def clean_text_for_canvas(text: str) -> str:
+    """Strip emojis and unsupported glyphs that cause .notdef tofu boxes in PIL."""
+    if not text:
+        return ""
+    t = str(text)
+    t = t.replace("➡️", ">>").replace("👉", ">").replace("↗️", ">").replace("▶️", ">")
+    t = t.replace("🚀", "").replace("🔥", "").replace("✨", "").replace("💡", "").replace("📌", "").replace("💬", "").replace("🎵", "").replace("🌐", "").replace("📸", "").replace("📍", "")
+    t = re.sub(r'[\U00010000-\U0010ffff]', '', t)
+    t = re.sub(r'[ \t]+', ' ', t)
+    return t.strip()
+
+
+def has_indic_chars(text: str) -> bool:
+    """Detect if string contains Bengali or Devanagari Unicode characters."""
+    if not text:
+        return False
+    return any(('\u0980' <= c <= '\u09ff') or ('\u0900' <= c <= '\u097f') for c in text)
+
+
+def latin_font(size: int, bold: bool = True):
+    """Reliable Latin/English font that renders ASCII, digits, and @ perfectly without boxes."""
+    families = [
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation2/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSans-Bold.ttf" if bold else "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
+        "C:\\Windows\\Fonts\\arialbd.ttf" if bold else "C:\\Windows\\Fonts\\arial.ttf",
+        "C:\\Windows\\Fonts\\segoeuib.ttf" if bold else "C:\\Windows\\Fonts\\segoeui.ttf",
+    ]
     for item in families:
         if Path(item).exists():
             try:
@@ -931,6 +946,107 @@ def font(size, bold=True, language="English"):
     except TypeError:
         return ImageFont.load_default()
 
+
+def indic_font(size: int, bold: bool = True, language="Bengali"):
+    """Load regional Indic font (Bengali or Devanagari)."""
+    families = []
+    if language == "Bengali":
+        families = [
+            str(ROOT / "fonts" / ("NotoSansBengali-Bold.ttf" if bold else "NotoSansBengali-Regular.ttf")),
+            "/usr/share/fonts/truetype/noto/NotoSansBengali-Bold.ttf" if bold else "/usr/share/fonts/truetype/noto/NotoSansBengali-Regular.ttf",
+            "C:\\Windows\\Fonts\\Nirmala.ttc",
+        ]
+    elif language == "Hindi":
+        families = [
+            str(ROOT / "fonts" / ("NotoSansDevanagari-Bold.ttf" if bold else "NotoSansDevanagari-Regular.ttf")),
+            "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Bold.ttf" if bold else "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Regular.ttf",
+            "C:\\Windows\\Fonts\\Nirmala.ttc",
+        ]
+    for item in families:
+        if Path(item).exists():
+            try:
+                return ImageFont.truetype(item, size)
+            except Exception:
+                pass
+    return latin_font(size, bold=bold)
+
+
+def font(size, bold=True, language="English", text=None):
+    """Smart font loader: Uses Indic font for Bengali/Hindi text, Latin font for English/ASCII text."""
+    if text is not None and not has_indic_chars(text):
+        return latin_font(size, bold=bold)
+    if language in ("Bengali", "Hindi"):
+        return indic_font(size, bold=bold, language=language)
+    return latin_font(size, bold=bold)
+
+
+def get_mixed_text_width(draw, text, size, bold=True, language="Bengali"):
+    """Compute exact pixel width of a string that may mix Latin and Indic words."""
+    f_lat = latin_font(size, bold=bold)
+    f_ind = indic_font(size, bold=bold, language=language) if language in ("Bengali", "Hindi") else f_lat
+    space_w = draw.textbbox((0, 0), " ", font=f_lat)[2]
+    words = text.split(" ")
+    total_w = 0
+    for idx, word in enumerate(words):
+        if not word:
+            total_w += space_w
+            continue
+        f = f_ind if has_indic_chars(word) else f_lat
+        wb = draw.textbbox((0, 0), word, font=f)
+        total_w += (wb[2] - wb[0])
+        if idx < len(words) - 1:
+            total_w += space_w
+    return total_w
+
+
+def draw_mixed_text(draw, pos, text, size, bold=True, language="Bengali", fill=(255, 255, 255)):
+    """Draw mixed Latin and Indic words in a single line with perfect glyph selection and zero tofu boxes."""
+    x, y = pos
+    f_lat = latin_font(size, bold=bold)
+    f_ind = indic_font(size, bold=bold, language=language) if language in ("Bengali", "Hindi") else f_lat
+    space_w = draw.textbbox((0, 0), " ", font=f_lat)[2]
+    words = text.split(" ")
+    for idx, word in enumerate(words):
+        if not word:
+            x += space_w
+            continue
+        f = f_ind if has_indic_chars(word) else f_lat
+        draw.text((x, y), word, font=f, fill=fill)
+        wb = draw.textbbox((0, 0), word, font=f)
+        w = wb[2] - wb[0]
+        x += w + space_w
+
+
+def wrap_mixed_by_pixels(draw, text, size, max_width, bold=True, language="Bengali"):
+    """Word-wrap text that may contain mixed Latin and Indic characters without overflowing."""
+    words = text.split()
+    lines, current_line = [], ""
+    for word in words:
+        candidate = (current_line + " " + word).strip()
+        if get_mixed_text_width(draw, candidate, size, bold=bold, language=language) <= max_width:
+            current_line = candidate
+        else:
+            if current_line:
+                lines.append(current_line)
+            current_line = word
+    if current_line:
+        lines.append(current_line)
+    return lines
+
+
+def paste_rounded_image(base_img, photo, box, radius=20, border_color=None, border_width=2):
+    """Composite a high-res photo with antialiased rounded corners and border onto the canvas."""
+    bx, by, bw, bh = box
+    if photo is None or bw <= 0 or bh <= 0:
+        return
+    cropped = resize_and_crop(photo, int(bw), int(bh))
+    mask = Image.new("L", (int(bw), int(bh)), 0)
+    draw_mask = ImageDraw.Draw(mask)
+    draw_mask.rounded_rectangle((0, 0, int(bw), int(bh)), radius=int(radius), fill=255)
+    base_img.paste(cropped, (int(bx), int(by)), mask=mask)
+    if border_color and border_width > 0:
+        draw_border = ImageDraw.Draw(base_img)
+        draw_border.rounded_rectangle((int(bx), int(by), int(bx + bw), int(by + bh)), radius=int(radius), outline=border_color, width=int(border_width))
 
 def wrap_by_pixels(draw, words, f, max_width):
     lines, line = [], ""
@@ -1561,17 +1677,18 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
     if not slides_data:
         slides_data = [
             {"slide_number": 1, "tag": item.get("category", "IDEAS"), "headline": item["title"],
-             "body": item["subtitle"], "swipe_prompt": "Swipe to explore ➡️"},
-            {"slide_number": 2, "tag": "CONNECT", "headline": "FOUND THIS HELPFUL? 💡",
-             "body": f"Follow @{settings['brand'].lower()} for more daily updates! 🚀🔥✨\n\n📌 Save this post\n↗️ Share with a friend"}
+             "body": item["subtitle"], "swipe_prompt": "Swipe to explore >>"},
+            {"slide_number": 2, "tag": "CONNECT", "headline": "FOUND THIS HELPFUL?",
+             "body": f"Follow @{settings['brand'].lower()} for more daily updates!\n\nSave this post\nShare with a friend"}
         ]
     total_slides = len(slides_data)
     rendered_paths = []
-    brand = settings.get("brand", "Choicematrix")
+    brand = settings.get("brand", "Choicematrix").upper()
     W, H = 1080, 1350
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
     theme_pool = THEMES_CYBER if slot == "afternoon" else THEMES_WARM
+    used_ids = set()
 
     for idx, slide in enumerate(slides_data):
         slide_num = slide.get("slide_number", idx + 1)
@@ -1596,29 +1713,25 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             theme_idx = (base_theme_idx + (idx % 2)) % len(theme_pool)
             theme = theme_pool[theme_idx]
 
-        slide_tag = slide.get("tag", "")
-        photo_query = f"{item.get('unsplash_query', '')} {slide_tag}".strip()
-        bg_photo = fetch_unsplash_image(photo_query or item.get("title", "technology"), W, H)
+        raw_tag = slide.get("tag", "HOT TOPIC")
+        tag = clean_text_for_canvas(raw_tag).upper()
+        headline = clean_text_for_canvas(slide.get("headline", ""))
+        body = clean_text_for_canvas(slide.get("body", ""))
+        audio = item.get("recommended_audio") or {}
 
-        if bg_photo:
-            overlay = Image.new("RGBA", (W, H))
-            draw_ol = ImageDraw.Draw(overlay)
-            for y in range(H):
-                ratio = y / H
-                alpha = int(185 + 50 * ratio)
-                r = int(theme["bg_top"][0]*(1-ratio) + theme["bg_bot"][0]*ratio)
-                g = int(theme["bg_top"][1]*(1-ratio) + theme["bg_bot"][1]*ratio)
-                b = int(theme["bg_top"][2]*(1-ratio) + theme["bg_bot"][2]*ratio)
-                draw_ol.line((0, y, W, y), fill=(r, g, b, alpha))
-            image = Image.alpha_composite(bg_photo.convert("RGBA"), overlay).convert("RGB")
-            draw = ImageDraw.Draw(image)
-        else:
-            image = Image.new("RGB", (W, H))
-            draw = ImageDraw.Draw(image)
-            for y in range(H):
-                ratio = y / H
-                c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
-                draw.line((0, y, W, y), fill=c)
+        # Fetch distinct high-res photo for THIS slide's content
+        slide_img_query = slide.get("image_query") or f"{item.get('unsplash_query', '')} {tag}".strip()
+        content_photo = fetch_unsplash_image(slide_img_query or item.get("title", "technology"), 940, 430, used_ids=used_ids)
+        if not content_photo:
+            content_photo = fetch_unsplash_image("modern technology future", 940, 430, used_ids=used_ids)
+
+        # Base atmospheric canvas
+        image = Image.new("RGB", (W, H))
+        draw = ImageDraw.Draw(image)
+        for y in range(H):
+            ratio = y / H
+            c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
+            draw.line((0, y, W, y), fill=c)
 
         # Decorative Background Accents
         rnd = random.Random(int(hashlib.sha256(f"{clean_date}-{slot}-{revision}-{slide_num}-{theme['name']}".encode()).hexdigest()[:12], 16))
@@ -1628,33 +1741,26 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             alpha_color = tuple(min(255, int(v * 0.4)) for v in theme["border"])
             draw.ellipse((rx-rad, ry-rad, rx+rad, ry+rad), outline=alpha_color, width=2)
 
-        # FRAME STYLES: Cyber Minimalist (Afternoon) vs Warm Editorial (Evening)
+        # Frame styles
         if slot == "afternoon":
-            # Sharp cyber double border with corner L-brackets
             draw.rectangle((36, 36, W - 36, H - 36), outline=theme["border"], width=2)
-            # L-brackets at 4 corners (length 32px)
             brk = 32
             draw.line([(36, 36 + brk), (36, 36), (36 + brk, 36)], fill=theme["accent"], width=4)
             draw.line([(W - 36 - brk, 36), (W - 36, 36), (W - 36, 36 + brk)], fill=theme["accent"], width=4)
             draw.line([(36, H - 36 - brk), (36, H - 36), (36 + brk, H - 36)], fill=theme["accent"], width=4)
             draw.line([(W - 36 - brk, H - 36), (W - 36, H - 36), (W - 36 - brk, H - 36)], fill=theme["accent"], width=4)
         else:
-            # Warm ornamental rounded double border with gold trim & corner diamonds
             draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=32, outline=theme["border"], width=3)
             draw.rounded_rectangle((48, 48, W - 48, H - 48), radius=22, outline=theme["accent"], width=1)
             for (cx, cy) in [(62, 62), (W - 62, 62), (62, H - 62), (W - 62, H - 62)]:
                 draw.polygon([(cx, cy - 6), (cx + 6, cy), (cx, cy + 6), (cx - 6, cy)], fill=theme["accent"])
 
-        tag = slide.get("tag", "HOT TOPIC").upper()
-        headline = slide.get("headline", "")
-        body = slide.get("body", "")
-        audio = item.get("recommended_audio") or {}
-
         # Top Header Bar
         pill_w = 260
         pill_radius = 8 if slot == "afternoon" else 20
         draw.rounded_rectangle((70, 75, 70 + pill_w, 135), radius=pill_radius, fill=theme["accent"])
-        draw.text((90, 92), tag[:22], font=font(22, bold=True, language=language), fill=theme["bg_top"])
+        f_tag = font(22, bold=True, language=language, text=tag)
+        draw.text((90, 92), tag[:22], font=f_tag, fill=theme["bg_top"])
 
         if slot == "afternoon":
             counter_str = f"{slide_num:02d} / {total_slides:02d}"
@@ -1662,125 +1768,124 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             s_indic = to_indic_digits(f"{slide_num:02d}", language)
             t_indic = to_indic_digits(f"{total_slides:02d}", language)
             counter_str = f"{s_indic} / {t_indic}"
-        draw.text((W - 190, 92), counter_str, font=font(24, bold=True, language=language), fill=theme["accent_secondary"])
+        f_counter = font(24, bold=True, language=language, text=counter_str)
+        draw.text((W - 190, 92), counter_str, font=f_counter, fill=theme["accent_secondary"])
         draw.line((70, 165, W - 70, 165), fill=theme["border"], width=2)
 
         if slide_num == 1:
             header_label = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ বিশ্লেষণ" if language == "Bengali" else "आज का विशेष विश्लेषण")
-            draw.text((70, 220), header_label, font=font(22, bold=True, language=language), fill=theme["accent"])
-            f_title = font(52, bold=True, language=language)
-            title_lines = wrap_by_pixels(draw, headline, f_title, 940)
-            y = 265
-            for line in title_lines[:4]:
-                draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
-                y += 66
-            y += 15
-            draw.rounded_rectangle((70, y, 70 + 200, y + 8), radius=4, fill=theme["accent"])
-            y += 35
-            card_h = 390
-            card_r = 16 if slot == "afternoon" else 28
-            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=card_r, fill=theme["card_bg"], outline=theme["border"], width=3)
-            f_body = font(32, bold=False, language=language)
-            body_lines = wrap_by_pixels(draw, body, f_body, 860)
-            by = y + 36
-            for line in body_lines[:7]:
-                draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
-                by += 46
+            f_lbl = font(22, bold=True, language=language, text=header_label)
+            draw.text((70, 195), header_label, font=f_lbl, fill=theme["accent"])
 
+            title_lines = wrap_mixed_by_pixels(draw, headline, 46, 940, bold=True, language=language)
+            y = 235
+            for line in title_lines[:2]:
+                draw_mixed_text(draw, (70, y), line, 46, bold=True, language=language, fill=theme["text_primary"])
+                y += 58
+            y += 12
 
+            # PROMINENT COVER HERO PHOTO
+            photo_h = 430
+            paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=22, border_color=theme["accent"], border_width=3)
+            loc_badge = "WEST BENGAL • SPECIAL FEATURE" if language == "Bengali" else ("BHARAT • SPECIAL FEATURE" if language == "Hindi" else "GLOBAL TECH • LIVE REPORT")
+            draw.rounded_rectangle((90, y + photo_h - 48, 90 + 360, y + photo_h - 14), radius=10, fill=(0, 0, 0), outline=theme["accent"], width=1)
+            draw.text((105, y + photo_h - 43), loc_badge, font=latin_font(16, bold=True), fill=theme["accent"])
+            y += photo_h + 20
 
-            swipe_y = H - 235
-            draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 85), radius=22, fill=theme["accent"])
-            swipe_text = slide.get("swipe_prompt")
-            if not swipe_text:
-                if language == "Bengali":
-                    swipe_text = "বিস্তারিত দেখতে সোয়াইপ করুন ➡️"
-                elif language == "Hindi":
-                    swipe_text = "आगे जानने के लिए स्वाइप करें ➡️"
-                else:
-                    swipe_text = "Swipe to explore ➡️"
-            draw.text((110, swipe_y + 26), swipe_text.upper(), font=font(28, bold=True, language=language), fill=theme["bg_top"])
-
-        elif slide_num == total_slides:
-            header_label = "KEY TAKEAWAY COMPLETED" if slot == "afternoon" else ("গুরুত্বপূর্ণ তথ্যাবলী সমাপ্ত" if language == "Bengali" else "मुख्य बिंदु संपन्न")
-            draw.text((70, 220), header_label, font=font(22, bold=True, language=language), fill=theme["accent"])
-            f_title = font(50, bold=True, language=language)
-            draw.text((70, 270), headline, font=f_title, fill=theme["text_primary"])
-            box_y = 360
-            box_h = 510
-            card_r = 16 if slot == "afternoon" else 28
-            draw.rounded_rectangle((70, box_y, W - 70, box_y + box_h), radius=card_r, fill=theme["card_bg"], outline=theme["accent"], width=4)
-            draw.text((110, box_y + 40), f"👉 FOLLOW @{brand.upper()}", font=font(38, bold=True, language=language), fill=theme["accent"])
-
-            if language == "Bengali":
-                sub_cta = "প্রতিদিনের সেরা টেক ও জ্ঞানমূলক আপডেটের জন্য! 🚀🔥✨"
-                bullet1 = "📌  ভবিষ্যতের জন্য পোস্টটি সেভ করে রাখুন"
-                bullet2 = "💬  আপনার মতামত কমেন্টে জানান"
-                bullet3 = "↗️  বন্ধুদের সাথে পোস্টটি শেয়ার করুন!"
-            elif language == "Hindi":
-                sub_cta = "रोज़ाना बेहतरीन टेक इनसाइट्स और स्मार्ट अपडेट्स के लिए! 🚀🔥✨"
-                bullet1 = "📌  इस पोस्ट को बाद के लिए सेव करें"
-                bullet2 = "💬  कमेंट्स में अपनी राय साझा करें"
-                bullet3 = "↗️  अपने दोस्तों के साथ ज़रूर शेयर करें!"
-            else:
-                sub_cta = "For daily hot trends, tech breakthroughs & smart tips! 🚀🔥✨"
-                bullet1 = "📌  Save this post to revisit anytime"
-                bullet2 = "💬  Share your thoughts in the comments"
-                bullet3 = "↗️  Send to someone who needs this!"
-
-            draw.text((110, box_y + 98), sub_cta, font=font(24, bold=False, language=language), fill=theme["text_secondary"])
-
-            if audio.get("title"):
-                draw.text((110, box_y + 148), f"🎵 Recommended Audio: {audio.get('title')} — {audio.get('artist')}", font=font(22, bold=True, language=language), fill=theme["accent_secondary"])
-                draw.line((110, box_y + 195, W - 110, box_y + 195), fill=theme["border"], width=2)
-                line_offset = 230
-            else:
-                draw.line((110, box_y + 165, W - 110, box_y + 165), fill=theme["border"], width=2)
-                line_offset = 200
-
-            draw.text((110, box_y + line_offset), bullet1, font=font(27, bold=False, language=language), fill=theme["text_primary"])
-            draw.text((110, box_y + line_offset + 60), bullet2, font=font(27, bold=False, language=language), fill=theme["text_primary"])
-            draw.text((110, box_y + line_offset + 120), bullet3, font=font(27, bold=False, language=language), fill=theme["text_primary"])
-
-        else:
-            if slot == "afternoon":
-                step_str = f"STEP {slide_num - 1:02d}" if slide_num < total_slides - 1 else "SUMMARY"
-            else:
-                if language == "Bengali":
-                    step_str = f"ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "সারসংক্ষেপ"
-                else:
-                    step_str = f"चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}" if slide_num < total_slides - 1 else "निष्कर्ष"
-            draw.text((70, 210), step_str, font=font(26, bold=True, language=language), fill=theme["accent"])
-            f_title = font(46, bold=True, language=language)
-            title_lines = wrap_by_pixels(draw, headline, f_title, 940)
-            y = 260
-            for line in title_lines[:3]:
-                draw.text((70, y), line, font=f_title, fill=theme["text_primary"])
-                y += 62
-            y += 25
-            card_h = 670
-            card_r = 16 if slot == "afternoon" else 28
-            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=card_r, fill=theme["card_bg"], outline=theme["border"], width=3)
-            f_body = font(29, bold=False, language=language)
-            body_lines = wrap_by_pixels(draw, body, f_body, 860)
-            by = y + 38
-            for line in body_lines[:14]:
-                draw.text((110, by), line, font=f_body, fill=theme["text_secondary"])
+            # Hook / Subtitle Card below photo
+            card_h = 280
+            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=18, fill=theme["card_bg"], outline=theme["border"], width=2)
+            body_lines = wrap_mixed_by_pixels(draw, body, 28, 860, bold=False, language=language)
+            by = y + 25
+            for line in body_lines[:5]:
+                draw_mixed_text(draw, (105, by), line, 28, bold=False, language=language, fill=theme["text_secondary"])
                 by += 44
 
-        # Footer Brand Bar
-        draw.line((70, H - 120, W - 70, H - 120), fill=theme["border"], width=2)
-        draw.text((70, H - 90), f"@{brand.upper()}", font=font(24, bold=True, language=language), fill=theme["accent"])
-        if slot == "afternoon":
-            footer_tag = "GLOBAL TECH & SYSTEMS"
-        elif language == "Bengali":
-            footer_tag = "পশ্চিমবঙ্গ ইনোভেশন ও ট্রেন্ড"
+            # Swipe prompt button (100% clean, no emoji box)
+            swipe_y = H - 215
+            draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 75), radius=18, fill=theme["accent"])
+            swipe_text = clean_text_for_canvas(slide.get("swipe_prompt") or ("Swipe to explore >>" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন >>" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें >>")))
+            f_swipe = font(26, bold=True, language=language, text=swipe_text)
+            draw.text((110, swipe_y + 22), swipe_text, font=f_swipe, fill=theme["bg_top"])
+
+        elif slide_num == total_slides:
+            # Slide 6: Outro / CTA Slide
+            header_label = "KEY TAKEAWAYS COMPLETED" if slot == "afternoon" else ("গুরুত্বপূর্ণ তথ্যাবলী সমাপ্ত" if language == "Bengali" else "मुख्य बिंदु संपन्न")
+            draw.text((70, 195), header_label, font=font(22, bold=True, language=language, text=header_label), fill=theme["accent"])
+            draw_mixed_text(draw, (70, 235), headline, 46, bold=True, language=language, fill=theme["text_primary"])
+
+            card_y = 330
+            card_h = 670
+            draw.rounded_rectangle((70, card_y, W - 70, card_y + card_h), radius=22, fill=theme["card_bg"], outline=theme["accent"], width=3)
+            draw.text((110, card_y + 40), f"> FOLLOW @{brand}", font=latin_font(36, bold=True), fill=theme["accent"])
+
+            sub_cta = ("প্রতিদিনের সেরা টেক ও জ্ঞানমূলক আপডেটের জন্য!" if language == "Bengali"
+                       else ("रोज़ाना बेहतरीन टेक इनसाइट्स और स्मार्ट अपडेट्स के लिए!" if language == "Hindi"
+                             else "For daily breakthroughs, smart tips & insights!"))
+            draw.text((110, card_y + 100), sub_cta, font=font(24, bold=False, language=language, text=sub_cta), fill=theme["text_secondary"])
+            draw.line((110, card_y + 155, W - 110, card_y + 155), fill=theme["border"], width=2)
+
+            bullets = [
+                "ভবিষ্যতের জন্য পোস্টটি সেভ করে রাখুন",
+                "আপনার মতামত কমেন্টে জানান",
+                "বন্ধুদের সাথে পোস্টটি শেয়ার করুন!"
+            ] if language == "Bengali" else ([
+                "इस पोस्ट को बाद के लिए सेव करें",
+                "कमेंट्स में अपनी राय साझा करें",
+                "अपने दोस्तों के साथ ज़रूर शेयर करें!"
+            ] if language == "Hindi" else [
+                "Save this post to revisit anytime",
+                "Share your thoughts in the comments",
+                "Send to someone who needs this!"
+            ])
+            by = card_y + 195
+            for b_text in bullets:
+                draw.ellipse((115, by + 10, 127, by + 22), fill=theme["accent"])
+                draw_mixed_text(draw, (145, by), b_text, 27, bold=False, language=language, fill=theme["text_primary"])
+                by += 65
+
+            if audio.get("title"):
+                audio_str = f"Audio: {clean_text_for_canvas(audio.get('title'))} - {clean_text_for_canvas(audio.get('artist'))}"
+                draw.text((110, by + 20), audio_str, font=latin_font(21, bold=True), fill=theme["accent_secondary"])
+
         else:
-            footer_tag = "डिजिटल भारत व टेक ट्रेंड्स"
-        draw.text((W - 350, H - 90), footer_tag, font=font(21, bold=False, language=language), fill=theme["text_secondary"])
+            # Slides 2-5: Step Content Slides with prominent image!
+            step_str = (f"STEP {slide_num - 1:02d}" if slot == "afternoon"
+                        else (f"ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if language == "Bengali"
+                              else f"चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}"))
+            draw.text((70, 195), step_str, font=font(22, bold=True, language=language, text=step_str), fill=theme["accent"])
+
+            title_lines = wrap_mixed_by_pixels(draw, headline, 42, 940, bold=True, language=language)
+            y = 235
+            for line in title_lines[:2]:
+                draw_mixed_text(draw, (70, y), line, 42, bold=True, language=language, fill=theme["text_primary"])
+                y += 54
+            y += 10
+
+            # DEDICATED CONTENT PHOTO FOR THIS STEP
+            photo_h = 390
+            paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=20, border_color=theme["accent"], border_width=3)
+            y += photo_h + 18
+
+            # Explanation / Breakdown Card below photo
+            card_h = (H - 120) - y - 15
+            draw.rounded_rectangle((70, y, W - 70, y + card_h), radius=18, fill=theme["card_bg"], outline=theme["border"], width=2)
+            body_lines = wrap_mixed_by_pixels(draw, body, 28, 860, bold=False, language=language)
+            by = y + 25
+            for line in body_lines[:8]:
+                draw_mixed_text(draw, (105, by), line, 28, bold=False, language=language, fill=theme["text_secondary"])
+                by += 44
+
+        # Footer Brand Bar (Latin font for brand, zero boxes!)
+        draw.line((70, H - 120, W - 70, H - 120), fill=theme["border"], width=2)
+        draw.text((70, H - 90), f"@{brand}", font=latin_font(24, bold=True), fill=theme["accent"])
+        footer_tag = ("GLOBAL TECH & SYSTEMS" if slot == "afternoon"
+                      else ("পশ্চিমবঙ্গ ইনোভেশন ও ট্রেন্ড" if language == "Bengali"
+                            else "डिजिटल भारत व टेक ट्रेंड्स"))
+        draw.text((W - 350, H - 90), footer_tag, font=font(21, bold=False, language=language, text=footer_tag), fill=theme["text_secondary"])
 
         dest = IMAGE_DIR / f"{date_key}-v{revision}-slide{slide_num}.jpg"
-        image.save(dest, "JPEG", quality=90, optimize=True)
+        image.save(dest, "JPEG", quality=92, optimize=True)
         rendered_paths.append(dest.relative_to(ROOT / "docs").as_posix())
 
     return rendered_paths

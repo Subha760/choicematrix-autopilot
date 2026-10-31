@@ -229,9 +229,24 @@ def recreate_and_send_post(posts, approver_name="Subha", target_key=None, target
     approver_id = str(os.getenv("TG_APPROVER_ID", ""))
     today = datetime.now(autopilot.IST).date().isoformat()
 
-    slot = target_slot or ("evening" if target_key and "_evening" in target_key else "afternoon")
-    if not target_key:
-        target_key = f"{today}_{slot}"
+    if not target_slot:
+        if target_key and "_evening" in target_key:
+            slot = "evening"
+        elif target_key and "_afternoon" in target_key:
+            slot = "afternoon"
+        else:
+            # Smart slot detection: pick whichever slot is currently pending/needs_attention/rejected
+            if posts.get(f"{today}_evening", {}).get("status") in ("pending", "needs_attention", "rejected"):
+                slot = "evening"
+            elif posts.get(f"{today}_afternoon", {}).get("status") in ("pending", "needs_attention", "rejected"):
+                slot = "afternoon"
+            else:
+                now_hour = datetime.now(autopilot.IST).hour
+                slot = "evening" if now_hour >= 14 else "afternoon"
+    else:
+        slot = target_slot
+
+    target_key = f"{today}_{slot}"
 
     entry = posts.get(target_key)
     old_rev = entry.get("revision", 1) if entry else 1
