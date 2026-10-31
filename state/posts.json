@@ -1821,7 +1821,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "dd9f70a67963c07467bfb02157a7efba929767b4a140bd086477558b31313432",
-    "status": "pending",
+    "status": "rejected",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
