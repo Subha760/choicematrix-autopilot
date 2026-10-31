@@ -1939,15 +1939,14 @@
     "approved_at": "2026-10-31T04:54:09.331397+00:00",
     "approval_hash": "7e12c640a8fc456e11a668147a84989c82d0ab8352a7a3b30c22a154aa58a242",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122133982869465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-10-31T08:30:03.220096+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-10-31T08:30:18.428995+00:00"
     },
     "threads": {
       "status": "not_started",
