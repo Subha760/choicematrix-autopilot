@@ -1712,7 +1712,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "7993d4f6dba58a547baa101df034950c9519ddc2b0daca209bc06af05c806998",
-    "status": "needs_attention",
+    "status": "published",
     "approved_at": "2026-10-30T03:58:04.057413+00:00",
     "approval_hash": "9344bff6c54b2198bb21a0c8930e5595fba555804a788b787361463426511257",
     "fb": {
@@ -1720,16 +1720,16 @@
       "id": "1279646595235354_122133751479465406"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18147606991603700",
+      "container": "18121914086470290",
       "attempted_at": "2026-10-30T14:30:18.770381+00:00"
     },
     "threads": {
       "status": "published",
-      "id": "18120093056090905",
-      "container": "17990026659113014",
-      "attempted_at": "2026-10-30T14:30:19.587227+00:00"
+      "id": "18119489059985383",
+      "container": "17990026929113014",
+      "attempted_at": "2026-10-30T14:30:59.071701+00:00"
     },
     "created_at": "2026-10-30T03:30:58.556643+00:00"
   }
