@@ -1197,6 +1197,29 @@ THEMES_WARM = [
     }
 ]
 
+THEMES_MASTER = [
+    {"name": "Cyber Cyan", "bg_top": (8, 14, 28), "bg_bot": (15, 25, 48), "card_bg": (18, 30, 56), "accent": (0, 242, 254), "accent_secondary": (255, 184, 0), "text_primary": (255, 255, 255), "text_secondary": (170, 195, 225), "border": (35, 65, 105)},
+    {"name": "Royal Terracotta", "bg_top": (42, 16, 18), "bg_bot": (70, 26, 24), "card_bg": (56, 20, 22), "accent": (245, 158, 11), "accent_secondary": (254, 215, 170), "text_primary": (255, 255, 255), "text_secondary": (250, 225, 215), "border": (125, 45, 38)},
+    {"name": "Electric Violet", "bg_top": (14, 12, 34), "bg_bot": (28, 18, 62), "card_bg": (36, 22, 74), "accent": (168, 85, 247), "accent_secondary": (56, 189, 248), "text_primary": (255, 255, 255), "text_secondary": (220, 210, 245), "border": (68, 45, 115)},
+    {"name": "Bengal Indigo", "bg_top": (12, 22, 44), "bg_bot": (24, 40, 72), "card_bg": (20, 32, 60), "accent": (251, 191, 36), "accent_secondary": (147, 197, 253), "text_primary": (255, 255, 255), "text_secondary": (224, 235, 255), "border": (48, 78, 125)},
+    {"name": "Matrix Emerald", "bg_top": (6, 26, 22), "bg_bot": (10, 48, 40), "card_bg": (14, 64, 54), "accent": (52, 211, 153), "accent_secondary": (167, 243, 208), "text_primary": (255, 255, 255), "text_secondary": (209, 250, 229), "border": (25, 85, 72)},
+    {"name": "Royal Plum", "bg_top": (36, 14, 38), "bg_bot": (60, 20, 58), "card_bg": (48, 16, 46), "accent": (245, 158, 11), "accent_secondary": (244, 114, 182), "text_primary": (255, 255, 255), "text_secondary": (245, 220, 240), "border": (98, 32, 92)},
+    {"name": "Cyber Amber", "bg_top": (16, 18, 26), "bg_bot": (28, 32, 44), "card_bg": (35, 40, 56), "accent": (251, 191, 36), "accent_secondary": (245, 158, 11), "text_primary": (255, 255, 255), "text_secondary": (226, 232, 240), "border": (60, 75, 100)},
+    {"name": "Heritage Forest", "bg_top": (16, 34, 24), "bg_bot": (26, 54, 38), "card_bg": (22, 44, 32), "accent": (251, 191, 36), "accent_secondary": (167, 243, 208), "text_primary": (255, 255, 255), "text_secondary": (215, 245, 225), "border": (45, 85, 58)},
+    {"name": "Deep Cobalt", "bg_top": (10, 22, 40), "bg_bot": (22, 48, 82), "card_bg": (28, 58, 96), "accent": (56, 189, 248), "accent_secondary": (0, 255, 210), "text_primary": (255, 255, 255), "text_secondary": (215, 230, 255), "border": (45, 85, 140)},
+    {"name": "Kolkata Sunset", "bg_top": (35, 20, 35), "bg_bot": (65, 25, 45), "card_bg": (50, 20, 40), "accent": (251, 146, 60), "accent_secondary": (254, 240, 138), "text_primary": (255, 255, 255), "text_secondary": (254, 225, 210), "border": (110, 42, 65)},
+    {"name": "Cosmic Nebula", "bg_top": (8, 8, 24), "bg_bot": (18, 14, 48), "card_bg": (26, 20, 64), "accent": (192, 132, 252), "accent_secondary": (250, 204, 21), "text_primary": (255, 255, 255), "text_secondary": (224, 215, 250), "border": (70, 50, 120)},
+    {"name": "Marigold Festive", "bg_top": (44, 14, 18), "bg_bot": (74, 22, 22), "card_bg": (58, 18, 20), "accent": (251, 191, 36), "accent_secondary": (244, 63, 94), "text_primary": (255, 255, 255), "text_secondary": (254, 230, 210), "border": (130, 40, 35)},
+    {"name": "Neon Crimson", "bg_top": (22, 10, 18), "bg_bot": (42, 16, 30), "card_bg": (48, 20, 36), "accent": (244, 63, 94), "accent_secondary": (251, 146, 60), "text_primary": (255, 255, 255), "text_secondary": (254, 205, 215), "border": (105, 35, 65)},
+    {"name": "Vedic Ochre", "bg_top": (36, 20, 14), "bg_bot": (60, 32, 20), "card_bg": (48, 26, 16), "accent": (249, 115, 22), "accent_secondary": (253, 224, 71), "text_primary": (255, 255, 255), "text_secondary": (254, 235, 220), "border": (108, 52, 28)},
+    {"name": "Stealth Obsidian", "bg_top": (12, 14, 18), "bg_bot": (20, 24, 30), "card_bg": (28, 34, 42), "accent": (163, 230, 53), "accent_secondary": (226, 232, 240), "text_primary": (255, 255, 255), "text_secondary": (203, 213, 225), "border": (55, 65, 80)},
+    {"name": "Kashmir Blossom", "bg_top": (32, 14, 28), "bg_bot": (54, 20, 44), "card_bg": (44, 18, 36), "accent": (244, 114, 182), "accent_secondary": (251, 191, 36), "text_primary": (255, 255, 255), "text_secondary": (251, 225, 240), "border": (92, 34, 76)},
+    {"name": "Quantum Teal", "bg_top": (6, 20, 26), "bg_bot": (12, 38, 48), "card_bg": (16, 48, 62), "accent": (45, 212, 191), "accent_secondary": (251, 191, 36), "text_primary": (255, 255, 255), "text_secondary": (204, 251, 241), "border": (28, 75, 92)},
+    {"name": "Sundarban Jade", "bg_top": (14, 28, 22), "bg_bot": (22, 48, 36), "card_bg": (18, 40, 30), "accent": (52, 211, 153), "accent_secondary": (251, 191, 36), "text_primary": (255, 255, 255), "text_secondary": (209, 250, 229), "border": (38, 82, 60)},
+    {"name": "Solaris Plasma", "bg_top": (24, 12, 10), "bg_bot": (46, 20, 14), "card_bg": (54, 24, 18), "accent": (249, 115, 22), "accent_secondary": (253, 224, 71), "text_primary": (255, 255, 255), "text_secondary": (254, 215, 170), "border": (110, 48, 28)},
+    {"name": "Murshidabad Silk", "bg_top": (28, 12, 36), "bg_bot": (50, 18, 60), "card_bg": (40, 16, 48), "accent": (234, 179, 8), "accent_secondary": (216, 180, 254), "text_primary": (255, 255, 255), "text_secondary": (243, 225, 255), "border": (85, 30, 95)}
+]
+
 THEMES = THEMES_CYBER
 
 
@@ -1669,7 +1692,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
         except Exception as exc:
             print(f"Chromium render warning ({exc}), falling back to PIL: {exc}")
 
-    """Render 5-6 high-res 1080x1350 carousel slides with dedicated frame & style per slot."""
+    """Render 5-6 high-res 1080x1350 carousel slides with atmospheric background photo & dedicated rotational style."""
     clean_date = date_key.split("_")[0]
     day = date.fromisoformat(clean_date)
     language = item.get("language", "English")
@@ -1687,31 +1710,17 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
     W, H = 1080, 1350
     IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
-    theme_pool = THEMES_CYBER if slot == "afternoon" else THEMES_WARM
+    # Dynamic daily & post-by-post rotational matrix
+    day_seed = int(clean_date.replace("-", ""))
+    slot_offset = 7 if slot == "evening" else 0
+    base_theme_idx = (day_seed + slot_offset + (revision - 1) * 3) % len(THEMES_MASTER)
+    design_mode = (day_seed + (2 if slot == "evening" else 0) + (revision - 1)) % 4
     used_ids = set()
 
     for idx, slide in enumerate(slides_data):
         slide_num = slide.get("slide_number", idx + 1)
-        if slide_num == total_slides:
-            if slot == "afternoon":
-                theme = {
-                    "name": "Cyber Outro",
-                    "bg_top": (10, 16, 32), "bg_bot": (18, 30, 58), "card_bg": (22, 36, 70),
-                    "accent": (0, 242, 254), "accent_secondary": (255, 184, 0),
-                    "text_primary": (255, 255, 255), "text_secondary": (225, 235, 255), "border": (45, 75, 120)
-                }
-            else:
-                theme = {
-                    "name": "Radiant Outro",
-                    "bg_top": (28, 14, 32), "bg_bot": (52, 18, 55), "card_bg": (42, 16, 48),
-                    "accent": (255, 184, 0), "accent_secondary": (244, 63, 94),
-                    "text_primary": (255, 255, 255), "text_secondary": (245, 230, 250), "border": (95, 30, 95)
-                }
-        else:
-            weekday = day.weekday()
-            base_theme_idx = (weekday * 2 + (0 if slot == "afternoon" else 1) + (revision - 1)) % len(theme_pool)
-            theme_idx = (base_theme_idx + (idx % 2)) % len(theme_pool)
-            theme = theme_pool[theme_idx]
+        theme_idx = (base_theme_idx + (idx % 2)) % len(THEMES_MASTER)
+        theme = THEMES_MASTER[theme_idx]
 
         raw_tag = slide.get("tag", "HOT TOPIC")
         tag = clean_text_for_canvas(raw_tag).upper()
@@ -1719,48 +1728,75 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
         body = clean_text_for_canvas(slide.get("body", ""))
         audio = item.get("recommended_audio") or {}
 
-        # Fetch distinct high-res photo for THIS slide's content
+        # Fetch distinct high-res photo for THIS slide's content and atmospheric background
         slide_img_query = slide.get("image_query") or f"{item.get('unsplash_query', '')} {tag}".strip()
+        bg_photo = fetch_unsplash_image(f"{slide_img_query} atmospheric", W, H, used_ids=used_ids)
+        if not bg_photo:
+            bg_photo = fetch_unsplash_image(item.get("title", "technology abstract"), W, H, used_ids=used_ids)
+
         content_photo = fetch_unsplash_image(slide_img_query or item.get("title", "technology"), 940, 430, used_ids=used_ids)
         if not content_photo:
             content_photo = fetch_unsplash_image("modern technology future", 940, 430, used_ids=used_ids)
 
-        # Base atmospheric canvas
-        image = Image.new("RGB", (W, H))
-        draw = ImageDraw.Draw(image)
+        # 1. Composite full-bleed atmospheric background photo with themed gradient overlay
+        overlay = Image.new("RGBA", (W, H))
+        draw_ol = ImageDraw.Draw(overlay)
         for y in range(H):
             ratio = y / H
-            c = tuple(int(theme["bg_top"][i]*(1-ratio) + theme["bg_bot"][i]*ratio) for i in range(3))
-            draw.line((0, y, W, y), fill=c)
+            alpha = int(165 + 60 * ratio)  # 65% to 88% opacity preserves photo depth while boosting text contrast
+            r = int(theme["bg_top"][0] * (1 - ratio) + theme["bg_bot"][0] * ratio)
+            g = int(theme["bg_top"][1] * (1 - ratio) + theme["bg_bot"][1] * ratio)
+            b = int(theme["bg_top"][2] * (1 - ratio) + theme["bg_bot"][2] * ratio)
+            draw_ol.line((0, y, W, y), fill=(r, g, b, alpha))
 
-        # Decorative Background Accents
-        rnd = random.Random(int(hashlib.sha256(f"{clean_date}-{slot}-{revision}-{slide_num}-{theme['name']}".encode()).hexdigest()[:12], 16))
-        for _ in range(6):
-            rx, ry = rnd.randrange(0, W), rnd.randrange(0, H)
-            rad = rnd.randrange(40, 160)
-            alpha_color = tuple(min(255, int(v * 0.4)) for v in theme["border"])
-            draw.ellipse((rx-rad, ry-rad, rx+rad, ry+rad), outline=alpha_color, width=2)
+        if bg_photo:
+            image = Image.alpha_composite(bg_photo.resize((W, H)).convert("RGBA"), overlay).convert("RGB")
+        else:
+            image = overlay.convert("RGB")
+        draw = ImageDraw.Draw(image)
 
-        # Frame styles
-        if slot == "afternoon":
+        # 2. Rotational Frame Styles & Accents based on design_mode (0, 1, 2, 3)
+        if design_mode == 0:  # Cyber Grid & Corner Brackets
             draw.rectangle((36, 36, W - 36, H - 36), outline=theme["border"], width=2)
-            brk = 32
+            brk = 36
             draw.line([(36, 36 + brk), (36, 36), (36 + brk, 36)], fill=theme["accent"], width=4)
             draw.line([(W - 36 - brk, 36), (W - 36, 36), (W - 36, 36 + brk)], fill=theme["accent"], width=4)
             draw.line([(36, H - 36 - brk), (36, H - 36), (36 + brk, H - 36)], fill=theme["accent"], width=4)
             draw.line([(W - 36 - brk, H - 36), (W - 36, H - 36), (W - 36 - brk, H - 36)], fill=theme["accent"], width=4)
-        else:
+            glyph_prefix = "⚡"
+            bullet_type = "diamond"
+        elif design_mode == 1:  # Royal Luxury Double Border & Star Florets
             draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=32, outline=theme["border"], width=3)
             draw.rounded_rectangle((48, 48, W - 48, H - 48), radius=22, outline=theme["accent"], width=1)
             for (cx, cy) in [(62, 62), (W - 62, 62), (62, H - 62), (W - 62, H - 62)]:
-                draw.polygon([(cx, cy - 6), (cx + 6, cy), (cx, cy + 6), (cx - 6, cy)], fill=theme["accent"])
+                draw.polygon([(cx, cy - 7), (cx + 7, cy), (cx, cy + 7), (cx - 7, cy)], fill=theme["accent"])
+            glyph_prefix = "✦"
+            bullet_type = "circle"
+        elif design_mode == 2:  # Neo Glass Minimalist
+            draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=28, outline=theme["border"], width=2)
+            draw.line([(52, 52), (52 + 40, 52)], fill=theme["accent"], width=3)
+            draw.line([(52, 52), (52, 52 + 40)], fill=theme["accent"], width=3)
+            draw.line([(W - 52, 52), (W - 52 - 40, 52)], fill=theme["accent"], width=3)
+            draw.line([(W - 52, 52), (W - 52, 52 + 40)], fill=theme["accent"], width=3)
+            draw.line([(52, H - 52), (52 + 40, H - 52)], fill=theme["accent"], width=3)
+            draw.line([(52, H - 52), (52, H - 52 - 40)], fill=theme["accent"], width=3)
+            draw.line([(W - 52, H - 52), (W - 52 - 40, H - 52)], fill=theme["accent"], width=3)
+            draw.line([(W - 52, H - 52), (W - 52, H - 52 - 40)], fill=theme["accent"], width=3)
+            glyph_prefix = "●"
+            bullet_type = "square"
+        else:  # Radiant Solaris
+            draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=20, outline=theme["border"], width=3)
+            for cx, cy in [(50, 50), (W - 50, 50), (50, H - 50), (W - 50, H - 50)]:
+                draw.ellipse((cx - 5, cy - 5, cx + 5, cy + 5), fill=theme["accent"])
+            glyph_prefix = "★"
+            bullet_type = "triangle"
 
-        # Top Header Bar
+        # 3. Top Header Bar
         pill_w = 260
-        pill_radius = 8 if slot == "afternoon" else 20
+        pill_radius = 16
         draw.rounded_rectangle((70, 75, 70 + pill_w, 135), radius=pill_radius, fill=theme["accent"])
         f_tag = font(22, bold=True, language=language, text=tag)
-        draw.text((90, 92), tag[:22], font=f_tag, fill=theme["bg_top"])
+        draw.text((90, 92), f"{glyph_prefix} {tag[:20]}", font=f_tag, fill=theme["bg_top"])
 
         if slot == "afternoon":
             counter_str = f"{slide_num:02d} / {total_slides:02d}"
@@ -1772,6 +1808,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
         draw.text((W - 190, 92), counter_str, font=f_counter, fill=theme["accent_secondary"])
         draw.line((70, 165, W - 70, 165), fill=theme["border"], width=2)
 
+        # 4. Slide-Specific Content Layout
         if slide_num == 1:
             header_label = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ বিশ্লেষণ" if language == "Bengali" else "आज का विशेष विश्लेषण")
             f_lbl = font(22, bold=True, language=language, text=header_label)
@@ -1787,8 +1824,8 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             # PROMINENT COVER HERO PHOTO
             photo_h = 430
             paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=22, border_color=theme["accent"], border_width=3)
-            loc_badge = "WEST BENGAL • SPECIAL FEATURE" if language == "Bengali" else ("BHARAT • SPECIAL FEATURE" if language == "Hindi" else "GLOBAL TECH • LIVE REPORT")
-            draw.rounded_rectangle((90, y + photo_h - 48, 90 + 360, y + photo_h - 14), radius=10, fill=(0, 0, 0), outline=theme["accent"], width=1)
+            loc_badge = f"{glyph_prefix} WEST BENGAL • SPECIAL FEATURE" if language == "Bengali" else (f"{glyph_prefix} BHARAT • SPECIAL FEATURE" if language == "Hindi" else f"{glyph_prefix} GLOBAL TECH • LIVE REPORT")
+            draw.rounded_rectangle((90, y + photo_h - 48, 90 + 380, y + photo_h - 14), radius=10, fill=(0, 0, 0), outline=theme["accent"], width=1)
             draw.text((105, y + photo_h - 43), loc_badge, font=latin_font(16, bold=True), fill=theme["accent"])
             y += photo_h + 20
 
@@ -1801,7 +1838,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
                 draw_mixed_text(draw, (105, by), line, 28, bold=False, language=language, fill=theme["text_secondary"])
                 by += 44
 
-            # Swipe prompt button (100% clean, no emoji box)
+            # Swipe prompt button
             swipe_y = H - 215
             draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 75), radius=18, fill=theme["accent"])
             swipe_text = clean_text_for_canvas(slide.get("swipe_prompt") or ("Swipe to explore >>" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন >>" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें >>")))
@@ -1840,7 +1877,14 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             ])
             by = card_y + 195
             for b_text in bullets:
-                draw.ellipse((115, by + 10, 127, by + 22), fill=theme["accent"])
+                if bullet_type == "circle":
+                    draw.ellipse((115, by + 10, 127, by + 22), fill=theme["accent"])
+                elif bullet_type == "diamond":
+                    draw.polygon([(121, by + 8), (128, by + 16), (121, by + 24), (114, by + 16)], fill=theme["accent"])
+                elif bullet_type == "square":
+                    draw.rectangle((115, by + 10, 126, by + 21), fill=theme["accent"])
+                else:
+                    draw.polygon([(115, by + 9), (127, by + 16), (115, by + 23)], fill=theme["accent"])
                 draw_mixed_text(draw, (145, by), b_text, 27, bold=False, language=language, fill=theme["text_primary"])
                 by += 65
 
@@ -1850,9 +1894,9 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
 
         else:
             # Slides 2-5: Step Content Slides with prominent image!
-            step_str = (f"STEP {slide_num - 1:02d}" if slot == "afternoon"
-                        else (f"ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if language == "Bengali"
-                              else f"चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}"))
+            step_str = (f"{glyph_prefix} STEP {slide_num - 1:02d}" if slot == "afternoon"
+                        else (f"{glyph_prefix} ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if language == "Bengali"
+                              else f"{glyph_prefix} चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}"))
             draw.text((70, 195), step_str, font=font(22, bold=True, language=language, text=step_str), fill=theme["accent"])
 
             title_lines = wrap_mixed_by_pixels(draw, headline, 42, 940, bold=True, language=language)
@@ -1889,6 +1933,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
         rendered_paths.append(dest.relative_to(ROOT / "docs").as_posix())
 
     return rendered_paths
+
 
 
 def image_art(date_key, revision, settings, item, slot="afternoon"):
