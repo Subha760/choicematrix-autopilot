@@ -1,12 +1,21 @@
-"""Real-time Telegram Approval & Interaction Daemon.
-- 100% Pure text command listener (Zero broken/frozen buttons!).
+"""Real-time Telegram Approval, Interaction & Diagnostics Daemon.
+- 100% Interactive with 1-Click Inline Buttons & Pure Text Commands:
+    - [✅ Approve] — 1-click approval + instant live publish if scheduled time passed.
+    - [🔄 Recreate] — 1-click fresh regeneration with live news & Unsplash visuals.
+    - [🎨 Switch Theme] — 1-click cycling through 4 design archetypes & 20 themes.
+    - [📊 Status] — 1-click check of daily afternoon & evening schedule.
+    - [🩺 Health] — 1-click system diagnostics (CPU, RAM, Disk, Git, Meta API).
+    - [❌ Reject] — 1-click rejection.
 - Commands supported:
-    - 'approve afternoon', 'approve evening', 'approve'
-    - 'reject afternoon', 'reject evening', 'reject', 'reject all'
-    - 'recreate afternoon', 'recreate evening', 'recreate'
+    - '/topic <idea>' — On-demand custom 6-slide carousel generation on any topic.
+    - '/theme [cyber|royal|neo|solaris|0-3]' — Switch visual design archetype on the fly.
+    - '/diagnose' or 'health' — Complete server, git, and API diagnostics.
+    - 'approve afternoon', 'approve evening', 'approve', 'yes', 'ok'
+    - 'reject afternoon', 'reject evening', 'reject all', 'cancel'
+    - 'recreate afternoon', 'recreate evening', 'recreate', 'new'
     - 'status'
+    - 'token' — Meta Graph API token verification.
 - Crash-proof 24/7 background loop with auto-reconnect on network timeout.
-- Instant live publication if approved post is already past its scheduled time.
 - Seamless automatic Git state sync to GitHub main.
 """
 import os
@@ -16,14 +25,25 @@ import time
 import requests
 import subprocess
 import sys
+import shutil
+import platform
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+
 ROOT = Path(__file__).resolve().parent
 STATE = ROOT / "state" / "posts.json"
 TG_STATE = ROOT / "state" / "telegram.json"
 GEN_ERRORS = ROOT / "state" / "generation-attempts.json"
+
+ARCHETYPE_LABELS = {
+    0: "⚡ Cyber Grid (Sharp Brackets & Diamonds)",
+    1: "👑 Royal Luxury (Double Border & Star Florets)",
+    2: "🌿 Minimalist Neo (Smooth Rounded & Notches)",
+    3: "☀️ Radiant Solaris (Pill Dots & Triangles)"
+}
 
 def load_env():
     env_file = ROOT / ".env"
@@ -52,6 +72,7 @@ MAIN_KEYBOARD = {
     "keyboard": [
         [{"text": "✅ Approve Afternoon"}, {"text": "✅ Approve Evening"}],
         [{"text": "🔄 Recreate Afternoon"}, {"text": "🔄 Recreate Evening"}],
+        [{"text": "🎨 Switch Theme"}, {"text": "🩺 Diagnostics"}],
         [{"text": "📊 Check Status"}, {"text": "❌ Reject All"}]
     ],
     "resize_keyboard": True,
@@ -124,9 +145,90 @@ def check_meta_token_health(force=False, reply_chat_id=None):
             if approver_id:
                 tg_api("sendMessage", {"chat_id": approver_id, "text": alert, "parse_mode": "HTML", "disable_web_page_preview": True})
             return False, msg
-        return True, f"Token active for Page {res.get('name')}"
+        return True, f"Token active for Page '{res.get('name')}'"
     except Exception as exc:
         return False, str(exc)
+
+def get_system_diagnostics():
+    import autopilot
+    posts = read_json(STATE, {})
+    today = datetime.now(autopilot.IST).date().isoformat()
+    sys_plat = platform.platform()
+    
+    # Disk
+    du = shutil.disk_usage(ROOT)
+    total_gb = du.total / (1024**3)
+    free_gb = du.free / (1024**3)
+    disk_pct = (du.used / du.total) * 100
+    
+    # Memory
+    mem_info = "N/A"
+    try:
+        if Path("/proc/meminfo").exists():
+            mem_data = {}
+            for line in Path("/proc/meminfo").read_text().splitlines():
+                parts = line.split(":")
+                if len(parts) == 2:
+                    mem_data[parts[0].strip()] = parts[1].strip()
+            total_kb = int(mem_data.get("MemTotal", "0 kB").split()[0])
+            avail_kb = int(mem_data.get("MemAvailable", "0 kB").split()[0])
+            used_kb = total_kb - avail_kb
+            mem_info = f"{used_kb // 1024} MB / {total_kb // 1024} MB ({(used_kb/total_kb)*100:.1f}%)"
+    except Exception:
+        pass
+
+    # Load avg
+    load_avg = "N/A"
+    try:
+        if hasattr(os, "getloadavg"):
+            l1, l5, l15 = os.getloadavg()
+            load_avg = f"{l1:.2f}, {l5:.2f}, {l15:.2f}"
+    except Exception:
+        pass
+
+    # Git status
+    git_hash = "unknown"
+    git_msg = "unknown"
+    try:
+        mingit = r"C:\Users\bongo\.mingit\cmd\git.exe"
+        git_bin = mingit if Path(mingit).exists() else "git"
+        git_hash = subprocess.check_output([git_bin, "rev-parse", "--short", "HEAD"], cwd=str(ROOT), text=True).strip()
+        git_msg = subprocess.check_output([git_bin, "log", "-1", "--pretty=%s"], cwd=str(ROOT), text=True).strip()
+    except Exception:
+        pass
+
+    # Meta Graph Token Health
+    meta_ok, meta_msg = check_meta_token_health(force=True)
+    meta_status = f"✅ Active ({meta_msg})" if meta_ok else f"⚠️ Alert: {meta_msg[:60]}"
+
+    # Image Cache
+    img_dir = ROOT / "docs" / "posts"
+    img_count = len(list(img_dir.glob("*.jpg"))) if img_dir.exists() else 0
+
+    # Today's status
+    aft_entry = posts.get(f"{today}_afternoon", {})
+    aft_status = aft_entry.get("status", "not generated").upper()
+    aft_style = ARCHETYPE_LABELS.get(aft_entry.get("design_mode", 0), "Rotational")
+    
+    eve_entry = posts.get(f"{today}_evening", {})
+    eve_status = eve_entry.get("status", "not generated").upper()
+    eve_style = ARCHETYPE_LABELS.get(eve_entry.get("design_mode", 0), "Rotational")
+
+    report = (
+        "🩺 <b>AUTOPILOT SYSTEM DIAGNOSTICS & HEALTH</b>\n\n"
+        f"🖥️ <b>Host Platform:</b> <code>{sys_plat}</code>\n"
+        f"⚙️ <b>CPU Load:</b> <code>{load_avg}</code>\n"
+        f"💾 <b>RAM Usage:</b> <code>{mem_info}</code>\n"
+        f"💽 <b>Disk Space:</b> <code>{free_gb:.1f} GB free</code> / {total_gb:.1f} GB ({disk_pct:.1f}% used)\n"
+        f"📦 <b>Git Version:</b> <code>{git_hash}</code> — <i>{git_msg[:35]}</i>\n"
+        f"🔑 <b>Meta API:</b> {meta_status}\n"
+        f"🖼️ <b>Media Cache:</b> <code>{img_count} high-res slides</code>\n\n"
+        f"📅 <b>Schedule Status ({today}):</b>\n"
+        f"• 🌞 Afternoon (14:00 IST): <b>{aft_status}</b> [{aft_style[:18]}]\n"
+        f"• 🌙 Evening (20:00 IST): <b>{eve_status}</b> [{eve_style[:18]}]\n\n"
+        f"⚡ <b>Daemon Engine:</b> 🟢 Active & Listening (PID: {os.getpid()})"
+    )
+    return report
 
 def approve_pending_post(posts, approver_name="Subha", target_key=None, target_slot=None):
     import autopilot
@@ -242,7 +344,6 @@ def recreate_and_send_post(posts=None, approver_name="Subha", target_key=None, t
     elif target_slot:
         slot = target_slot
     else:
-        # Smart slot detection: pick whichever slot is currently pending/needs_attention/rejected
         if posts.get(f"{today}_evening", {}).get("status") in ("pending", "needs_attention", "rejected"):
             slot = "evening"
         elif posts.get(f"{today}_afternoon", {}).get("status") in ("pending", "needs_attention", "rejected"):
@@ -252,12 +353,10 @@ def recreate_and_send_post(posts=None, approver_name="Subha", target_key=None, t
             slot = "evening" if now_hour >= 14 else "afternoon"
 
     target_key = f"{today}_{slot}"
-
     entry = posts.get(target_key)
     old_rev = entry.get("revision", 1) if entry else 1
     new_rev = old_rev + 1
 
-    # Clear generation error backoff so it generates immediately with zero wait
     gen_errors = read_json(GEN_ERRORS, {})
     gen_errors.pop(target_key, None)
     write_json(GEN_ERRORS, gen_errors)
@@ -282,6 +381,110 @@ def recreate_and_send_post(posts=None, approver_name="Subha", target_key=None, t
     except Exception as e:
         return False, f"⚠️ Error regenerating post: {e}"
 
+def switch_theme_and_send_post(posts=None, approver_name="Subha", target_key=None, target_slot=None, mode=None):
+    import autopilot
+    approver_id = str(os.getenv("TG_APPROVER_ID", ""))
+    if posts is None or not isinstance(posts, dict):
+        posts = read_json(STATE, {})
+    
+    today = datetime.now(autopilot.IST).date().isoformat()
+    if target_key and "_" in target_key:
+        today_cand, slot_cand = target_key.split("_", 1)
+        today = today_cand
+        slot = slot_cand
+    elif target_slot:
+        slot = target_slot
+    else:
+        if f"{today}_evening" in posts and posts[f"{today}_evening"].get("status") in ("pending", "needs_attention", "approved"):
+            slot = "evening"
+        else:
+            slot = "afternoon"
+
+    target_key = f"{today}_{slot}"
+    entry = posts.get(target_key)
+    if not entry or not entry.get("slides"):
+        return False, f"⚠️ No active draft found for {slot.capitalize()} to switch theme.\nReply 'recreate {slot}' or '/topic' to create one!"
+
+    current_mode = entry.get("design_mode", 0)
+    if mode is not None:
+        try:
+            new_mode = int(mode) % 4
+        except Exception:
+            new_mode = (current_mode + 1) % 4
+    else:
+        new_mode = (current_mode + 1) % 4
+
+    style_label = ARCHETYPE_LABELS.get(new_mode, f"Archetype {new_mode}")
+
+    tg_api("sendMessage", {
+        "chat_id": approver_id,
+        "text": f"🎨 <b>SWITCHING THEME TO: {style_label}</b>\nRe-rendering slides with atmospheric background and vector accents... ⏳",
+        "parse_mode": "HTML"
+    })
+
+    settings = read_json(ROOT / "settings.json", {})
+    try:
+        images = autopilot.render_carousel_slides(
+            date_key=entry.get("clean_date", today),
+            revision=entry.get("revision", 1),
+            settings=settings,
+            item=entry,
+            slot=slot,
+            forced_design_mode=new_mode
+        )
+        if images:
+            entry["images"] = images
+            entry["primary_image"] = images[0]
+            entry["design_mode"] = new_mode
+            write_json(STATE, posts)
+            git_push_state()
+            autopilot.send_preview(entry, settings)
+            return True, f"✨ Switched {slot.capitalize()} to {style_label}! Check preview above."
+        else:
+            return False, "⚠️ Render returned no images."
+    except Exception as exc:
+        return False, f"⚠️ Error switching theme: {exc}"
+
+def create_custom_topic_post(topic_text, slot=None, approver_name="Subha"):
+    import autopilot
+    approver_id = str(os.getenv("TG_APPROVER_ID", ""))
+    posts = read_json(STATE, {})
+    today = datetime.now(autopilot.IST).date().isoformat()
+
+    if not slot:
+        has_indic = bool(re.search(r'[\u0980-\u09FF\u0900-\u097F]', topic_text))
+        slot = "evening" if has_indic else "afternoon"
+
+    target_key = f"{today}_{slot}"
+    old_rev = posts.get(target_key, {}).get("revision", 0)
+    new_rev = old_rev + 1
+
+    slot_label = "🌞 AFTERNOON (English)" if slot == "afternoon" else "🌙 EVENING (Regional)"
+    tg_api("sendMessage", {
+        "chat_id": approver_id,
+        "text": (
+            f"🧠 <b>GENERATING CUSTOM TOPIC POST</b>\n\n"
+            f"📌 <b>Topic:</b> <i>{topic_text}</i>\n"
+            f"🌐 <b>Slot:</b> {slot_label}\n"
+            f"🔄 <b>Revision:</b> {new_rev}\n\n"
+            "Generating 6-slide carousel with AI content & Unsplash visual cards... ⏳ (15-20s)"
+        ),
+        "parse_mode": "HTML"
+    })
+
+    gen_errors = read_json(GEN_ERRORS, {})
+    gen_errors.pop(target_key, None)
+    write_json(GEN_ERRORS, gen_errors)
+
+    settings = read_json(ROOT / "settings.json", {})
+    try:
+        new_entry = autopilot.create_post(target_key, settings, posts, revision=new_rev, slot=slot, custom_topic=topic_text)
+        write_json(STATE, posts)
+        git_push_state()
+        return True, f"✨ Custom Topic Carousel generated and sent above!\nClick [✅ Approve {slot.capitalize()}] when ready. 🚀"
+    except Exception as exc:
+        return False, f"⚠️ Error creating custom topic post: {exc}"
+
 def poll_once(offset=0):
     token = os.getenv("TG_BOT_TOKEN")
     approver_id = str(os.getenv("TG_APPROVER_ID", "")).strip()
@@ -289,7 +492,7 @@ def poll_once(offset=0):
     try:
         r = requests.get(
             f"https://api.telegram.org/bot{token}/getUpdates",
-            params={"offset": offset, "timeout": 10, "allowed_updates": json.dumps(["message"])},
+            params={"offset": offset, "timeout": 10, "allowed_updates": json.dumps(["message", "callback_query"])},
             timeout=25
         )
         res = r.json()
@@ -307,6 +510,63 @@ def poll_once(offset=0):
         offset = max(offset, int(u["update_id"]) + 1)
         write_json(TG_STATE, {"offset": offset})
 
+        # 1. Handle Inline Callback Queries (1-Click Action Buttons!)
+        if "callback_query" in u:
+            cq = u["callback_query"]
+            cq_id = cq["id"]
+            cq_data = cq.get("data", "")
+            cq_from = cq.get("from", {})
+            user_id = str(cq_from.get("id", ""))
+            first_name = cq_from.get("first_name", "Subha")
+            
+            # Dismiss Telegram loading spinner immediately
+            tg_api("answerCallbackQuery", {"callback_query_id": cq_id, "text": f"Processing {cq_data}..."})
+            print(f"🔘 Callback Query from {first_name} ({user_id}): '{cq_data}'", flush=True)
+
+            import autopilot
+            today = datetime.now(autopilot.IST).date().isoformat()
+
+            if cq_data.startswith("approve:"):
+                slot = cq_data.split(":", 1)[1]
+                target_key = f"{today}_{slot}"
+                success, msg = approve_pending_post(posts, first_name, target_key=target_key, target_slot=slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+            
+            elif cq_data.startswith("recreate:"):
+                slot = cq_data.split(":", 1)[1]
+                target_key = f"{today}_{slot}"
+                success, msg = recreate_and_send_post(posts, first_name, target_key=target_key, target_slot=slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+
+            elif cq_data.startswith("theme:"):
+                slot = cq_data.split(":", 1)[1]
+                target_key = f"{today}_{slot}"
+                success, msg = switch_theme_and_send_post(posts, first_name, target_key=target_key, target_slot=slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+
+            elif cq_data.startswith("reject:"):
+                slot = cq_data.split(":", 1)[1]
+                target_key = f"{today}_{slot}"
+                success, msg = reject_pending_post(posts, first_name, target_key=target_key, target_slot=slot)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+
+            elif cq_data == "status":
+                afternoon_st = posts.get(f"{today}_afternoon", {}).get("status", "not generated").upper()
+                evening_st = posts.get(f"{today}_evening", {}).get("status", "not generated").upper()
+                msg = (
+                    f"📊 <b>DAILY SCHEDULE STATUS ({today})</b>\n\n"
+                    f"🌞 <b>Afternoon Post (2:00 PM IST)</b>: {afternoon_st}\n"
+                    f"🌙 <b>Evening Post (8:00 PM IST)</b>: {evening_st}\n\n"
+                    "👉 Tap inline buttons or reply 'approve afternoon' / 'approve evening'"
+                )
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+
+            elif cq_data in ("diagnose", "health"):
+                diag_msg = get_system_diagnostics()
+                tg_api("sendMessage", {"chat_id": approver_id, "text": diag_msg, "parse_mode": "HTML"})
+            continue
+
+        # 2. Handle Text Messages & Slash Commands
         if "message" in u:
             m = u["message"]
             user_id = str(m.get("from", {}).get("id", "")).strip()
@@ -320,7 +580,7 @@ def poll_once(offset=0):
             import autopilot
             today = datetime.now(autopilot.IST).date().isoformat()
 
-            # Identify target slot (supports common abbreviations and misspellings like 'evenig')
+            # Identify target slot
             target_slot = None
             if any(w in lower_text for w in ("afternoon", "after", "2pm", "day", "aft")):
                 target_slot = "afternoon"
@@ -329,8 +589,49 @@ def poll_once(offset=0):
 
             target_key = f"{today}_{target_slot}" if target_slot else None
 
-            # 1. Reject All / Reject Both
-            if any(w in lower_text for w in ("reject all", "reject both", "cancel all", "cancel both")):
+            # Custom Topic Command: /topic <topic> or topic: <topic>
+            if lower_text.startswith(("/topic", "topic:", "custom:")) or (lower_text.startswith("topic ") and not any(w in lower_text for w in ("approve", "reject", "recreate"))):
+                raw = text
+                for pfx in ("/topic", "topic:", "custom:", "topic"):
+                    if raw.lower().startswith(pfx):
+                        raw = raw[len(pfx):].strip()
+                        break
+                slot = None
+                if raw.lower().startswith(("afternoon ", "after ")):
+                    slot = "afternoon"
+                    raw = raw.split(" ", 1)[1].strip()
+                elif raw.lower().startswith(("evening ", "eve ")):
+                    slot = "evening"
+                    raw = raw.split(" ", 1)[1].strip()
+                
+                if not raw:
+                    tg_api("sendMessage", {"chat_id": approver_id, "text": "⚠️ Please provide a topic! Example:\n<code>/topic AI Agents Revolution 2026</code>\n<code>/topic সুন্দরবনের রয়েল বেঙ্গল টাইগার</code>", "parse_mode": "HTML"})
+                else:
+                    success, msg = create_custom_topic_post(raw, slot=slot, approver_name=first_name)
+                    tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+
+            # Theme Switcher Command: /theme or theme [cyber|royal|neo|solaris|0-3]
+            elif lower_text.startswith(("/theme", "theme", "switch theme")):
+                target_mode = None
+                if "cyber" in lower_text or " 0" in lower_text:
+                    target_mode = 0
+                elif "royal" in lower_text or " 1" in lower_text:
+                    target_mode = 1
+                elif "neo" in lower_text or "minimal" in lower_text or " 2" in lower_text:
+                    target_mode = 2
+                elif "solaris" in lower_text or "radiant" in lower_text or " 3" in lower_text:
+                    target_mode = 3
+                
+                success, msg = switch_theme_and_send_post(posts, first_name, target_key=target_key, target_slot=target_slot, mode=target_mode)
+                tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
+
+            # System Diagnostics / Health Command
+            elif any(w in lower_text for w in ("/diagnose", "diagnose", "diagnostics", "health", "system", "/health")):
+                diag_msg = get_system_diagnostics()
+                tg_api("sendMessage", {"chat_id": approver_id, "text": diag_msg, "parse_mode": "HTML"})
+
+            # Reject All / Cancel All
+            elif any(w in lower_text for w in ("reject all", "reject both", "cancel all", "cancel both")):
                 rej_count = 0
                 for s in ("afternoon", "evening"):
                     sk = f"{today}_{s}"
@@ -346,27 +647,23 @@ def poll_once(offset=0):
                 else:
                     msg = "⚠️ No active drafts found to reject for today."
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[REJECT ALL] by {first_name}", flush=True)
 
-            # 2. Approve Single Slot (Check APPROVE before reject; word boundaries protect 'afternoon')
+            # Approve Single Slot
             elif any(w in lower_text for w in ("approve", "publish", "accept", "✅")) or re.search(r'\b(yes|ok|1)\b', lower_text):
                 success, msg = approve_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[APPROVED] {target_key or target_slot} by {first_name}", flush=True)
 
-            # 3. Reject Single Slot (Use word boundary for 'no' so it never matches inside 'afternoon')
+            # Reject Single Slot
             elif any(w in lower_text for w in ("reject", "cancel", "decline", "❌")) or re.search(r'\b(no|3)\b', lower_text):
                 success, msg = reject_pending_post(posts, first_name, target_key=target_key, target_slot=target_slot)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[REJECTED] {target_key or target_slot} by {first_name}", flush=True)
 
-            # 4. Recreate Single Slot (e.g. 'recreate afternoon', 'recreate evening')
+            # Recreate Single Slot
             elif any(w in lower_text for w in ("recreate", "regenerate", "retry", "regen", "🔄")) or re.search(r'\b(new|2)\b', lower_text):
                 success, msg = recreate_and_send_post(posts, first_name, target_key=target_key, target_slot=target_slot)
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
-                print(f"[RECREATED] {target_key or target_slot} by {first_name}", flush=True)
 
-            # 5. Check Status
+            # Check Status
             elif any(w in lower_text for w in ("status", "check", "info")):
                 afternoon_st = posts.get(f"{today}_afternoon", {}).get("status", "not generated").upper()
                 evening_st = posts.get(f"{today}_evening", {}).get("status", "not generated").upper()
@@ -374,30 +671,35 @@ def poll_once(offset=0):
                     f"📊 <b>DAILY SCHEDULE STATUS ({today})</b>\n\n"
                     f"🌞 <b>Afternoon Post (2:00 PM IST)</b>: {afternoon_st}\n"
                     f"🌙 <b>Evening Post (8:00 PM IST)</b>: {evening_st}\n\n"
-                    "👉 Reply <b>approve afternoon</b> or <b>approve evening</b>\n"
-                    "👉 Reply <b>reject afternoon</b> or <b>reject evening</b>\n"
-                    "👉 Reply <b>recreate afternoon</b> or <b>recreate evening</b>"
+                    "👉 Tap inline buttons or reply 'approve afternoon' / 'approve evening'"
                 )
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
-                        # Check Token Status
+            # Check Meta Token Status
             elif any(w in lower_text for w in ("token", "meta token", "key", "keys")):
                 ok, detail = check_meta_token_health(force=True, reply_chat_id=approver_id)
                 if ok:
                     tg_api("sendMessage", {"chat_id": approver_id, "text": f"✅ <b>Meta Page Token is ACTIVE & VALID!</b>\n\n{detail}", "parse_mode": "HTML"})
-                print(f"[TOKEN CHECK] by {first_name}: {ok}", flush=True)
 
-            # 6. Help / Default
+            # Help / Commands Guide
             else:
                 msg = (
-                    "👋 <b>Choicematrix Autopilot Commands:</b>\n\n"
-                    "• <b>approve afternoon</b> — Approve 2:00 PM English post 🚀\n"
-                    "• <b>approve evening</b> — Approve 8:00 PM Regional post 🚀\n"
-                    "• <b>reject afternoon</b> — Cancel 2:00 PM post ❌\n"
-                    "• <b>reject evening</b> — Cancel 8:00 PM post ❌\n"
-                    "• <b>recreate afternoon</b> / <b>recreate evening</b> — Generate fresh draft 🔄\n"
-                    "• <b>reject all</b> — Cancel both posts ❌\n"
-                    "• <b>status</b> — View schedule & status 📊\n• <b>token</b> — Check Meta API token health 🔑"
+                    "👋 <b>Choicematrix Autopilot Tools & Commands:</b>\n\n"
+                    "🔘 <b>1-Click Action Buttons:</b>\n"
+                    "• Tap inline buttons below any preview to Approve, Recreate, Switch Theme, or check Status!\n\n"
+                    "🧠 <b>On-Demand Custom Carousel:</b>\n"
+                    "• <code>/topic &lt;topic&gt;</code> — Generate instant 6-slide carousel!\n"
+                    "  <i>Example:</i> <code>/topic AI Breakthroughs 2026</code>\n\n"
+                    "🎨 <b>Visual Archetype Switcher:</b>\n"
+                    "• <code>/theme [cyber|royal|neo|solaris]</code> — Cycle through 4 design modes & 20 themes!\n\n"
+                    "🩺 <b>Diagnostics & Monitoring:</b>\n"
+                    "• <code>/diagnose</code> — Live CPU, RAM, disk, Git & Meta API status\n"
+                    "• <code>token</code> — Check Meta Facebook/Instagram token health\n"
+                    "• <code>status</code> — View daily schedule & approval status\n\n"
+                    "💬 <b>Quick Text Commands:</b>\n"
+                    "• <code>approve afternoon</code> / <code>approve evening</code>\n"
+                    "• <code>recreate afternoon</code> / <code>recreate evening</code>\n"
+                    "• <code>reject all</code>"
                 )
                 tg_api("sendMessage", {"chat_id": approver_id, "text": msg, "parse_mode": "HTML"})
 
@@ -434,10 +736,10 @@ def check_and_publish_due_posts():
 
 def main():
     load_env()
-    print("🚀 Telegram Text-Only Real-Time Approval Daemon started.", flush=True)
+    print("🚀 Telegram Interactive & Real-Time Approval Daemon started.", flush=True)
     tg_state = read_json(TG_STATE, {"offset": 0})
     offset = tg_state.get("offset", 0)
-    print(f"Listening for text commands on offset {offset}...", flush=True)
+    print(f"Listening for inline buttons and text commands on offset {offset}...", flush=True)
     last_health_check = 0
     last_due_check = 0
     while True:

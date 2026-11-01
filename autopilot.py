@@ -664,7 +664,7 @@ def tri_ai_generate_and_upgrade(prompt, slot_info, gemini_key):
     return best
 
 
-def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
+def generated_content(settings, posts, date_key, revision=1, slot="afternoon", custom_topic=None):
     key = getenv("GEMINI_API_KEY", True)
     use_web = settings.get("use_live_web_feed", False)
     clean_date = date_key.split("_")[0]
@@ -674,7 +674,17 @@ def generated_content(settings, posts, date_key, revision=1, slot="afternoon"):
         recent.append(curr_post.get("title"))
     if curr_post.get("direction"):
         recent.append(curr_post.get("direction"))
-    slot_info = choose_topic(clean_date, revision, use_web=use_web, recent_titles=recent, slot_type=slot)
+    if custom_topic:
+        slot_info = {
+            "category": "Technology Frontier" if slot == "afternoon" else "বিশেষ প্রতিবেদন",
+            "type": "practical",
+            "angle": "in-depth breakdown and actionable insights",
+            "seed": custom_topic,
+            "direction": custom_topic,
+            "language": "English" if slot == "afternoon" else "Bengali"
+        }
+    else:
+        slot_info = choose_topic(clean_date, revision, use_web=use_web, recent_titles=recent, slot_type=slot)
     brand = settings.get("brand", "Choicematrix")
     language = slot_info.get("language", "English")
 
@@ -913,7 +923,7 @@ def clean_text_for_canvas(text: str) -> str:
     t = str(text)
     t = t.replace("➡️", ">>").replace("👉", ">").replace("↗️", ">").replace("▶️", ">")
     t = t.replace("🚀", "").replace("🔥", "").replace("✨", "").replace("💡", "").replace("📌", "").replace("💬", "").replace("🎵", "").replace("🌐", "").replace("📸", "").replace("📍", "")
-    t = re.sub(r'[\U00010000-\U0010ffff]', '', t)
+    t = re.sub(r'[\u2000-\u206F\u2190-\u21FF\u2300-\u27BF\u2B00-\u2BFF\U00010000-\U0010FFFF]', '', t)
     t = re.sub(r'[ \t]+', ' ', t)
     return t.strip()
 
@@ -1695,7 +1705,7 @@ def draw_design_icon(draw, cx: int, cy: int, design_mode: int, color, size: int 
         draw.polygon([(cx, cy - s), (cx + s, cy + s), (cx - s, cy + s)], fill=color)
 
 
-def render_carousel_slides(date_key, revision, settings, item, slot="afternoon"):
+def render_carousel_slides(date_key, revision, settings, item, slot="afternoon", forced_design_mode=None):
     # Use Chromium layout engine for pixel-perfect typography, conjuncts & styling when available
     browser_exe = get_browser_executable()
     if browser_exe:
@@ -1728,7 +1738,13 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
     day_seed = int(clean_date.replace("-", ""))
     slot_offset = 7 if slot == "evening" else 0
     base_theme_idx = (day_seed + slot_offset + (revision - 1) * 3) % len(THEMES_MASTER)
-    design_mode = (day_seed + (2 if slot == "evening" else 0) + (revision - 1)) % 4
+    if forced_design_mode is not None:
+        design_mode = int(forced_design_mode) % 4
+    else:
+        design_mode = (day_seed + (2 if slot == "evening" else 0) + (revision - 1)) % 4
+    if isinstance(item, dict):
+        item["design_mode"] = design_mode
+        item["theme_name"] = THEMES_MASTER[base_theme_idx]["name"]
     used_ids = set()
 
     for idx, slide in enumerate(slides_data):
@@ -2009,7 +2025,7 @@ def public_url(relative_image_path):
     return base.rstrip("/") + "/" + clean_path
 
 
-def create_post(date_key, settings, posts, revision=1, slot=None):
+def create_post(date_key, settings, posts, revision=1, slot=None, custom_topic=None, forced_design_mode=None):
     if slot is None:
         if "_evening" in date_key:
             slot = "evening"
@@ -2024,11 +2040,11 @@ def create_post(date_key, settings, posts, revision=1, slot=None):
         "14:00" if slot == "afternoon" else "20:00"
     )
 
-    content = generated_content(settings, posts, date_key, revision=revision, slot=slot)
+    content = generated_content(settings, posts, date_key, revision=revision, slot=slot, custom_topic=custom_topic)
     language = content.get("language", "English")
     slides = content.get("slides")
     if slides and isinstance(slides, list) and len(slides) >= 2:
-        images = render_carousel_slides(date_key, revision, settings, content, slot=slot)
+        images = render_carousel_slides(date_key, revision, settings, content, slot=slot, forced_design_mode=forced_design_mode)
         primary_image = images[0]
     else:
         primary_image = image_art(date_key, revision, settings, content, slot=slot)
@@ -2111,28 +2127,48 @@ def send_preview(post, settings):
     audio_info = ""
 
     publish_time = post.get("publish_time_ist") or settings.get("publish_time_ist", "14:00")
+    archetype_labels = {
+        0: "⚡ Cyber Grid",
+        1: "👑 Royal Luxury",
+        2: "🌿 Minimalist Neo",
+        3: "☀️ Radiant Solaris"
+    }
+    d_mode = post.get("design_mode", 0)
+    t_name = post.get("theme_name", "Dynamic Rotational")
+    style_label = archetype_labels.get(d_mode, "Rotational")
+
     full_text = (
         f"{slot_label} • {len(images)}-SLIDE CAROUSEL DRAFT\n"
-        f"📅 Date: {clean_date} | 🌐 Language: {lang_label}\n\n"
+        f"📅 Date: {clean_date} | 🌐 Language: {lang_label}\n"
+        f"🎨 Style: {style_label} | Theme: {t_name}\n\n"
         f"TITLE: {post['title']}\n\n"
         f"{audio_info}"
         f"{post['caption']}\n\n"
         f"⏰ Scheduled for {publish_time} IST.\n\n"
-        "👉 To Approve: Reply 'approve afternoon' or 'approve evening' (or 'approve') 🚀\n"
-        "👉 To Reject: Reply 'reject afternoon' or 'reject evening' (or 'reject') ❌\n"
-        "👉 To Recreate: Reply 'recreate afternoon' or 'recreate evening' (or 'recreate') 🔄\n"
-        "👉 To Check Status: Reply 'status' 📊"
+        "👉 Tap inline buttons below for 1-click action:\n"
+        "• [✅ Approve] Approve post\n"
+        "• [🔄 Recreate] Fresh new draft\n"
+        "• [🎨 Switch Theme] Change design style\n"
+        "• [📊 Status] View schedule"
     )
-    main_keyboard = {
-        "keyboard": [
-            [{"text": "✅ Approve Afternoon"}, {"text": "✅ Approve Evening"}],
-            [{"text": "🔄 Recreate Afternoon"}, {"text": "🔄 Recreate Evening"}],
-            [{"text": "📊 Check Status"}, {"text": "❌ Reject All"}]
-        ],
-        "resize_keyboard": True,
-        "is_persistent": True
+
+    inline_keyboard = {
+        "inline_keyboard": [
+            [
+                {"text": f"✅ Approve {slot.capitalize()}", "callback_data": f"approve:{slot}"},
+                {"text": f"🔄 Recreate {slot.capitalize()}", "callback_data": f"recreate:{slot}"}
+            ],
+            [
+                {"text": "🎨 Switch Theme", "callback_data": f"theme:{slot}"},
+                {"text": "📊 Status", "callback_data": "status"},
+                {"text": "🩺 Health", "callback_data": "diagnose"}
+            ],
+            [
+                {"text": f"❌ Reject {slot.capitalize()}", "callback_data": f"reject:{slot}"}
+            ]
+        ]
     }
-    telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000], "reply_markup": json.dumps(main_keyboard)})
+    telegram("sendMessage", {"chat_id": chat, "text": full_text[:4000], "reply_markup": json.dumps(inline_keyboard)})
 
 
 def take_approvals(posts, settings, now=None):
