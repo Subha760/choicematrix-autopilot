@@ -47,25 +47,66 @@ TIMEOUT = 20
 UNSPLASH_CACHE = ROOT / "state" / "unsplash_cache"
 
 
-def resize_and_crop(photo: Image.Image, W: int, H: int) -> Image.Image:
-    pw, ph = photo.size
-    target_aspect = W / H
-    current_aspect = pw / ph
-    if current_aspect > target_aspect:
-        new_w = int(ph * target_aspect)
-        left = (pw - new_w) // 2
-        photo = photo.crop((left, 0, left + new_w, ph))
-    else:
-        new_h = int(pw / target_aspect)
-        top = (ph - new_h) // 2
-        photo = photo.crop((0, top, pw, top + new_h))
-    return photo.resize((W, H), Image.Resampling.LANCZOS)
+def resize_and_crop(photo: Image.Image, W: int, H: int, centering: tuple = (0.5, 0.15)) -> Image.Image:
+    """Smart top-weighted image fitting to keep heads, faces, and top subjects 100% in view without cropping."""
+    try:
+        from PIL import ImageOps
+        return ImageOps.fit(photo, (int(W), int(H)), method=Image.Resampling.LANCZOS, centering=centering)
+    except Exception:
+        pw, ph = photo.size
+        target_aspect = W / H
+        current_aspect = pw / ph
+        if current_aspect > target_aspect:
+            new_w = int(ph * target_aspect)
+            left = int((pw - new_w) * centering[0])
+            photo = photo.crop((left, 0, left + new_w, ph))
+        else:
+            new_h = int(pw / target_aspect)
+            top = max(0, int((ph - new_h) * centering[1]))
+            photo = photo.crop((0, top, pw, top + new_h))
+        return photo.resize((int(W), int(H)), Image.Resampling.LANCZOS)
 
 
-def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350, used_ids: set | None = None) -> Image.Image | None:
-    """Fetch high-res photo from Unsplash matching query, with curated fallback."""
+def smart_card_fit(photo: Image.Image, W: int, H: int) -> Image.Image:
+    """Intelligently fit photo into card box without ever cutting off heads, faces, or subjects.
+    - If photo is wide (aspect >= 1.35): uses top-anchored crop (centering 0.5, 0.08) keeping 92% headroom.
+    - If photo is portrait/square (aspect < 1.35): displays full un-cropped subject centered with frosted ambient blur backdrop!
+    """
+    try:
+        from PIL import ImageFilter, ImageEnhance, ImageOps
+        pw, ph = photo.size
+        current_aspect = pw / ph
+        
+        if current_aspect >= 1.35:
+            return ImageOps.fit(photo, (int(W), int(H)), method=Image.Resampling.LANCZOS, centering=(0.5, 0.08))
+        
+        bg = ImageOps.fit(photo, (int(W), int(H)), method=Image.Resampling.LANCZOS, centering=(0.5, 0.15))
+        bg = bg.filter(ImageFilter.GaussianBlur(radius=24))
+        bg = ImageEnhance.Brightness(bg).enhance(0.45)
+        
+        scale = H / ph
+        fg_w = int(pw * scale)
+        fg_h = int(ph * scale)
+        if fg_w > W:
+            scale = W / pw
+            fg_w = int(pw * scale)
+            fg_h = int(ph * scale)
+        
+        fg = photo.resize((max(1, fg_w), max(1, fg_h)), Image.Resampling.LANCZOS)
+        paste_x = (int(W) - fg_w) // 2
+        paste_y = (int(H) - fg_h) // 2
+        bg.paste(fg, (paste_x, paste_y))
+        return bg
+    except Exception:
+        return resize_and_crop(photo, int(W), int(H), centering=(0.5, 0.08))
+
+def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350, used_ids: set | None = None, orientation: str | None = None) -> Image.Image | None:
+    """Fetch high-res photo from Unsplash matching query with orientation control and smart top-anchored framing."""
     UNSPLASH_CACHE.mkdir(parents=True, exist_ok=True)
     access_key = getenv("UNSPLASH_ACCESS_KEY")
+
+    if orientation is None:
+        orientation = "landscape" if W > H else "portrait"
 
     # 1. Clean query of noise tags (e.g. 'STEP 01', 'HOT TREND', etc.)
     raw_query = query or "technology"
@@ -73,9 +114,11 @@ def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350, used_ids: set
     cleaned = re.sub(r"[^\w\s]", "", cleaned).strip()
     if not cleaned or len(cleaned) < 3:
         cleaned = "technology future"
+    if orientation == "landscape":
+        cleaned = re.sub(r"\b(portrait|headshot|close\s*up|macro\s*face)\b", "cinematic scene", cleaned, flags=re.IGNORECASE).strip()
 
-    cache_key = hashlib.sha256(cleaned.lower().encode()).hexdigest()[:12]
-    cached_file = UNSPLASH_CACHE / f"v2_{cache_key}.jpg"
+    cache_key = hashlib.sha256(f"{cleaned.lower()}_{orientation}_{W}x{H}".encode()).hexdigest()[:12]
+    cached_file = UNSPLASH_CACHE / f"v3_{cache_key}.jpg"
     if cached_file.exists() and (used_ids is None or len(used_ids) == 0):
         try:
             return Image.open(cached_file).convert("RGB")
@@ -97,7 +140,7 @@ def fetch_unsplash_image(query: str, W: int = 1080, H: int = 1350, used_ids: set
         for cq in candidate_queries:
             try:
                 url = "https://api.unsplash.com/search/photos"
-                params = {"query": cq, "per_page": 10, "order_by": "relevant"}
+                params = {"query": cq, "per_page": 10, "order_by": "relevant", "orientation": orientation}
                 headers = {"Authorization": f"Client-ID {access_key}"}
                 r = requests.get(url, params=params, headers=headers, timeout=6)
                 if r.status_code == 200:
@@ -1044,12 +1087,12 @@ def wrap_mixed_by_pixels(draw, text, size, max_width, bold=True, language="Benga
     return lines
 
 
-def paste_rounded_image(base_img, photo, box, radius=20, border_color=None, border_width=2):
-    """Composite a high-res photo with antialiased rounded corners and border onto the canvas."""
+def paste_rounded_image(base_img, photo, box, radius=20, border_color=None, border_width=2, centering: tuple = (0.5, 0.15)):
+    """Composite a high-res photo with antialiased rounded corners and border onto the canvas with zero head cutting."""
     bx, by, bw, bh = box
     if photo is None or bw <= 0 or bh <= 0:
         return
-    cropped = resize_and_crop(photo, int(bw), int(bh))
+    cropped = smart_card_fit(photo, int(bw), int(bh))
     mask = Image.new("L", (int(bw), int(bh)), 0)
     draw_mask = ImageDraw.Draw(mask)
     draw_mask.rounded_rectangle((0, 0, int(bw), int(bh)), radius=int(radius), fill=255)
@@ -1760,13 +1803,14 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
 
         # Fetch distinct high-res photo for THIS slide's content and atmospheric background
         slide_img_query = slide.get("image_query") or f"{item.get('unsplash_query', '')} {tag}".strip()
-        bg_photo = fetch_unsplash_image(f"{slide_img_query} atmospheric", W, H, used_ids=used_ids)
+        bg_photo = fetch_unsplash_image(f"{slide_img_query} atmospheric", W, H, used_ids=used_ids, orientation="portrait")
         if not bg_photo:
-            bg_photo = fetch_unsplash_image(item.get("title", "technology abstract"), W, H, used_ids=used_ids)
+            bg_photo = fetch_unsplash_image(item.get("title", "technology abstract"), W, H, used_ids=used_ids, orientation="portrait")
 
-        content_photo = fetch_unsplash_image(slide_img_query or item.get("title", "technology"), 940, 430, used_ids=used_ids)
+        card_h = 460 if slide_num == 1 else 410
+        content_photo = fetch_unsplash_image(slide_img_query or item.get("title", "technology"), 940, card_h, used_ids=used_ids, orientation="landscape")
         if not content_photo:
-            content_photo = fetch_unsplash_image("modern technology future", 940, 430, used_ids=used_ids)
+            content_photo = fetch_unsplash_image("modern technology future", 940, card_h, used_ids=used_ids, orientation="landscape")
 
         # 1. Composite full-bleed atmospheric background photo with themed gradient overlay
         overlay = Image.new("RGBA", (W, H))
@@ -1848,8 +1892,8 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
             y += 12
 
             # PROMINENT COVER HERO PHOTO
-            photo_h = 430
-            paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=22, border_color=theme["accent"], border_width=3)
+            photo_h = 460
+            paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=22, border_color=theme["accent"], border_width=3, centering=(0.5, 0.15))
             loc_badge = "WEST BENGAL • SPECIAL FEATURE" if language == "Bengali" else ("BHARAT • SPECIAL FEATURE" if language == "Hindi" else "GLOBAL TECH • LIVE REPORT")
             draw.rounded_rectangle((90, y + photo_h - 48, 90 + 380, y + photo_h - 14), radius=10, fill=(0, 0, 0), outline=theme["accent"], width=1)
             draw_design_icon(draw, 108, y + photo_h - 31, design_mode, theme["accent"], size=5)
@@ -1936,8 +1980,8 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
             y += 10
 
             # DEDICATED CONTENT PHOTO FOR THIS STEP
-            photo_h = 390
-            paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=20, border_color=theme["accent"], border_width=3)
+            photo_h = 410
+            paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=20, border_color=theme["accent"], border_width=3, centering=(0.5, 0.15))
             y += photo_h + 18
 
             # Explanation / Breakdown Card below photo
