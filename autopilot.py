@@ -1681,6 +1681,20 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
     return rendered_paths
 
 
+def draw_design_icon(draw, cx: int, cy: int, design_mode: int, color, size: int = 7):
+    """Draw crisp PIL vector design icons that never suffer from missing font glyphs or tofu boxes."""
+    s = int(size)
+    if design_mode == 0:  # Cyber Diamond
+        draw.polygon([(cx, cy - s), (cx + s, cy), (cx, cy + s), (cx - s, cy)], fill=color)
+    elif design_mode == 1:  # Royal Star Floret
+        draw.polygon([(cx, cy - s - 1), (cx + s + 1, cy), (cx, cy + s + 1), (cx - s - 1, cy)], fill=color)
+        draw.rectangle((cx - 2, cy - 2, cx + 2, cy + 2), fill=(255, 255, 255))
+    elif design_mode == 2:  # Neo Circle Dot
+        draw.ellipse((cx - s, cy - s, cx + s, cy + s), fill=color)
+    else:  # Solaris Triangle
+        draw.polygon([(cx, cy - s), (cx + s, cy + s), (cx - s, cy + s)], fill=color)
+
+
 def render_carousel_slides(date_key, revision, settings, item, slot="afternoon"):
     # Use Chromium layout engine for pixel-perfect typography, conjuncts & styling when available
     browser_exe = get_browser_executable()
@@ -1763,14 +1777,12 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             draw.line([(W - 36 - brk, 36), (W - 36, 36), (W - 36, 36 + brk)], fill=theme["accent"], width=4)
             draw.line([(36, H - 36 - brk), (36, H - 36), (36 + brk, H - 36)], fill=theme["accent"], width=4)
             draw.line([(W - 36 - brk, H - 36), (W - 36, H - 36), (W - 36 - brk, H - 36)], fill=theme["accent"], width=4)
-            glyph_prefix = "⚡"
             bullet_type = "diamond"
         elif design_mode == 1:  # Royal Luxury Double Border & Star Florets
             draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=32, outline=theme["border"], width=3)
             draw.rounded_rectangle((48, 48, W - 48, H - 48), radius=22, outline=theme["accent"], width=1)
             for (cx, cy) in [(62, 62), (W - 62, 62), (62, H - 62), (W - 62, H - 62)]:
                 draw.polygon([(cx, cy - 7), (cx + 7, cy), (cx, cy + 7), (cx - 7, cy)], fill=theme["accent"])
-            glyph_prefix = "✦"
             bullet_type = "circle"
         elif design_mode == 2:  # Neo Glass Minimalist
             draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=28, outline=theme["border"], width=2)
@@ -1782,21 +1794,19 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             draw.line([(52, H - 52), (52, H - 52 - 40)], fill=theme["accent"], width=3)
             draw.line([(W - 52, H - 52), (W - 52 - 40, H - 52)], fill=theme["accent"], width=3)
             draw.line([(W - 52, H - 52), (W - 52, H - 52 - 40)], fill=theme["accent"], width=3)
-            glyph_prefix = "●"
             bullet_type = "square"
         else:  # Radiant Solaris
             draw.rounded_rectangle((36, 36, W - 36, H - 36), radius=20, outline=theme["border"], width=3)
             for cx, cy in [(50, 50), (W - 50, 50), (50, H - 50), (W - 50, H - 50)]:
                 draw.ellipse((cx - 5, cy - 5, cx + 5, cy + 5), fill=theme["accent"])
-            glyph_prefix = "★"
             bullet_type = "triangle"
 
-        # 3. Top Header Bar
+        # 3. Top Header Bar (Vector icon + mixed text, zero boxes!)
         pill_w = 260
         pill_radius = 16
         draw.rounded_rectangle((70, 75, 70 + pill_w, 135), radius=pill_radius, fill=theme["accent"])
-        f_tag = font(22, bold=True, language=language, text=tag)
-        draw.text((90, 92), f"{glyph_prefix} {tag[:20]}", font=f_tag, fill=theme["bg_top"])
+        draw_design_icon(draw, 96, 105, design_mode, theme["bg_top"], size=7)
+        draw_mixed_text(draw, (115, 92), tag[:18], 22, bold=True, language=language, fill=theme["bg_top"])
 
         if slot == "afternoon":
             counter_str = f"{slide_num:02d} / {total_slides:02d}"
@@ -1811,8 +1821,8 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
         # 4. Slide-Specific Content Layout
         if slide_num == 1:
             header_label = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ বিশ্লেষণ" if language == "Bengali" else "आज का विशेष विश्लेषण")
-            f_lbl = font(22, bold=True, language=language, text=header_label)
-            draw.text((70, 195), header_label, font=f_lbl, fill=theme["accent"])
+            draw_design_icon(draw, 80, 206, design_mode, theme["accent"], size=6)
+            draw_mixed_text(draw, (98, 195), header_label, 22, bold=True, language=language, fill=theme["accent"])
 
             title_lines = wrap_mixed_by_pixels(draw, headline, 46, 940, bold=True, language=language)
             y = 235
@@ -1824,9 +1834,10 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
             # PROMINENT COVER HERO PHOTO
             photo_h = 430
             paste_rounded_image(image, content_photo, (70, y, W - 140, photo_h), radius=22, border_color=theme["accent"], border_width=3)
-            loc_badge = f"{glyph_prefix} WEST BENGAL • SPECIAL FEATURE" if language == "Bengali" else (f"{glyph_prefix} BHARAT • SPECIAL FEATURE" if language == "Hindi" else f"{glyph_prefix} GLOBAL TECH • LIVE REPORT")
+            loc_badge = "WEST BENGAL • SPECIAL FEATURE" if language == "Bengali" else ("BHARAT • SPECIAL FEATURE" if language == "Hindi" else "GLOBAL TECH • LIVE REPORT")
             draw.rounded_rectangle((90, y + photo_h - 48, 90 + 380, y + photo_h - 14), radius=10, fill=(0, 0, 0), outline=theme["accent"], width=1)
-            draw.text((105, y + photo_h - 43), loc_badge, font=latin_font(16, bold=True), fill=theme["accent"])
+            draw_design_icon(draw, 108, y + photo_h - 31, design_mode, theme["accent"], size=5)
+            draw.text((122, y + photo_h - 43), loc_badge, font=latin_font(16, bold=True), fill=theme["accent"])
             y += photo_h + 20
 
             # Hook / Subtitle Card below photo
@@ -1848,7 +1859,8 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
         elif slide_num == total_slides:
             # Slide 6: Outro / CTA Slide
             header_label = "KEY TAKEAWAYS COMPLETED" if slot == "afternoon" else ("গুরুত্বপূর্ণ তথ্যাবলী সমাপ্ত" if language == "Bengali" else "मुख्य बिंदु संपन्न")
-            draw.text((70, 195), header_label, font=font(22, bold=True, language=language, text=header_label), fill=theme["accent"])
+            draw_design_icon(draw, 80, 206, design_mode, theme["accent"], size=6)
+            draw_mixed_text(draw, (98, 195), header_label, 22, bold=True, language=language, fill=theme["accent"])
             draw_mixed_text(draw, (70, 235), headline, 46, bold=True, language=language, fill=theme["text_primary"])
 
             card_y = 330
@@ -1894,10 +1906,11 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon")
 
         else:
             # Slides 2-5: Step Content Slides with prominent image!
-            step_str = (f"{glyph_prefix} STEP {slide_num - 1:02d}" if slot == "afternoon"
-                        else (f"{glyph_prefix} ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if language == "Bengali"
-                              else f"{glyph_prefix} चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}"))
-            draw.text((70, 195), step_str, font=font(22, bold=True, language=language, text=step_str), fill=theme["accent"])
+            step_str = (f"STEP {slide_num - 1:02d}" if slot == "afternoon"
+                        else (f"ধাপ {to_indic_digits(f'{slide_num - 1:02d}', language)}" if language == "Bengali"
+                              else f"चरण {to_indic_digits(f'{slide_num - 1:02d}', language)}"))
+            draw_design_icon(draw, 80, 206, design_mode, theme["accent"], size=6)
+            draw_mixed_text(draw, (98, 195), step_str, 22, bold=True, language=language, fill=theme["accent"])
 
             title_lines = wrap_mixed_by_pixels(draw, headline, 42, 940, bold=True, language=language)
             y = 235
