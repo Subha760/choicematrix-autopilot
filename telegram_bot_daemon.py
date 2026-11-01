@@ -224,27 +224,32 @@ def reject_pending_post(posts, approver_name="Subha", target_key=None, target_sl
     git_push_state()
     return True, f"❌ <b>{slot_name.upper()} POST REJECTED by {approver_name}.</b>\nThis post will not be published.\n(Reply 'recreate {slot_name.lower()}' if you want a fresh new draft!)"
 
-def recreate_and_send_post(posts, approver_name="Subha", target_key=None, target_slot=None):
+def recreate_and_send_post(posts=None, approver_name="Subha", target_key=None, target_slot=None):
     import autopilot
     approver_id = str(os.getenv("TG_APPROVER_ID", ""))
-    today = datetime.now(autopilot.IST).date().isoformat()
+    
+    if isinstance(posts, str):
+        target_key = posts
+        posts = None
+    if posts is None or not isinstance(posts, dict):
+        posts = read_json(STATE, {})
 
-    if not target_slot:
-        if target_key and "_evening" in target_key:
+    today = datetime.now(autopilot.IST).date().isoformat()
+    if target_key and "_" in target_key:
+        today_cand, slot_cand = target_key.split("_", 1)
+        today = today_cand
+        slot = slot_cand
+    elif target_slot:
+        slot = target_slot
+    else:
+        # Smart slot detection: pick whichever slot is currently pending/needs_attention/rejected
+        if posts.get(f"{today}_evening", {}).get("status") in ("pending", "needs_attention", "rejected"):
             slot = "evening"
-        elif target_key and "_afternoon" in target_key:
+        elif posts.get(f"{today}_afternoon", {}).get("status") in ("pending", "needs_attention", "rejected"):
             slot = "afternoon"
         else:
-            # Smart slot detection: pick whichever slot is currently pending/needs_attention/rejected
-            if posts.get(f"{today}_evening", {}).get("status") in ("pending", "needs_attention", "rejected"):
-                slot = "evening"
-            elif posts.get(f"{today}_afternoon", {}).get("status") in ("pending", "needs_attention", "rejected"):
-                slot = "afternoon"
-            else:
-                now_hour = datetime.now(autopilot.IST).hour
-                slot = "evening" if now_hour >= 14 else "afternoon"
-    else:
-        slot = target_slot
+            now_hour = datetime.now(autopilot.IST).hour
+            slot = "evening" if now_hour >= 14 else "afternoon"
 
     target_key = f"{today}_{slot}"
 
