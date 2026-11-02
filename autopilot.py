@@ -960,13 +960,19 @@ def similar(a, b):
 
 
 def clean_text_for_canvas(text: str) -> str:
-    """Strip emojis and unsupported glyphs that cause .notdef tofu boxes in PIL."""
+    """Strip emojis and unsupported glyphs that cause .notdef tofu boxes in PIL and Chromium."""
     if not text:
         return ""
     t = str(text)
-    t = t.replace("➡️", ">>").replace("👉", ">").replace("↗️", ">").replace("▶️", ">")
-    t = t.replace("🚀", "").replace("🔥", "").replace("✨", "").replace("💡", "").replace("📌", "").replace("💬", "").replace("🎵", "").replace("🌐", "").replace("📸", "").replace("📍", "")
-    t = re.sub(r'[\u2000-\u206F\u2190-\u21FF\u2300-\u27BF\u2B00-\u2BFF\U00010000-\U0010FFFF]', '', t)
+    t = t.replace("\u27a1\ufe0f", ">>").replace("\u27a1", ">>")
+    t = t.replace("\U0001f449", ">")
+    t = t.replace("\u2197\ufe0f", ">").replace("\u2197", ">")
+    t = t.replace("\u25b6\ufe0f", ">").replace("\u25b6", ">")
+    t = t.replace("“", '"').replace("”", '"').replace("‘", "'").replace("’", "'")
+    t = t.replace("—", " - ").replace("–", "-").replace("…", "...")
+    t = t.replace("\ufe0e", "").replace("\ufe0f", "")
+    t = re.sub(r'[\U00010000-\U0010FFFF]', '', t)
+    t = re.sub(r'[\u2600-\u27BF\u2B00-\u2BFF]', '', t)
     t = re.sub(r'[ \t]+', ' ', t)
     return t.strip()
 
@@ -975,7 +981,35 @@ def has_indic_chars(text: str) -> bool:
     """Detect if string contains Bengali or Devanagari Unicode characters."""
     if not text:
         return False
-    return any(('\u0980' <= c <= '\u09ff') or ('\u0900' <= c <= '\u097f') for c in text)
+    return any(('ঀ' <= c <= '৿') or ('ऀ' <= c <= 'ॿ') for c in text)
+
+
+def split_script_runs(text: str):
+    """
+    Split text into contiguous runs of (segment, is_indic).
+    is_indic is True if character is Indic (Bengali / Devanagari blocks \u0900-\u09FF).
+    All ASCII letters, numbers, @, $, symbols, and punctuation are classified as non-indic (is_indic=False)
+    so they are rendered by the Latin font, guaranteeing ZERO tofu boxes.
+    """
+    if not text:
+        return []
+    runs = []
+    current_run = []
+    current_is_indic = None
+    for ch in text:
+        is_ind = ('ऀ' <= ch <= '৿')
+        if current_is_indic is None:
+            current_is_indic = is_ind
+            current_run.append(ch)
+        elif is_ind == current_is_indic:
+            current_run.append(ch)
+        else:
+            runs.append((''.join(current_run), current_is_indic))
+            current_run = [ch]
+            current_is_indic = is_ind
+    if current_run:
+        runs.append((''.join(current_run), current_is_indic))
+    return runs
 
 
 def latin_font(size: int, bold: bool = True):
@@ -1034,40 +1068,30 @@ def font(size, bold=True, language="English", text=None):
 
 
 def get_mixed_text_width(draw, text, size, bold=True, language="Bengali"):
-    """Compute exact pixel width of a string that may mix Latin and Indic words."""
+    """Compute exact pixel width of a string that may mix Latin and Indic text."""
+    if not text:
+        return 0
     f_lat = latin_font(size, bold=bold)
     f_ind = indic_font(size, bold=bold, language=language) if language in ("Bengali", "Hindi") else f_lat
-    space_w = draw.textbbox((0, 0), " ", font=f_lat)[2]
-    words = text.split(" ")
-    total_w = 0
-    for idx, word in enumerate(words):
-        if not word:
-            total_w += space_w
-            continue
-        f = f_ind if has_indic_chars(word) else f_lat
-        wb = draw.textbbox((0, 0), word, font=f)
-        total_w += (wb[2] - wb[0])
-        if idx < len(words) - 1:
-            total_w += space_w
+    total_w = 0.0
+    for seg, is_ind in split_script_runs(text):
+        f = f_ind if is_ind else f_lat
+        total_w += draw.textlength(seg, font=f)
     return total_w
 
 
 def draw_mixed_text(draw, pos, text, size, bold=True, language="Bengali", fill=(255, 255, 255)):
-    """Draw mixed Latin and Indic words in a single line with perfect glyph selection and zero tofu boxes."""
+    """Draw mixed Latin and Indic text in a single line with sub-token script segmentation and zero tofu boxes."""
+    if not text:
+        return
     x, y = pos
     f_lat = latin_font(size, bold=bold)
     f_ind = indic_font(size, bold=bold, language=language) if language in ("Bengali", "Hindi") else f_lat
-    space_w = draw.textbbox((0, 0), " ", font=f_lat)[2]
-    words = text.split(" ")
-    for idx, word in enumerate(words):
-        if not word:
-            x += space_w
-            continue
-        f = f_ind if has_indic_chars(word) else f_lat
-        draw.text((x, y), word, font=f, fill=fill)
-        wb = draw.textbbox((0, 0), word, font=f)
-        w = wb[2] - wb[0]
-        x += w + space_w
+    cleaned = clean_text_for_canvas(text)
+    for seg, is_ind in split_script_runs(cleaned):
+        f = f_ind if is_ind else f_lat
+        draw.text((x, y), seg, font=f, fill=fill)
+        x += draw.textlength(seg, font=f)
 
 
 def wrap_mixed_by_pixels(draw, text, size, max_width, bold=True, language="Bengali"):
@@ -1321,7 +1345,7 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             @font-face {{ font-family: 'NotoBengali'; src: url('data:font/truetype;charset=utf-8;base64,{b64_b}') format('truetype'); font-weight: bold; }}
             @font-face {{ font-family: 'NotoBengali'; src: url('data:font/truetype;charset=utf-8;base64,{b64_r}') format('truetype'); font-weight: normal; }}
             """
-            font_family_css = "'NotoBengali', 'Nirmala UI', sans-serif"
+            font_family_css = "'NotoBengali', 'Liberation Sans', 'DejaVu Sans', 'Noto Color Emoji', 'Segoe UI Emoji', sans-serif"
     elif language == "Hindi":
         f_b_path = ROOT / "fonts" / "NotoSansDevanagari-Bold.ttf"
         f_r_path = ROOT / "fonts" / "NotoSansDevanagari-Regular.ttf"
@@ -1332,7 +1356,7 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             @font-face {{ font-family: 'NotoDevanagari'; src: url('data:font/truetype;charset=utf-8;base64,{b64_b}') format('truetype'); font-weight: bold; }}
             @font-face {{ font-family: 'NotoDevanagari'; src: url('data:font/truetype;charset=utf-8;base64,{b64_r}') format('truetype'); font-weight: normal; }}
             """
-            font_family_css = "'NotoDevanagari', 'Nirmala UI', sans-serif"
+            font_family_css = "'NotoDevanagari', 'Liberation Sans', 'DejaVu Sans', 'Noto Color Emoji', 'Segoe UI Emoji', sans-serif"
 
     theme_pool = THEMES_CYBER if slot == "afternoon" else THEMES_WARM
     used_ids = set()
@@ -1357,9 +1381,9 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             slide_num = slide.get("slide_number", idx + 1)
             theme_idx = (base_theme_idx + (idx % 2)) % len(theme_pool)
             theme = theme_pool[theme_idx]
-            tag = slide.get("tag", "HOT TOPIC").upper()
-            headline = slide.get("headline", "")
-            body = slide.get("body", "")
+            tag = clean_text_for_canvas(slide.get("tag", "HOT TOPIC")).upper()
+            headline = clean_text_for_canvas(slide.get("headline", ""))
+            body = clean_text_for_canvas(slide.get("body", ""))
             audio = item.get("recommended_audio") or {}
 
             # Unsplash photo (slide-specific query for true variety across all slides)
@@ -1415,14 +1439,14 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
 
             if slide_num == 1:
                 header_tag = "TODAY'S HOT BREAKDOWN" if slot == "afternoon" else ("আজকের বিশেষ অন্তর্দৃষ্টি" if language == "Bengali" else "आज का विशेष विश्लेषण")
-                swipe_prompt = slide.get("swipe_prompt") or ("Swipe to explore ➡️" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন ➡️" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें ➡️"))
+                swipe_prompt = clean_text_for_canvas(slide.get("swipe_prompt") or ("Swipe to explore >>" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন >>" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें >>")))
                 audio_line = ""
 
                 # PROMINENT 550px COVER HERO PHOTO
                 photo_window_html = ""
                 if bg_b64:
-                    loc_badge = "📍 পশ্চিমবঙ্গ • আসল চিত্র" if language == "Bengali" else ("📍 भारत • लाइव अपडेट्स" if language == "Hindi" else "🌐 GLOBAL FRONTIER • LIVE")
-                    ver_badge = "📸 আসল আলোকচিত্র" if language == "Bengali" else ("📸 वास्तविक चित्र" if language == "Hindi" else "📸 VERIFIED VISUAL")
+                    loc_badge = "পশ্চিমবঙ্গ • বিশেষ প্রতিবেদন" if language == "Bengali" else ("भारत • लाइव अपडेट्स" if language == "Hindi" else "GLOBAL FRONTIER • LIVE")
+                    ver_badge = "আসল আলোকচিত্র" if language == "Bengali" else ("वास्तविक चित्र" if language == "Hindi" else "VERIFIED VISUAL")
                     photo_window_html = f"""
                     <div style="width:100%; height:550px; border-radius:20px; overflow:hidden; border:2.5px solid {accent_hex}; box-shadow:0 16px 40px rgba(0,0,0,0.75); position:relative; margin-bottom:14px;">
                       <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
@@ -1457,27 +1481,27 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             elif slide_num == total_slides:
                 header_tag = "KEY TAKEAWAY COMPLETED" if slot == "afternoon" else ("গুরুত্বপূর্ণ তথ্যাবলী সমাপ্ত" if language == "Bengali" else "मुख्य बिंदु संपन्न")
                 if language == "Bengali":
-                    sub_cta = "প্রতিদিনের সেরা টেক ও জ্ঞানমূলক আপডেটের জন্য! 🚀🔥✨"
-                    b1, b2, b3 = "📌 ভবিষ্যতের জন্য পোস্টটি সেভ করে রাখুন", "💬 আপনার মতামত কমেন্টে জানান", "↗️ বন্ধুদের সাথে শেয়ার করুন!"
+                    sub_cta = "প্রতিদিনের সেরা টেক ও জ্ঞানমূলক আপডেটের জন্য!"
+                    b1, b2, b3 = "ভবিষ্যতের জন্য পোস্টটি সেভ করে রাখুন", "আপনার মতামত কমেন্টে জানান", "বন্ধুদের সাথে শেয়ার করুন!"
                 elif language == "Hindi":
-                    sub_cta = "रोज़ाना बेहतरीन टेक इनसाइट्स और स्मार्ट अपडेट्स के लिए! 🚀🔥✨"
-                    b1, b2, b3 = "📌 इस पोस्ट को बाद के लिए सेव करें", "💬 कमेंट्स में अपनी राय साझा करें", "↗️ अपने दोस्तों के साथ ज़रूर शेयर करें!"
+                    sub_cta = "रोज़ाना बेहतरीन टेक इनसाइट्स और स्मार्ट अपडेट्स के लिए!"
+                    b1, b2, b3 = "इस पोस्ट को बाद के लिए सेव करें", "कमेंट्स में अपनी राय साझा करें", "अपने दोस्तों के साथ ज़रूर शेयर करें!"
                 else:
-                    sub_cta = "For daily hot trends, tech breakthroughs & smart tips! 🚀🔥✨"
-                    b1, b2, b3 = "📌 Save this post to revisit anytime", "💬 Share your thoughts in the comments", "↗️ Send to someone who needs this!"
+                    sub_cta = "For daily hot trends, tech breakthroughs & smart tips!"
+                    b1, b2, b3 = "Save this post to revisit anytime", "Share your thoughts in the comments", "Send to someone who needs this!"
 
                 content_html = f"""
                 <div style="flex:1; display:flex; flex-direction:column; justify-content:center; margin:14px 0;">
                   <div style="color:{accent_hex}; font-size:23px; font-weight:bold; margin-bottom:8px;">{header_tag}</div>
                   <div style="font-size:48px; font-weight:bold; line-height:1.24; margin-bottom:22px; color:#ffffff;">{headline}</div>
                   <div style="{card_style}">
-                    <div style="font-size:38px; font-weight:bold; color:{accent_hex}; margin-bottom:12px;">👉 FOLLOW @{brand}</div>
+                    <div style="font-size:38px; font-weight:bold; color:{accent_hex}; margin-bottom:12px;">&gt; FOLLOW @{brand}</div>
                     <div style="font-size:23px; color:{text_sec_css}; margin-bottom:22px;">{sub_cta}</div>
                     <hr style="border:none; border-top:1.5px solid {border_css}; margin:18px 0;">
-                    <div style="font-size:27px; line-height:1.95; color:#ffffff;">
-                      <div>{b1}</div>
-                      <div>{b2}</div>
-                      <div>{b3}</div>
+                    <div style="font-size:27px; line-height:2.0; color:#ffffff;">
+                      <div><span style="color:{accent_hex}; font-weight:bold; margin-right:12px;">•</span>{b1}</div>
+                      <div><span style="color:{accent_hex}; font-weight:bold; margin-right:12px;">•</span>{b2}</div>
+                      <div><span style="color:{accent_hex}; font-weight:bold; margin-right:12px;">•</span>{b3}</div>
                     </div>
                   </div>
                 </div>
@@ -1485,25 +1509,25 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             elif slide_num == 2 and is_tech_topic:
                 # Slide 2 for TECH: SHOW BOTH 280px PHOTO + 4-STEP PIPELINE DIAGRAM
                 step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०১")
-                wf_title = "⚙️ সিস্টেম আর্কিটেকচার ওয়ার্কফ্লো" if language == "Bengali" else ("⚙️ सिस्टम आर्किटेक्चर वर्कफ़्लो" if language == "Hindi" else "⚙️ SYSTEM ARCHITECTURE WORKFLOW")
+                wf_title = "সিস্টেম আর্কিটেকচার ওয়ার্কফ্লো" if language == "Bengali" else ("सिस्टम आर्किटेक्चर वर्कफ़्लो" if language == "Hindi" else "SYSTEM ARCHITECTURE WORKFLOW")
                 live_tag = "লাইভ পাইপলাইন" if language == "Bengali" else ("लाइव पाइपलाइन" if language == "Hindi" else "LIVE PIPELINE")
                 tech_tag = "হার্ডওয়্যার ও আর্কিটেকচার" if language == "Bengali" else ("हार्डवेयर विश्लेषण" if language == "Hindi" else "HARDWARE ARCHITECTURE")
 
                 if language == "Bengali":
-                    s1_i, s1_t, s1_d = "🚀", "১. ইনপুট", "ফ্রেমওয়ার্ক"
-                    s2_i, s2_t, s2_d = "⚡", "২. প্রসেসর", "সুপারকম্পিউটিং"
-                    s3_i, s3_t, s3_d = "🧠", "৩. ক্লাস্টার", "নিউরাল মেশ"
-                    s4_i, s4_t, s4_d = "🎯", "৪. স্কেল", "বাস্তব প্রয়োগ"
+                    s1_i, s1_t, s1_d = "1", "১. ইনপুট", "ফ্রেমওয়ার্ক"
+                    s2_i, s2_t, s2_d = "2", "২. প্রসেসর", "সুপারকম্পিউটিং"
+                    s3_i, s3_t, s3_d = "3", "৩. ক্লাস্টার", "নিউরাল মেশ"
+                    s4_i, s4_t, s4_d = "4", "৪. স্কেল", "বাস্তব প্রয়োগ"
                 elif language == "Hindi":
-                    s1_i, s1_t, s1_d = "🚀", "१. इनपुट", "फ़्रेमवर्क"
-                    s2_i, s2_t, s2_d = "⚡", "२. प्रोसेसर", "क्लाउड कंप्यूटिंग"
-                    s3_i, s3_t, s3_d = "🧠", "३. क्लस्टर", "हाई-स्पीड मेश"
-                    s4_i, s4_t, s4_d = "🎯", "४. प्रभाव", "व्यावसायिक उपयोग"
+                    s1_i, s1_t, s1_d = "1", "१. इनपुट", "फ़्रेमवर्क"
+                    s2_i, s2_t, s2_d = "2", "२. प्रोसेसर", "क्लाउड कंप्यूटिंग"
+                    s3_i, s3_t, s3_d = "3", "३. क्लस्टर", "हाई-स्पीड मेश"
+                    s4_i, s4_t, s4_d = "4", "४. प्रभाव", "व्यावसायिक उपयोग"
                 else:
-                    s1_i, s1_t, s1_d = "🚀", "1. App Input", "Weights"
-                    s2_i, s2_t, s2_d = "⚡", "2. Core Engine", "HPC Unit"
-                    s3_i, s3_t, s3_d = "🧠", "3. AI Cluster", "Neural Mesh"
-                    s4_i, s4_t, s4_d = "🎯", "4. Global Scale", "Real-Time API"
+                    s1_i, s1_t, s1_d = "1", "1. App Input", "Weights"
+                    s2_i, s2_t, s2_d = "2", "2. Core Engine", "HPC Unit"
+                    s3_i, s3_t, s3_d = "3", "3. AI Cluster", "Neural Mesh"
+                    s4_i, s4_t, s4_d = "4", "4. Global Scale", "Real-Time API"
 
                 diagram_html = f"""
                 <div style="background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.08); border: 1.5px solid {accent_hex}; border-radius: 16px; padding: 14px 16px; margin-bottom: 12px;">
@@ -1543,7 +1567,7 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 <div style="width:100%; height:280px; border-radius:18px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 10px 28px rgba(0,0,0,0.6); position:relative; margin-bottom:12px;">
                   <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
                   <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:8px 18px; display:flex; justify-content:space-between;">
-                    <div style="font-size:16px; font-weight:bold; color:{accent_hex};">🔬 {tech_tag}</div>
+                    <div style="font-size:16px; font-weight:bold; color:{accent_hex};">{tech_tag}</div>
                   </div>
                 </div>
                 """ if bg_b64 else ""
@@ -1564,8 +1588,8 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
             elif slide_num == 2 and not is_tech_topic:
                 # Slide 2 for CULTURE / NEWS / HEALTH: 380px CLEAR PHOTO SHOWCASE
                 step_str = f"⚡ STEP 01" if slot == "afternoon" else ("⚡ ধাপ ০১" if language == "Bengali" else "⚡ चरण ०१")
-                loc_badge = "📍 পশ্চিমবঙ্গ • সমসাময়িক দৃশ্য" if language == "Bengali" else ("📍 भारत • प्रत्यक्ष दृश्य" if language == "Hindi" else "🌐 GROUND PERSPECTIVE")
-                ver_badge = "📸 আসল দৃশ্য" if language == "Bengali" else ("📸 वास्तविक दृश्य" if language == "Hindi" else "📸 VERIFIED")
+                loc_badge = "পশ্চিমবঙ্গ • সমসাময়িক দৃশ্য" if language == "Bengali" else ("भारत • प्रत्यक्ष दृश्य" if language == "Hindi" else "GROUND PERSPECTIVE")
+                ver_badge = "আসল দৃশ্য" if language == "Bengali" else ("वास्तविक दृश्य" if language == "Hindi" else "VERIFIED")
                 photo_card_html = f"""
                 <div style="width:100%; height:380px; border-radius:20px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 12px 30px rgba(0,0,0,0.6); position:relative; margin-bottom:14px;">
                   <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
@@ -1601,7 +1625,7 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                 <div style="width:100%; height:320px; border-radius:18px; overflow:hidden; border:2px solid {accent_hex}; box-shadow:0 12px 30px rgba(0,0,0,0.6); position:relative; margin-bottom:12px;">
                   <img src="data:image/jpeg;base64,{bg_b64}" style="width:100%; height:100%; object-fit:cover; display:block;" />
                   <div style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 100%); padding:8px 18px; font-size:16px; font-weight:bold; color:{accent_hex};">
-                    🔍 {slide_img_q.upper()}
+                    TAG • {slide_img_q.upper()}
                   </div>
                 </div>
                 """ if bg_b64 else ""
@@ -1617,28 +1641,28 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                     if slot == "afternoon":
                         b_type = "chart"
                         defaults = [
-                            ("📊 BENCHMARK EFFICIENCY", "+340% Performance Acceleration"),
-                            ("⚡ SYSTEM LATENCY VECTOR", "< 12ms Real-Time Throughput"),
-                            ("📈 SCALABILITY & ADOPTION", "84% Enterprise Integration"),
-                            ("🎯 CORE FRONTIER MODEL", "Next-Gen System Deployed"),
+                            ("BENCHMARK EFFICIENCY", "+340% Performance Acceleration"),
+                            ("SYSTEM LATENCY VECTOR", "< 12ms Real-Time Throughput"),
+                            ("SCALABILITY & ADOPTION", "84% Enterprise Integration"),
+                            ("CORE FRONTIER MODEL", "Next-Gen System Deployed"),
                         ]
                         b_lbl, b_val = defaults[(slide_num - 2) % len(defaults)]
                     elif language == "Hindi":
                         b_type = "chart"
                         defaults = [
-                            ("📊 भारतीय तकनीक आँकड़े", "+४৫০% नवाचार व विकास"),
-                            ("🚀 डिजिटल भारत गति", "१०x तीव्र कार्यान्वयन"),
-                            ("⚡ स्टार्टअप बाज़ार विस्तार", "₹১০০ বিলিয়ন अवसर"),
-                            ("✨ मुख्य आत्मनिर्भर उपलब्धि", "भारतीय तकनीक क्रांति"),
+                            ("भारतीय तकनीक आँकड़े", "+४৫০% नवाचार व विकास"),
+                            ("डिजिटल भारत गति", "१०x तीव्र कार्यान्वयन"),
+                            ("स्टार्टअप बाज़ार विस्तार", "₹১০০ বিলিয়ন अवसर"),
+                            ("मुख्य आत्मनिर्भर उपलब्धि", "भारतीय तकनीक क्रांति"),
                         ]
                         b_lbl, b_val = defaults[(slide_num - 2) % len(defaults)]
                     else:
                         b_type = "badge"
                         defaults = [
-                            ("📍 পশ্চিমবঙ্গ সমসাময়িক মডেল", "১ টাকার অভিনব সহায়তা"),
-                            ("🎭 শিল্পচর্চা ও আত্মবিশ্বাস", "১০x সামাজিক মুক্তি ও সাহস"),
-                            ("🌱 মানবিক শিক্ষা বিপ্লব", "ভবিষ্যৎ প্রজন্মের স্বনির্ভরতা"),
-                            ("✨ অনন্য সামাজিক দিশা", "বাংলার গর্ব ও অগ্রগতি"),
+                            ("পশ্চিমবঙ্গ সমসাময়িক মডেল", "১ টাকার অভিনব সহায়তা"),
+                            ("শিল্পচর্চা ও আত্মবিশ্বাস", "১০x সামাজিক মুক্তি ও সাহস"),
+                            ("মানবিক শিক্ষা বিপ্লব", "ভবিষ্যৎ প্রজন্মের স্বনির্ভরতা"),
+                            ("অনন্য সামাজিক দিশা", "বাংলার গর্ব ও অগ্রগতি"),
                         ]
                         b_lbl, b_val = defaults[(slide_num - 2) % len(defaults)]
 
@@ -1663,14 +1687,15 @@ def render_carousel_slides_chrome(date_key, revision, settings, item, slot="afte
                     </div>
                     """
                 else:
-                    icon_e = "🎭" if "শিল্প" in b_lbl or "নাট্য" in b_lbl else ("📍" if "পশ্চিমবঙ্গ" in b_lbl else "💡")
                     badge_html = f"""
                     <div style="margin-bottom: 12px; background: rgba({theme['accent'][0]}, {theme['accent'][1]}, {theme['accent'][2]}, 0.09); border: 1.5px solid {accent_hex}; border-radius: 18px; padding: 14px 22px; display: flex; align-items: center; justify-content: space-between;">
                       <div>
                         <div style="font-size: 18px; font-weight: bold; color: {accent_hex};">{b_lbl}</div>
                         <div style="font-size: 28px; font-weight: bold; color: #ffffff; margin-top: 2px;">{b_val}</div>
                       </div>
-                      <div style="font-size: 34px;">{icon_e}</div>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{accent_hex}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                      </svg>
                     </div>
                     """
 
@@ -1874,8 +1899,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
             s_indic = to_indic_digits(f"{slide_num:02d}", language)
             t_indic = to_indic_digits(f"{total_slides:02d}", language)
             counter_str = f"{s_indic} / {t_indic}"
-        f_counter = font(24, bold=True, language=language, text=counter_str)
-        draw.text((W - 190, 92), counter_str, font=f_counter, fill=theme["accent_secondary"])
+        draw_mixed_text(draw, (W - 190, 92), counter_str, 24, bold=True, language=language, fill=theme["accent_secondary"])
         draw.line((70, 165, W - 70, 165), fill=theme["border"], width=2)
 
         # 4. Slide-Specific Content Layout
@@ -1913,8 +1937,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
             swipe_y = H - 215
             draw.rounded_rectangle((70, swipe_y, W - 70, swipe_y + 75), radius=18, fill=theme["accent"])
             swipe_text = clean_text_for_canvas(slide.get("swipe_prompt") or ("Swipe to explore >>" if slot == "afternoon" else ("বিস্তারিত দেখতে সোয়াইপ করুন >>" if language == "Bengali" else "आगे जानने के लिए स्वाइप करें >>")))
-            f_swipe = font(26, bold=True, language=language, text=swipe_text)
-            draw.text((110, swipe_y + 22), swipe_text, font=f_swipe, fill=theme["bg_top"])
+            draw_mixed_text(draw, (110, swipe_y + 22), swipe_text, 26, bold=True, language=language, fill=theme["bg_top"])
 
         elif slide_num == total_slides:
             # Slide 6: Outro / CTA Slide
@@ -1931,7 +1954,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
             sub_cta = ("প্রতিদিনের সেরা টেক ও জ্ঞানমূলক আপডেটের জন্য!" if language == "Bengali"
                        else ("रोज़ाना बेहतरीन टेक इनसाइट्स और स्मार्ट अपडेट्स के लिए!" if language == "Hindi"
                              else "For daily breakthroughs, smart tips & insights!"))
-            draw.text((110, card_y + 100), sub_cta, font=font(24, bold=False, language=language, text=sub_cta), fill=theme["text_secondary"])
+            draw_mixed_text(draw, (110, card_y + 100), sub_cta, 24, bold=False, language=language, fill=theme["text_secondary"])
             draw.line((110, card_y + 155, W - 110, card_y + 155), fill=theme["border"], width=2)
 
             bullets = [
@@ -1962,7 +1985,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
 
             if audio.get("title"):
                 audio_str = f"Audio: {clean_text_for_canvas(audio.get('title'))} - {clean_text_for_canvas(audio.get('artist'))}"
-                draw.text((110, by + 20), audio_str, font=latin_font(21, bold=True), fill=theme["accent_secondary"])
+                draw_mixed_text(draw, (110, by + 20), audio_str, 21, bold=True, language=language, fill=theme["accent_secondary"])
 
         else:
             # Slides 2-5: Step Content Slides with prominent image!
@@ -1999,7 +2022,7 @@ def render_carousel_slides(date_key, revision, settings, item, slot="afternoon",
         footer_tag = ("GLOBAL TECH & SYSTEMS" if slot == "afternoon"
                       else ("পশ্চিমবঙ্গ ইনোভেশন ও ট্রেন্ড" if language == "Bengali"
                             else "डिजिटल भारत व टेक ट्रेंड्स"))
-        draw.text((W - 350, H - 90), footer_tag, font=font(21, bold=False, language=language, text=footer_tag), fill=theme["text_secondary"])
+        draw_mixed_text(draw, (W - 350, H - 90), footer_tag, 21, bold=False, language=language, fill=theme["text_secondary"])
 
         dest = IMAGE_DIR / f"{date_key}-v{revision}-slide{slide_num}.jpg"
         image.save(dest, "JPEG", quality=92, optimize=True)

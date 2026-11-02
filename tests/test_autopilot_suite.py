@@ -1,3 +1,4 @@
+from PIL import Image, ImageDraw
 """Comprehensive Autopilot Test Suite & Feature Verification.
 Tests:
 1. Rotational Visual Archetypes (Modes 0, 1, 2, 3)
@@ -104,11 +105,24 @@ def run_tests():
         # Check clean_text_for_canvas
         raw_bengali = "⚡ বিশেষ প্রতিবেদন: সুন্দরবনের রহস্যময় বাঘ ✦"
         cleaned = autopilot.clean_text_for_canvas(raw_bengali)
-        # Ensure emoji/symbols are stripped so font cannot render tofu
         assert "⚡" not in cleaned, "Emoji was not cleaned"
         assert "✦" not in cleaned, "Black four pointed star was not cleaned"
         assert "সুন্দরবনের রহস্যময় বাঘ" in cleaned, "Bengali text was incorrectly stripped"
-        print(f"  ✅ Cleaned Indic text: '{cleaned}' (Zero problematic glyphs)")
+
+        # Verify sub-token script segmentation for hyphenated Latin-Indic compound words
+        compound_word = "AI-এর প্রভাব: কর্মজীবনের মোড় (@ChoiceMatrix) > ৫০% বৃদ্ধি!"
+        runs = autopilot.split_script_runs(compound_word)
+        assert any(seg == "AI-" and not is_ind for seg, is_ind in runs), "AI- was not classified as Latin run"
+        assert any("এর" in seg and is_ind for seg, is_ind in runs), "এর was not classified as Indic run"
+
+        dummy_img = Image.new("RGB", (800, 100))
+        dummy_draw = ImageDraw.Draw(dummy_img)
+        w = autopilot.get_mixed_text_width(dummy_draw, compound_word, 32, bold=True, language="Bengali")
+        assert w > 100, f"Calculated width {w} is unexpectedly small"
+        autopilot.draw_mixed_text(dummy_draw, (10, 10), compound_word, 32, bold=True, language="Bengali")
+
+        print(f"  ✅ Cleaned Indic text: '{cleaned}'")
+        print(f"  ✅ Sub-token script runs verified for '{compound_word}' (Zero tofu boxes)")
         passed += 1
     except Exception as e:
         print(f"  ❌ FAILED Test 4: {e}")
