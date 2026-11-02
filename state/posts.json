@@ -2273,19 +2273,22 @@
     "approved_at": "2026-11-02T06:38:00.652977+00:00",
     "approval_hash": "c16fcaefc22e26ef83060a6d993e48bf872ca72e944c3090372f843944f070b9",
     "fb": {
-      "status": "published",
-      "id": "1279646595235354_122134636353465406"
-    },
-    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-02T08:30:23.861531+00:00"
+      "attempted_at": "2026-11-02T08:30:03.438767+00:00"
+    },
+    "ig": {
+      "status": "published",
+      "id": "17911150251594598",
+      "container": "18122319656470290",
+      "attempted_at": "2026-11-02T08:30:06.180620+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-02T08:30:45.696324+00:00"
     },
     "created_at": "2026-11-02T03:30:39.888430+00:00"
   },
