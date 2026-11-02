@@ -1823,7 +1823,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "fb0530cbeeceff595b585542bd410c85820888a235f1c23185de7b34bce2c1e6",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
