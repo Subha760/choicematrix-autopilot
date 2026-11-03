@@ -2047,7 +2047,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "7b61b4c5bf484bfecd2d036c64a2e32bcc273f9192b8ed619bb20039dae41846",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -2158,7 +2158,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "cd9d6a380663718af7a8ccc53d2ecfe5190e120a52d76c01021d052da120dc1c",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -2382,7 +2382,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "69d78a321634bd4048aab97c916ff00f5bdbaec44f8531229c8a73baeb08a101",
-    "status": "approved",
+    "status": "needs_attention",
     "approved_at": "2026-11-02T08:54:54.358643+00:00",
     "approval_hash": "d2e5204d3197ec19b8891ca077edc8faf10511c90adb1ca1eabdd1c6c0ffd0d3",
     "fb": {
