@@ -2613,22 +2613,20 @@
     "approved_at": "2026-11-03T04:35:17.801073+00:00",
     "approval_hash": "717fd91c1e8ad91a3983e4fae1fb7f9fcec934485f2ac687c850bf9680649083",
     "fb": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
-      "attempted_at": "2026-11-03T14:30:02.628640+00:00"
+      "status": "published",
+      "id": "1279646595235354_122135076027465406"
     },
     "ig": {
       "status": "published",
-      "id": "18138575512755151",
-      "container": "18122472101470290",
-      "attempted_at": "2026-11-03T14:30:19.354918+00:00"
+      "id": "18188686894411692",
+      "container": "18122472104470290",
+      "attempted_at": "2026-11-03T14:30:17.858916+00:00"
     },
     "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-03T14:30:56.858629+00:00"
+      "attempted_at": "2026-11-03T14:30:57.248288+00:00"
     },
     "created_at": "2026-11-03T03:31:20.457167+00:00"
   }
