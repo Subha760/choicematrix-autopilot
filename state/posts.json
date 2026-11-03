@@ -2496,13 +2496,14 @@
     ],
     "recommended_audio": null,
     "image_sha256": "deccccf2fb3ee118d842e93f69f12533797031bef1bf0f7631cd86848a807d7a",
-    "status": "approved",
+    "status": "publishing",
     "approved_at": "2026-11-03T04:35:13.412784+00:00",
     "approval_hash": "621f499aed0e65ef037336b057f1d1f1620bd2c8c417c1d50558820eda2bb686",
     "fb": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-03T08:30:08.515761+00:00"
     },
     "ig": {
       "status": "not_started",
