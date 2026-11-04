@@ -2849,9 +2849,10 @@
       "attempted_at": "2026-11-04T14:30:22.927793+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-04T14:30:38.979707+00:00"
     },
     "created_at": "2026-11-04T03:31:26.282365+00:00"
   }
