@@ -2839,15 +2839,14 @@
     "approved_at": "2026-11-04T05:03:08.629897+00:00",
     "approval_hash": "14dda387be0b817a2ce7f533f94149966a18d8fb5827692b099695def9de7f33",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122135381169465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-04T14:30:08.337969+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-04T14:30:22.927793+00:00"
     },
     "threads": {
       "status": "not_started",
