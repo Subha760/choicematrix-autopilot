@@ -2629,5 +2629,228 @@
       "attempted_at": "2026-11-03T14:30:57.248288+00:00"
     },
     "created_at": "2026-11-03T03:31:20.457167+00:00"
+  },
+  "2026-11-04_afternoon": {
+    "date": "2026-11-04_afternoon",
+    "clean_date": "2026-11-04",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Interstellar Invader: 3I/ATLAS",
+    "subtitle": "JWST reveals the cosmic origin of comet 3I/ATLAS. A deep dive into the data that reshapes our understanding of the universe.",
+    "caption": "🚀 THE UNIVERSE JUST SENT US A POSTCARD\n\n🔍 WHAT HAPPENED TODAY:\nThe James Webb Space Telescope (JWST) has captured high-resolution spectral data of 3I/ATLAS, the first confirmed interstellar comet to visit our solar system in recorded history. This object didn't just pass by; it left a chemical fingerprint that suggests it formed in a region of space radically different from our own.\n\n💡 CORE TAKEAWAYS:\n• ⚡ 1. **The Chemical Anomaly**: Spectroscopic analysis shows an unusual ratio of carbon monoxide to water, indicating formation in a colder, denser nebular environment.\n• 📊 2. **Speed & Trajectory**: Traveling at ~50 km/s relative to the Sun, its hyperbolic orbit confirms it is not bound to our solar system, making it a rare cosmic traveler.\n• 🎯 3. **Origin Hypothesis**: Data suggests it may have originated from a dense star cluster, providing a snapshot of stellar nurseries we cannot otherwise observe.\n\n🔥 WHY THIS MATTERS NOW:\nThis is not just a rock in space; it is a physical sample from another star system. It validates theoretical models of how small bodies migrate between stars and offers a tangible way to study the diversity of planetary systems across the galaxy.\n\n💬 WHAT DO YOU THINK?\nIf you could land on this comet, what is the first experiment you would run? Drop your theories below! 👇\n\n#Choicematrix #Astronomy #JWST #SpaceExploration #Cosmos\n\nReference: Space — https://news.google.com/rss/articles/CBMi3AFBVV95cUxOV0FiNHpuLVVyUktOd2RGdUhUVmJlc296TGVnV2JwU1o2NU43c2FNdk9XT0ZxeVN1NkJ5R2MyQXQwU1FZZWZFa3EwYXVvQjNZaFc2VVhqemFHOVVOSjM0Ync2RXc5VWJSU2ppSkNzdVVEWWJKZVRER2tjaXdOOGlqdUhoWV9XekVETS14X2FmYjhfaTVMN01mLUg1WW1BRWxQeXVpYzMtSUJNa2xvUXQ2X3pXdWJxc2dFV2tzTmYydUN4em53VUNKTURNNkFCWTJtS1pVb3BjSnJ1UDVn?oc=5",
+    "category": "Cosmos & Deep Science Mysteries",
+    "content_type": "practical",
+    "source": {
+      "label": "Space",
+      "url": "https://news.google.com/rss/articles/CBMi3AFBVV95cUxOV0FiNHpuLVVyUktOd2RGdUhUVmJlc296TGVnV2JwU1o2NU43c2FNdk9XT0ZxeVN1NkJ5R2MyQXQwU1FZZWZFa3EwYXVvQjNZaFc2VVhqemFHOVVOSjM0Ync2RXc5VWJSU2ppSkNzdVVEWWJKZVRER2tjaXdOOGlqdUhoWV9XekVETS14X2FmYjhfaTVMN01mLUg1WW1BRWxQeXVpYzMtSUJNa2xvUXQ2X3pXdWJxc2dFV2tzTmYydUN4em53VUNKTURNNkFCWTJtS1pVb3BjSnJ1UDVn?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "The First Interstellar Guest",
+        "body": "For centuries, comets were seen as local messengers. Now, 3I/ATLAS has shattered that paradigm. It is the first object confirmed to originate from outside our solar system, traveling at speeds that defy local gravitational binding. JWST is now peering into its nucleus to decode its birth story, offering a rare glimpse into the composition of other star systems. This is a once-in-a-lifetime opportunity to understand the cosmic neighborhood.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "glowing interstellar comet space"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "Decoding the Chemical Fingerprint",
+        "body": "JWST’s Near-Infrared Spectrograph (NIRSpec) has identified a distinct spectral signature in 3I/ATLAS’s coma. Unlike local comets, which show abundant water ice and organic compounds typical of the Kuiper Belt, 3I/ATLAS exhibits a high ratio of carbon monoxide (CO) to water. This specific chemical imbalance suggests the comet formed in a region with drastically lower temperatures and higher densities than our own solar nebula. It acts as a frozen archive, preserving the conditions of its parent star system billions of years ago.",
+        "image_query": "scientific spectroscopy data chart",
+        "visual_badge": {
+          "label": "CHEMICAL ANOMALY",
+          "value": "High CO / Low H2O",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "The Hyperbolic Trajectory",
+        "body": "The comet’s orbit is not elliptical but hyperbolic, meaning it has enough kinetic energy to escape the Sun’s gravity well entirely. Calculations place its velocity at approximately 50 km/s at perihelion, far exceeding the escape velocity for objects originating within our system. This trajectory confirms its extraterrestrial origin and allows astronomers to backtrack its path to a specific region of the galaxy. By modeling this path, scientists can estimate the time of departure and the likely stellar cluster of origin, linking it to dense star-forming regions.",
+        "image_query": "hyperbolic orbit trajectory diagram",
+        "visual_badge": {
+          "label": "RELATIVE VELOCITY",
+          "value": "~50 km/s",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "Implications for Cosmic Exchanges",
+        "body": "This discovery validates the 'Oort Cloud Exchange' hypothesis, suggesting that small bodies are frequently ejected from star systems and captured by others. It implies that the building blocks of planetary systems are not unique but are shared across the galaxy. This process could have delivered organic molecules and water to early Earth, highlighting a cosmic recycling mechanism. Understanding 3I/ATLAS helps us model how planetary systems interact dynamically, revealing that the universe is a connected web of material exchange rather than isolated islands.",
+        "image_query": "galactic star cluster nebula",
+        "visual_badge": {
+          "label": "COSMIC EXCHANGE",
+          "value": "Interstellar Transfer",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "A New Lens on the Universe",
+        "body": "The study of 3I/ATLAS marks a shift from observing static stars to tracking dynamic, tangible objects from other systems. It provides a direct probe into the diversity of exoplanetary environments, allowing us to test models of star formation and planetary migration. This discovery underscores the power of JWST to resolve details previously inaccessible, turning a fleeting visitor into a permanent scientific milestone. As we watch it depart, we gain a deeper appreciation for the interconnectedness of cosmic history and the vast, active nature of our galactic neighborhood.",
+        "image_query": "futuristic space telescope view",
+        "visual_badge": {
+          "label": "SCIENTIFIC IMPACT",
+          "value": "Paradigm Shift",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "interstellar comet deep space",
+    "image": "posts/2026-11-04_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-04_afternoon-v1-slide1.jpg",
+      "posts/2026-11-04_afternoon-v1-slide2.jpg",
+      "posts/2026-11-04_afternoon-v1-slide3.jpg",
+      "posts/2026-11-04_afternoon-v1-slide4.jpg",
+      "posts/2026-11-04_afternoon-v1-slide5.jpg",
+      "posts/2026-11-04_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "7da2fffecddca5f048f963b60cfec17e2c8c185af79c382c72bc3ce165cbcd5b",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-04T03:30:38.679281+00:00"
+  },
+  "2026-11-04_evening": {
+    "date": "2026-11-04_evening",
+    "clean_date": "2026-11-04",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 1,
+    "title": "গগনযান মিশন: ভারতের মহাকাশ স্বপ্ন",
+    "subtitle": "শীঘ্রই মহাকাশে মানুষ পাঠাবে ভারত! গগনযানের ঐতিহাসিক টাইমলাইন জানুন 🚀",
+    "caption": "🚀 **ভারতের মহাকাশ বিজয়: গগনযান মিশন!**\n\n🔍 **আজকের খবর:** ভারত তার ঐতিহাসিক গগনযান মিশনের মাধ্যমে মানব মহাকাশযাত্রার দ্বারপ্রান্তে। শীঘ্রই মহাকাশে মানুষ পাঠানোর প্রস্তুতি নিচ্ছে ISRO, যা ভারতকে বিশ্বের চতুর্থ দেশ হিসেবে এই গৌরব এনে দেবে। TV-D1 টেস্ট ফ্লাইটের সফলতার পর মিশন এখন এক গুরুত্বপূর্ণ পর্যায়ে।\n\n💡 **মূল বিষয়গুলি:**\n• ⚡ **সফল টেস্ট ফ্লাইট:** TV-D1 এর মাধ্যমে নভোচারী সুরক্ষাব্যবস্থা সফলভাবে পরীক্ষা করা হয়েছে।\n• 📊 **পরিকল্পিত টাইমলাইন:** ধাপে ধাপে মানববিহীন মিশন এবং ব্যোমমিত্রা রোবটের উৎক্ষেপণ।\n• 🎯 **ব্যোমযাত্রী প্রশিক্ষণ:** ভারতীয় বায়ুসেনার ৪ জন পাইলট কঠোর প্রশিক্ষণ নিচ্ছেন।\n\n🔥 **কেন এটি এখন গুরুত্বপূর্ণ:** গগনযান ভারতের বৈজ্ঞানিক সক্ষমতা, প্রযুক্তিগত স্বনির্ভরতা এবং মহাকাশ গবেষণায় অগ্রগতির এক উজ্জ্বল দৃষ্টান্ত। এটি দেশের তরুণ প্রজন্মকে অনুপ্রাণিত করবে এবং আন্তর্জাতিক মহাকাশ মঞ্চে ভারতের অবস্থানকে আরও শক্তিশালী করবে।\n\n💬 **আপনার কি মনে হয়, এই মিশন ভারতের জন্য কতটা গুরুত্বপূর্ণ? মন্তব্য করে জানান!**\n\n#GaganyaanMission #ISRO #IndianSpace #MahakashBigyan #ScienceIndia #Choicematrix\n\nReference: AajTak Bangla — https://news.google.com/rss/articles/CBMiugFBVV95cUxPb2JBTUdhaVlXdjlhM1hOTUZ1dnNfczAxdF82MFN1dmlXcUtsLUJKdUhWNndhQTBKYTgtRmVWRVppdzNodUo4ZkxTa0xRYkNQTTB4elFuWGV0Nlh6SjR0b21BcGZfc3NZR2M5UlQwdk5fYlpBU1IzNDNjM2pjaUlNazlpbjlJVzlLcUdnQWV0cTZWc0h5ajNQQk1XcHdwNTE4cTIxeGFPMi0zbFZqNHdFaWNOTERKbklxRnfSAb8BQVVfeXFMUExXaHVnQkF5WDMwTnlkb3JiQ2JBeG5DYXA5Q2RRTU1Mbm1qZWFlMG9iZFdZUHFwTFhiMC1kbXlfX1BET1lnSXJyblhkeGtKMjl1d1AydzdUVHZ0dDYyQmlVUFc5cUs2SVRUQW1qLVE1bzR6QUt4S0dXTmlJQjducVNyM0pVZU9qSVR0cU9HckdGRkhucThZbUZTRHNRLW1KN3VtSndwRGVHLTltc3lVQnFHS2pBVWpBQ1VHNzlZVVk?oc=5",
+    "category": "মহাকাশ বিজ্ঞান ও গবেষণার রহস্য",
+    "content_type": "practical",
+    "source": {
+      "label": "AajTak Bangla",
+      "url": "https://news.google.com/rss/articles/CBMiugFBVV95cUxPb2JBTUdhaVlXdjlhM1hOTUZ1dnNfczAxdF82MFN1dmlXcUtsLUJKdUhWNndhQTBKYTgtRmVWRVppdzNodUo4ZkxTa0xRYkNQTTB4elFuWGV0Nlh6SjR0b21BcGZfc3NZR2M5UlQwdk5fYlpBU1IzNDNjM2pjaUlNazlpbjlJVzlLcUdnQWV0cTZWc0h5ajNQQk1XcHdwNTE4cTIxeGFPMi0zbFZqNHdFaWNOTERKbklxRnfSAb8BQVVfeXFMUExXaHVnQkF5WDMwTnlkb3JiQ2JBeG5DYXA5Q2RRTU1Mbm1qZWFlMG9iZFdZUHFwTFhiMC1kbXlfX1BET1lnSXJyblhkeGtKMjl1d1AydzdUVHZ0dDYyQmlVUFc5cUs2SVRUQW1qLVE1bzR6QUt4S0dXTmlJQjducVNyM0pVZU9qSVR0cU9HckdGRkhucThZbUZTRHNRLW1KN3VtSndwRGVHLTltc3lVQnFHS2pBVWpBQ1VHNzlZVVk?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "গগনযান: ভারতের মহাকাশ স্বপ্ন",
+        "body": "ভারত তার ঐতিহাসিক গগনযান মিশনের মাধ্যমে মানব মহাকাশযাত্রার দ্বারপ্রান্তে। এই উচ্চাকাঙ্ক্ষী প্রকল্পটি ভারতকে বিশ্বের চতুর্থ দেশ হিসেবে মহাকাশে মানুষ পাঠানোর গৌরব এনে দেবে। প্রস্তুতি তুঙ্গে, আর এই মিশনের প্রতিটি ধাপই ভারতের বৈজ্ঞানিক সক্ষমতার প্রমাণ। এই যুগান্তকারী যাত্রার বিস্তারিত টাইমলাইন জানতে স্লাইড করুন।",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "gaganayaan mission concept art"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "প্রথম টেস্ট ফ্লাইট: TV-D1",
+        "body": "গগনযান মিশনের প্রথম গুরুত্বপূর্ণ ধাপ ছিল TV-D1 (Test Vehicle Development Flight 1) পরীক্ষা। এটি নভোচারীদের নিরাপত্তা নিশ্চিত করতে ক্রু এস্কেপ সিস্টেমের কার্যকারিতা যাচাই করে। এই সফল উৎক্ষেপণ প্রমাণ করে যে জরুরি পরিস্থিতিতে নভোচারীরা নিরাপদে ফিরে আসতে পারবেন, যা মানব মহাকাশযাত্রার জন্য অপরিহার্য।",
+        "image_query": "isro test vehicle launch",
+        "visual_badge": {
+          "label": "🚀 প্রথম টেস্ট ফ্লাইট",
+          "value": "সফল উৎক্ষেপণ",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "মহাকাশ যাত্রার টাইমলাইন",
+        "body": "ISRO একটি সুনির্দিষ্ট টাইমলাইন মেনে গগনযান মিশনকে এগিয়ে নিয়ে যাচ্ছে। TV-D1 এর পর আরও কয়েকটি মানববিহীন পরীক্ষা হবে, যার মধ্যে ব্যোমমিত্রা রোবটকে মহাকাশে পাঠানো হবে। এই পরীক্ষাগুলি যানের বিভিন্ন সিস্টেম, লাইফ সাপোর্ট এবং পুনঃপ্রবেশের কৌশল যাচাই করবে। প্রতিটি ধাপই মানব মিশনের সাফল্যের জন্য অত্যন্ত গুরুত্বপূর্ণ।",
+        "image_query": "gaganayaan mission timeline infographic",
+        "visual_badge": {
+          "label": "🗓️ মিশন টাইমলাইন",
+          "value": "ধাপে ধাপে অগ্রগতি",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "নভোচারী ও প্রযুক্তির প্রস্তুতি",
+        "body": "ভারতীয় বায়ুসেনার চারজন পাইলটকে গগনযানের জন্য 'ব্যোমযাত্রী' বা নভোচারী হিসেবে প্রশিক্ষণ দেওয়া হচ্ছে। রাশিয়াতে কঠোর প্রশিক্ষণ শেষে বর্তমানে তাঁরা ভারতে আরও উন্নত প্রশিক্ষণ নিচ্ছেন। মহাকাশযানের নকশা, জীবনধারণের ব্যবস্থা, এবং প্রতিকূল পরিবেশে টিকে থাকার প্রযুক্তিগুলি অত্যাধুনিক উপায়ে তৈরি হচ্ছে, যা তাঁদের নিরাপদে মহাকাশে নিয়ে যাবে এবং ফিরিয়ে আনবে।",
+        "image_query": "indian astronaut training",
+        "visual_badge": {
+          "label": "🧑‍🚀 নভোচারী প্রশিক্ষণ",
+          "value": "৪ জন ব্যোমযাত্রী",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "ভারতের মহাকাশ স্বপ্নের উড়ান",
+        "body": "গগনযান শুধু একটি মিশন নয়, এটি ভারতের প্রযুক্তিগত স্বনির্ভরতা এবং বৈজ্ঞানিক উচ্চাকাঙ্ক্ষার প্রতীক। এই মিশন মহাকাশ গবেষণায় নতুন দিগন্ত উন্মোচন করবে, তরুণ প্রজন্মকে বিজ্ঞান ও প্রকৌশলে আগ্রহী করে তুলবে এবং বিশ্ব মঞ্চে ভারতের অবস্থান আরও সুদৃঢ় করবে। এটি এক নতুন ভারতের স্বপ্ন, যা মহাকাশেও নিজেদের সক্ষমতা প্রমাণ করতে প্রস্তুত।",
+        "image_query": "gaganayaan orbital module in space",
+        "visual_badge": {
+          "label": "🇮🇳 মহাকাশে ভারতের ছাপ",
+          "value": "বৈশ্বিক স্বীকৃতি",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "তথ্যটি ভালো লেগেছে কি? 💡",
+        "body": "Follow @choicematrix প্রতিদিনের সেরা টেক ট্রেন্ড, শিক্ষা ও উদ্ভাবনের আপডেটের জন্য! 🚀🔥✨\n\n📌 পোস্টটি সেভ করে রাখুন\n↗️ বন্ধুদের সাথে শেয়ার করুন"
+      }
+    ],
+    "unsplash_query": "indian space mission rocket launch",
+    "image": "posts/2026-11-04_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-04_evening-v1-slide1.jpg",
+      "posts/2026-11-04_evening-v1-slide2.jpg",
+      "posts/2026-11-04_evening-v1-slide3.jpg",
+      "posts/2026-11-04_evening-v1-slide4.jpg",
+      "posts/2026-11-04_evening-v1-slide5.jpg",
+      "posts/2026-11-04_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "e3bb46a31ff5f4b315a600ac7cbf45a8588e011efbdbd842b71baba3643a9090",
+    "status": "approved",
+    "approved_at": "2026-11-04T05:03:08.629897+00:00",
+    "approval_hash": "14dda387be0b817a2ce7f533f94149966a18d8fb5827692b099695def9de7f33",
+    "fb": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-04T03:31:26.282365+00:00"
   }
 }
