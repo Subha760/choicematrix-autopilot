@@ -2730,15 +2730,16 @@
       "id": "1279646595235354_122135296887465406"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18077412083765889",
+      "container": "18122549912470290",
       "attempted_at": "2026-11-04T08:30:27.242498+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-04T08:31:02.283120+00:00"
     },
     "created_at": "2026-11-04T03:30:38.679281+00:00"
   },
