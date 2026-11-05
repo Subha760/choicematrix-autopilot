@@ -2952,15 +2952,14 @@
     "approved_at": "2026-11-05T04:53:52.021685+00:00",
     "approval_hash": "3e683995b0c9d77284016be6d8e0fd735a1394f26c2de1a9fa3924729fe8218d",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122135651565465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-05T14:30:04.327113+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-05T14:30:19.002400+00:00"
     },
     "threads": {
       "status": "not_started",
