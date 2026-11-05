@@ -2948,13 +2948,14 @@
     ],
     "recommended_audio": null,
     "image_sha256": "a389251e9b2c878483b6c429ac31c0a5a0be359be92986f03f9d93d3d21842ff",
-    "status": "approved",
+    "status": "publishing",
     "approved_at": "2026-11-05T04:53:52.021685+00:00",
     "approval_hash": "3e683995b0c9d77284016be6d8e0fd735a1394f26c2de1a9fa3924729fe8218d",
     "fb": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-05T14:30:04.327113+00:00"
     },
     "ig": {
       "status": "not_started",
@@ -3060,26 +3061,24 @@
     ],
     "recommended_audio": null,
     "image_sha256": "6b4aa3570c5115fdc970dea64d5781ed9b9dcc6f2a6992b386c35ce51aece68d",
-    "status": "needs_attention",
+    "status": "published",
     "approved_at": "2026-11-05T04:54:08.723292+00:00",
     "approval_hash": "4df4e88e01aa0ad56b95f46d01a567a7539eab66d8ebfae0e3a47e00168115c3",
     "fb": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
-      "attempted_at": "2026-11-05T08:30:16.242241+00:00"
+      "status": "published",
+      "id": "1279646595235354_122135572863465406"
     },
     "ig": {
       "status": "published",
-      "id": "18055590206810449",
-      "container": "18122672783470290",
-      "attempted_at": "2026-11-05T08:30:22.304075+00:00"
+      "id": "18101494799538296",
+      "container": "18122672825470290",
+      "attempted_at": "2026-11-05T08:30:30.191759+00:00"
     },
     "threads": {
       "status": "published",
-      "id": "18144285595722250",
-      "container": "17991045912113014",
-      "attempted_at": "2026-11-05T08:31:01.428397+00:00"
+      "id": "18637236223060339",
+      "container": "17991045945113014",
+      "attempted_at": "2026-11-05T08:31:08.021381+00:00"
     },
     "created_at": "2026-11-05T03:45:43.501442+00:00"
   }
