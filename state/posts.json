@@ -3070,9 +3070,10 @@
       "attempted_at": "2026-11-05T08:30:16.242241+00:00"
     },
     "ig": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-05T08:30:22.304075+00:00"
     },
     "threads": {
       "status": "not_started",
