@@ -3292,13 +3292,13 @@
     "approval_hash": "71c31cd77da5c7d44844273030458b4224a38f701975abcd5dd5de906919978b",
     "fb": {
       "status": "published",
-      "id": "1279646595235354_122135944521465406"
+      "id": "1279646595235354_122135945103465406"
     },
     "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-06T14:30:20.294592+00:00"
+      "attempted_at": "2026-11-06T14:30:28.561675+00:00"
     },
     "threads": {
       "status": "not_started",
