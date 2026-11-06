@@ -3291,15 +3291,14 @@
     "approved_at": "2026-11-06T03:40:16.061201+00:00",
     "approval_hash": "71c31cd77da5c7d44844273030458b4224a38f701975abcd5dd5de906919978b",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122135944521465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-06T14:30:13.934636+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-06T14:30:20.294592+00:00"
     },
     "threads": {
       "status": "not_started",
