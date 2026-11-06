@@ -3178,15 +3178,14 @@
     "approved_at": "2026-11-06T03:40:02.457917+00:00",
     "approval_hash": "63effdee686065b7170552c4ba637cd3a0489632f1a4d490cc2ee17f62dfb254",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122135863113465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-06T08:30:14.250380+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-06T08:30:19.063686+00:00"
     },
     "threads": {
       "status": "not_started",
