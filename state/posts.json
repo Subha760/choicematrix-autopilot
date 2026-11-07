@@ -3408,16 +3408,16 @@
       "id": "1279646595235354_122136236415465406"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18036352820895189",
+      "container": "18122964557470290",
       "attempted_at": "2026-11-07T14:30:22.475556+00:00"
     },
     "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-07T14:30:39.104688+00:00"
+      "attempted_at": "2026-11-07T14:31:01.880631+00:00"
     },
     "created_at": "2026-11-07T03:31:03.685609+00:00"
   },
