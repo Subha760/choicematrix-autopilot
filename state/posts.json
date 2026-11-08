@@ -3630,16 +3630,14 @@
     "approved_at": "2026-11-08T04:13:58.248947+00:00",
     "approval_hash": "f72fad67a73970ec9c40244f59f3272c68000e225daf533c99f15817d19d5391",
     "fb": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
-      "attempted_at": "2026-11-08T08:30:07.438715+00:00"
+      "status": "published",
+      "id": "1279646595235354_122136425541465406"
     },
     "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-08T08:30:26.965870+00:00"
+      "attempted_at": "2026-11-08T08:30:29.081994+00:00"
     },
     "threads": {
       "status": "not_started",
