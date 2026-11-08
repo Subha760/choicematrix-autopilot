@@ -3737,12 +3737,13 @@
     ],
     "recommended_audio": null,
     "image_sha256": "b031ea41e1a3ec807ed921d7f864a38215fefefbae479f7bed8cf3dbb9e0a8fa",
-    "status": "pending",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-11-08T04:13:47.333010+00:00",
+    "approval_hash": "bffa7865c85134a684f345244651278eb21b008b6afbcfb01ceaf1f0cab7c320",
     "fb": {
       "status": "not_started",
-      "id": null
+      "id": null,
+      "container": null
     },
     "ig": {
       "status": "not_started",
