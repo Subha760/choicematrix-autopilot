@@ -3743,15 +3743,14 @@
     "approved_at": "2026-11-08T04:13:47.333010+00:00",
     "approval_hash": "bffa7865c85134a684f345244651278eb21b008b6afbcfb01ceaf1f0cab7c320",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122136500385465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-08T14:30:03.545549+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-08T14:30:18.108908+00:00"
     },
     "threads": {
       "status": "not_started",
