@@ -3533,5 +3533,227 @@
       "attempted_at": "2026-11-07T08:31:04.843822+00:00"
     },
     "created_at": "2026-11-07T03:45:41.160849+00:00"
+  },
+  "2026-11-08_afternoon": {
+    "date": "2026-11-08_afternoon",
+    "clean_date": "2026-11-08",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Taste of Tradition: Shared Meals",
+    "subtitle": "Discover how everyday cooking and communal eating are vibrant forms of living cultural heritage.",
+    "caption": "🚀 LIVING HERITAGE: IT'S IN YOUR KITCHEN!\n🔍 Today's Insight: We often think of heritage as ancient monuments or museum artifacts. But some of the richest cultural treasures are alive, breathing, and found in the everyday practices we share – especially around food and communal meals. This post unpacks how simple acts of cooking and eating together embody a vibrant, living heritage that connects generations.\n💡 CORE TAKEAWAYS:\n• ⚡ 1. Communal cooking is a dynamic knowledge system, passing down recipes, techniques, and stories.\n• 📊 2. Participating in these food traditions is an accessible way to actively engage with your cultural roots.\n• 🎯 3. Living heritage isn't static; it evolves, embracing new influences while retaining its core identity.\n🔥 WHY THIS MATTERS NOW: In a fast-paced world, rediscovering the wisdom and connection embedded in shared meal traditions offers a powerful anchor to our identity and community. It's a source of pride, learning, and belonging that anyone can tap into.\n💬 What's a food tradition from your heritage that you cherish? Share in the comments!\n#LivingHeritage #CulturalPractices #FoodTraditions #CommunityCooking #Choicematrix\n\nReference: UNESCO — Intangible Cultural Heritage — https://ich.unesco.org/en/what-is-intangible-heritage-00003",
+    "category": "Culture & Learning",
+    "content_type": "sourced",
+    "source": {
+      "label": "UNESCO — Intangible Cultural Heritage",
+      "url": "https://ich.unesco.org/en/what-is-intangible-heritage-00003"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "Unlock Living Heritage",
+        "body": "Often, we view heritage through dusty books or ancient stones. But what if the most vibrant cultural treasures are found in your kitchen? Everyday acts of cooking and sharing meals are powerful, living traditions that connect us directly to generations past and present. Discover how these simple practices embody a rich, accessible form of cultural heritage.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "traditional family cooking food together vibrant"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "More Than Just Food",
+        "body": "Communal cooking extends far beyond just preparing food; it's a living library where generations transmit invaluable knowledge. From the precise measurements of a spice blend to the rhythmic movements of kneading dough, every act is a lesson. These traditions embed not just recipes, but stories, values, and social customs, forming a dynamic repository of cultural identity. Understanding this core mechanism reveals how everyday kitchen activities are profound acts of cultural continuity and learning, connecting us to a collective past and present.",
+        "image_query": "hands preparing traditional meal kitchen",
+        "visual_badge": {
+          "label": "👥 KNOWLEDGE TRANSFER",
+          "value": "Generational Wisdom",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "Your Daily Heritage Practice",
+        "body": "To actively participate in this living heritage, start small. Cook a family recipe with an elder, documenting their techniques and stories. Explore local markets for traditional ingredients and learn how they're used. Attend community cooking workshops or food festivals. The key is engagement: don't just consume, create. By observing, asking questions, and getting your hands dirty, you become a direct link in the chain of cultural transmission, ensuring these practices thrive.",
+        "image_query": "family cooking together recipe book",
+        "visual_badge": {
+          "label": "💡 ACTIVE PARTICIPATION",
+          "value": "Daily Practice",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "Beyond the Recipe Card",
+        "body": "Living heritage isn't a static artifact; it's a vibrant, evolving process. The nuance lies in recognizing that while core elements persist, traditions naturally adapt to new ingredients, tools, and social contexts. Embrace this evolution – a new twist on an old recipe isn't a betrayal, but a continuation. Focus on the 'why' behind the 'what' – the community, the celebration, the sustenance – rather than rigid adherence. This flexibility ensures cultural practices remain relevant and cherished across generations.",
+        "image_query": "spices ingredients hands seasoning food",
+        "visual_badge": {
+          "label": "🔄 EVOLVING TRADITIONS",
+          "value": "Adapt & Thrive",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "Embrace Your Culinary Legacy",
+        "body": "Ultimately, embracing your culinary legacy means recognizing that living heritage is personal, active, and deeply enriching. It's about finding pride in the everyday acts of cooking and sharing meals that have defined your community and family for ages. By consciously engaging with these traditions, you don't just preserve history; you actively participate in its making, fostering a profound sense of connection, belonging, and cultural pride. Your kitchen is a classroom, and every meal a celebration of identity.",
+        "image_query": "happy community gathering celebration food",
+        "visual_badge": {
+          "label": "🌍 CULTURAL PRIDE",
+          "value": "Connect & Belong",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "cultural cooking shared meal",
+    "image": "posts/2026-11-08_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-08_afternoon-v1-slide1.jpg",
+      "posts/2026-11-08_afternoon-v1-slide2.jpg",
+      "posts/2026-11-08_afternoon-v1-slide3.jpg",
+      "posts/2026-11-08_afternoon-v1-slide4.jpg",
+      "posts/2026-11-08_afternoon-v1-slide5.jpg",
+      "posts/2026-11-08_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "ae2590cfb92cb8050749a256d82723ca007193f42dc6feab44375b3a10f91686",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-08T03:30:43.079616+00:00"
+  },
+  "2026-11-08_evening": {
+    "date": "2026-11-08_evening",
+    "clean_date": "2026-11-08",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 1,
+    "title": "পদ্মাপারের আশার আলো",
+    "subtitle": "ক্রিকেট কূটনীতি ও মানবিক সম্পর্ক: কীভাবে খেলাধুলা রাজনৈতিক বাধা পেরিয়ে সাংস্কৃতিক ঐক্য গড়ে তোলে।",
+    "caption": "🚀 [পদ্মাপারের দেশে আশার নবদিল্লি] 🔍 [কী ঘটছে]: ভারত-বাংলাদেশ সম্পর্কের রাজনৈতিক জটিলতার ভিড়েও ক্রিকেটের মাধ্যমে নতুন করে সংযুক্তির সুযোগ দেখা দিয়েছে। কোহলি ও শুভমনের সম্ভাব্য সফর শুধু একটি ক্রীড়া ঘটনা নয়, বরং এটি দুই ভাই দেশের মানুষের হৃদয়ে ভাবনার বজ্রপাত। 💡 [মূল শিক্ষা]: • ⚡ ১. খেলাধুলা সীমান্ত পেরিয়ে যায়: ক্রিকেট একটি সাধারণ ভাষা যা রাজনৈতিক বাধা পেরিয়ে মানুষের মন জয় করে। • 📊 ২. সাংস্কৃতিক ঐক্য: বাংলার সাংস্কৃতিক মূল্যবোধ ও আবেগ দুই দেশের মানুষকে এক করে তোলে। • 🎯 ৩. আশার সংকেত: এই সফর দুই দেশের কূটনৈতিক সম্পর্ক উষ্ণ করার একটি শক্তিশালী কারিগরি হতে পারে। 🔥 [এখন এটি কেন গুরুত্বপূর্ণ]: বর্তমানের জটিল রাজনৈতিক পরিবেশে, ক্রিকেটের মাধ্যমে মানবিক সংযোগ স্থাপন করা একমাত্র পথ যেখানে রাজনীতি নয়, মানুষের অধিকার প্রাধান্য পায়। 💬 [আপনার মতামত]: আপনার কি মনে হয় ক্রিকেট রাজনৈতিক বাধা পেরিয়ে সাংস্কৃতিক ঐক্য গড়ে তুলতে পারে? কমেন্টে জানান! #Choicematrix #BengalCulture #CricketDiplomacy #HopeAcrossBorders\n\nReference: Anandabazar Patrika — https://news.google.com/rss/articles/CBMitgFBVV95cUxQdFdnY1VtcVFOV28zcE44aEtsQ3dyVm16YUxCeWJXeC1DOVdqTmpTZXZvQ2xvYmh4R0UxLTdQOEpLbVhoWnB5QVNubXZZdENQaDh0dkM4dkJBelF5TDZuUWctNzF4cXo4dVJiVU5fVURTU2RBUExTd3MyRmxXZVhYRW0wZTExNkFmS1RWZkRYQWxucktmenZPcm50TVgzbERtME1rNjBJRkN0MG9DUk1aX2VRMVVkUdIBuwFBVV95cUxPSjBuYy1ZemhhVXdya3BNbHhOMFprT0tSd09TNFpkX25sSjNKdGdpWDh1M1QzTUFSYm5fLVVraDRpU3plWUxkREZwRVEyTHNfVDVFRERCZ192T3Rtc2M4dThEc3R1ZHJhVWZleHVLZV9NbGl5YTM0dkFDQXc1LS11QjVIVXItY01XWDNTMVNLTGpjTTNWZExlbEMtS2ZsTi0tcVhVeURRUkZRelU1UHJ2UWRadDR5X2ZrQU00?oc=5",
+    "category": "বাংলার স্মরণীয় মনীষী ও গল্প",
+    "content_type": "practical",
+    "source": {
+      "label": "Anandabazar Patrika",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQdFdnY1VtcVFOV28zcE44aEtsQ3dyVm16YUxCeWJXeC1DOVdqTmpTZXZvQ2xvYmh4R0UxLTdQOEpLbVhoWnB5QVNubXZZdENQaDh0dkM4dkJBelF5TDZuUWctNzF4cXo4dVJiVU5fVURTU2RBUExTd3MyRmxXZVhYRW0wZTExNkFmS1RWZkRYQWxucktmenZPcm50TVgzbERtME1rNjBJRkN0MG9DUk1aX2VRMVVkUdIBuwFBVV95cUxPSjBuYy1ZemhhVXdya3BNbHhOMFprT0tSd09TNFpkX25sSjNKdGdpWDh1M1QzTUFSYm5fLVVraDRpU3plWUxkREZwRVEyTHNfVDVFRERCZ192T3Rtc2M4dThEc3R1ZHJhVWZleHVLZV9NbGl5YTM0dkFDQXc1LS11QjVIVXItY01XWDNTMVNLTGpjTTNWZExlbEMtS2ZsTi0tcVhVeURRUkZRelU1UHJ2UWRadDR5X2ZrQU00?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "পদ্মাপারের আশার আলো",
+        "body": "রাজনৈতিক বাধা পেরিয়ে ক্রিকেটের মাধ্যমে নতুন সংযোগের সম্ভাবনা। কোহলি-শুভমনদের সম্ভাব্য সফর শুধু খেলা নয়, বরং দুই ভাই দেশের মানুষের মনের মধ্যে একটি বড় আলো জ্বালানোর কারিগরি। এই সফর কীভাবে সাংস্কৃতিক ঐক্য গড়ে তুলবে, তা জানতে সোয়াইপ করুন।",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "cricket stadium floodlights night"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "ক্রিকেট কূটনীতির গভীরতা",
+        "body": "ক্রিকেট মাত্র একটি খেলা নয়, এটি একটি সাংস্কৃতিক ও মানবিক প্ল্যাটফর্ম। ঐতিহাসিকভাবে দেখা গেছে যে, রাজনৈতিক বাধার মুখেও ক্রিকেট মানুষের মন জয় করে। পদ্মাপারের দেশে এই খেলার প্রতি আবেগপূর্ণ অনুরাগ রয়েছে, যা রাজনৈতিক বাধা পেরিয়ে যায়। এই সফর সেই আবেগকে কাজে লাগানোর একটি সুযোগ।",
+        "image_query": "cricket bat close up wood",
+        "visual_badge": {
+          "label": "📍 LOCATION",
+          "value": "বাংলাদেশ",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "মানবিক সংযোগের ভূমিকা",
+        "body": "খেলাধুলা মানুষের মন জয় করার সবচেয়ে কার্যকরী মাধ্যম। কোহলি ও শুভমনের মতো স্টার প্লেয়ারদের উপস্থিতি শুধু প্রাচুর্য আনে না, বরং সাংস্কৃতিক ঐক্যের একটি শক্তিশালী কারিগরি হিসেবে কাজ করে। এই সফর দুই দেশের মানুষের মধ্যে আবেগপূর্ণ সংযোগ স্থাপনে ভূমিকা রাখবে, যা রাজনৈতিক বাধা পেরিয়ে যায়।",
+        "image_query": "crowd cheering stadium lights",
+        "visual_badge": {
+          "label": "📊 IMPACT",
+          "value": "সাংস্কৃতিক ঐক্য",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "সাংস্কৃতিক ঐক্যের গুরুত্ব",
+        "body": "বাংলার সাংস্কৃতিক মূল্যবোধ ও আবেগ দুই দেশের মানুষকে এক করে তোলে। ক্রিকেটের মাধ্যমে এই সাংস্কৃতিক ঐক্যকে আরও শক্তিশালী করা সম্ভব। এই সফর শুধু খেলা নয়, বরং দুই দেশের মানুষের মনের মধ্যে একটি বড় আলো জ্বালানোর কারিগরি।",
+        "image_queue": "bengal traditional art painting",
+        "visual_badge": {
+          "label": "🎯 GOAL",
+          "value": "মানবিক সংযোগ",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "আশার নবদিল্লি",
+        "body": "ক্রিকেটের মাধ্যমে রাজনৈতিক বাধা পেরিয়ে সাংস্কৃতিক ঐক্য গড়ে তোলার সম্ভাবনা। কোহলি-শুভমনদের সফর দুই দেশের মানুষের মনের মধ্যে আশার আলো দেখা দেবে। এই সফর কীভাবে মানবিক সংযোগ স্থাপনে ভূমিকা রাখবে, তা এখনই জানুন।",
+        "image_query": "sunset over river bengal",
+        "visual_badge": {
+          "label": "🚀 FUTURE",
+          "value": "নতুন সংযোগ",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "তথ্যটি ভালো লেগেছে কি? 💡",
+        "body": "Follow @choicematrix প্রতিদিনের সেরা টেক ট্রেন্ড, শিক্ষা ও উদ্ভাবনের আপডেটের জন্য! 🚀🔥✨\n\n📌 পোস্টটি সেভ করে রাখুন\n↗️ বন্ধুদের সাথে শেয়ার করুন"
+      }
+    ],
+    "unsplash_query": "cricket stadium floodlights night",
+    "image": "posts/2026-11-08_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-08_evening-v1-slide1.jpg",
+      "posts/2026-11-08_evening-v1-slide2.jpg",
+      "posts/2026-11-08_evening-v1-slide3.jpg",
+      "posts/2026-11-08_evening-v1-slide4.jpg",
+      "posts/2026-11-08_evening-v1-slide5.jpg",
+      "posts/2026-11-08_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "ffe5a0fdcaa9ecc27954cbf4182b4c4f331e3fbeba7b18efaed2bb9b59d584c5",
+    "status": "rejected",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-08T03:31:27.516972+00:00"
   }
 }
