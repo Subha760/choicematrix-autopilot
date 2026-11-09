@@ -3856,15 +3856,14 @@
     "approved_at": "2026-11-09T06:04:46.229350+00:00",
     "approval_hash": "cf439ace7f9c85a7b6ef0b56de6ac69275fb554f7578e25f823d7609510472fb",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122136755367465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-09T08:30:14.277444+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-09T08:30:22.922907+00:00"
     },
     "threads": {
       "status": "not_started",
