@@ -3964,15 +3964,14 @@
     "approved_at": "2026-11-09T06:04:31.203280+00:00",
     "approval_hash": "5abaa7750f3eca1fff9f2b906cba9827d9afb7b6c1d1eed62561c765cb96aa63",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122136840141465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-09T14:30:27.631660+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-09T14:30:35.805169+00:00"
     },
     "threads": {
       "status": "not_started",
