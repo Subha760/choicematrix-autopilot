@@ -3857,13 +3857,13 @@
     "approval_hash": "cf439ace7f9c85a7b6ef0b56de6ac69275fb554f7578e25f823d7609510472fb",
     "fb": {
       "status": "published",
-      "id": "1279646595235354_122136755367465406"
+      "id": "1279646595235354_122136755655465406"
     },
     "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-09T08:30:22.922907+00:00"
+      "attempted_at": "2026-11-09T08:30:28.304131+00:00"
     },
     "threads": {
       "status": "not_started",
