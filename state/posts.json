@@ -4196,16 +4196,16 @@
       "id": "1279646595235354_122137167225465406"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18075128948777699",
+      "container": "18123343775470290",
       "attempted_at": "2026-11-10T14:30:19.589603+00:00"
     },
     "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-10T14:30:20.625436+00:00"
+      "attempted_at": "2026-11-10T14:31:00.246846+00:00"
     },
     "created_at": "2026-11-10T03:45:43.711372+00:00"
   }
