@@ -4192,15 +4192,14 @@
     "approved_at": "2026-11-10T06:30:40.452507+00:00",
     "approval_hash": "e1bb6c4867ce8907a15d52457fdfb13624f5ec3d540540efd0090f63f16f8cd8",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122137167225465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-10T14:30:03.113070+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-10T14:30:19.589603+00:00"
     },
     "threads": {
       "status": "not_started",
