@@ -4527,15 +4527,14 @@
     "approved_at": "2026-11-12T04:36:56.154893+00:00",
     "approval_hash": "cf22f1571468195c0ed5bf1b348b997ee064942328acb882c50e88d73693083e",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122137742367465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-12T08:30:03.259631+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-12T08:30:18.693281+00:00"
     },
     "threads": {
       "status": "not_started",
