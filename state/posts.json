@@ -4640,15 +4640,14 @@
     "approved_at": "2026-11-12T04:37:00.539840+00:00",
     "approval_hash": "1b90ea0b50e049b3d2852ee9bb27ddff44f647bf349d3ee8da5b2b8c0134723f",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122137817499465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-12T14:30:07.448273+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-12T14:30:26.833454+00:00"
     },
     "threads": {
       "status": "not_started",
