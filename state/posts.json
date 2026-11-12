@@ -4319,5 +4319,116 @@
       "container": null
     },
     "created_at": "2026-11-11T03:31:04.974904+00:00"
+  },
+  "2026-11-11_afternoon": {
+    "date": "2026-11-11_afternoon",
+    "clean_date": "2026-11-11",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "JWST's Hidden Planet Discovery",
+    "subtitle": "Astronomers uncover a previously unnoticed exoplanet in archival James Webb Space Telescope images, revealing new cosmic secrets.",
+    "caption": "🚀 UNSEEN WORLDS REVEALED!\n\n🔍 WHAT HAPPENED TODAY: The James Webb Space Telescope continues to astound! Astronomers have just announced the discovery of a 'hidden' alien planet, not from new observations, but by meticulously re-examining archival data. This groundbreaking find suggests our universe holds even more secrets within data we already possess.\n\n💡 CORE TAKEAWAYS:\n• ⚡️ Data Re-evaluation Power: This discovery highlights the immense value of revisiting existing high-resolution datasets with fresh perspectives and advanced analysis tools.\n• 📊 New Exoplanet Hunting Frontier: It opens a new avenue for exoplanet detection, focusing on mining previously collected JWST images for overlooked celestial bodies.\n• 🎯 JWST's Unmatched Detail: The Webb telescope's incredible resolution allows for such intricate discoveries, pushing the boundaries of what we thought possible in exoplanet research.\n\n🔥 WHY THIS MATTERS NOW: This isn't just another planet; it's a testament to human ingenuity and the sheer power of our most advanced instruments. It reminds us that the cosmos is brimming with surprises, constantly challenging our understanding and inspiring us to look deeper, even into what's already in front of us.\n\n💬 CALL TO ACTION QUESTION: What do you think this discovery means for the search for extraterrestrial life? Share your thoughts below!\n\n#HiddenPlanet #JWST #CosmicDiscovery #Exoplanet #ScienceNews #Choicematrix\n\nReference: Science Daily — https://news.google.com/rss/articles/CBMib0FVX3lxTFBnMzZIMTdyMXdtSDFpY1BRdUlMcXp4MzRxdnc3XzNmd0tiMTluTXRVdzdHY09HLXhVSllCenMwYWllajJFSXZlc0htcGNVSVQtT3B2enlwY2JQLW9Ddlh2UmJ4OVJVLWlkWkZWMzlKSQ?oc=5",
+    "category": "Cosmos & Deep Science Mysteries",
+    "content_type": "practical",
+    "source": {
+      "label": "Science Daily",
+      "url": "https://news.google.com/rss/articles/CBMib0FVX3lxTFBnMzZIMTdyMXdtSDFpY1BRdUlMcXp4MzRxdnc3XzNmd0tiMTluTXRVdzdHY09HLXhVSllCenMwYWllajJFSXZlc0htcGNVSVQtT3B2enlwY2JQLW9Ddlh2UmJ4OVJVLWlkWkZWMzlKSQ?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "Alien World Unveiled",
+        "body": "The James Webb Space Telescope, our eye into the cosmos, has once again delivered a revelation. Astronomers have found a 'hidden' alien planet, not through new observations, but by meticulously re-examining data already collected. This groundbreaking discovery showcases the immense potential of deep analysis in unlocking the universe's most guarded secrets.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "James Webb telescope deep space"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "JWST's Cosmic Detective Work",
+        "body": "This 'new' exoplanet wasn't a fresh catch but rather an overlooked signal within existing JWST archival data. Scientists, employing advanced image processing and analytical techniques, identified subtle light variations or gravitational tugs that had previously gone unnoticed. This highlights how even the most sophisticated instruments require persistent human ingenuity to fully interpret their vast data output, effectively turning archived observations into new hunting grounds.",
+        "image_query": "astronomer analyzing data",
+        "visual_badge": {
+          "label": "DATA RE-ANALYSIS",
+          "value": "UNEXPECTED FINDINGS",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "A New Exoplanet Hunting Strategy",
+        "body": "The method of discovering planets by re-evaluating existing high-resolution data marks a significant shift in exoplanet hunting strategies. Instead of solely focusing on new observational campaigns, researchers can now mine the rich archives of telescopes like JWST for hidden gems. This approach could dramatically accelerate the rate of exoplanet discoveries, potentially revealing a trove of worlds that were always there, just waiting for a closer look with refined analytical tools.",
+        "image_query": "exoplanet transit light curve",
+        "visual_badge": {
+          "label": "METHODOLOGY SHIFT",
+          "value": "DATA MINING",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "The Road Ahead for 'Hidden Worlds'",
+        "body": "While incredibly promising, confirming such discoveries requires rigorous follow-up. Astronomers will now need to conduct additional observations to verify the planet's existence, characterize its orbit, and rule out any false positives. This process, often involving multi-wavelength studies and advanced atmospheric analysis, is crucial. However, the potential for discovering countless more worlds within existing data, perhaps even habitable ones, makes this a high-leverage area of future cosmic exploration.",
+        "image_query": "futuristic space probe",
+        "visual_badge": {
+          "label": "CONFIRMATION CHALLENGE",
+          "value": "MULTI-WAVELENGTH",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "Unlocking the Universe's Secrets",
+        "body": "This discovery profoundly reinforces the JWST's unparalleled capabilities and the power of persistent scientific inquiry. It teaches us that the universe holds boundless secrets, often hidden in plain sight, waiting for us to develop new ways of seeing and interpreting. Every pixel of data from our advanced telescopes could be a gateway to a new world, urging us to continue exploring, questioning, and pushing the boundaries of our cosmic understanding.",
+        "image_query": "galaxy spiral cosmic dust",
+        "visual_badge": {
+          "label": "COSMIC POTENTIAL",
+          "value": "UNLIMITED DISCOVERY",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "cosmic discovery James Webb",
+    "image": "posts/2026-11-11_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-11_afternoon-v1-slide1.jpg",
+      "posts/2026-11-11_afternoon-v1-slide2.jpg",
+      "posts/2026-11-11_afternoon-v1-slide3.jpg",
+      "posts/2026-11-11_afternoon-v1-slide4.jpg",
+      "posts/2026-11-11_afternoon-v1-slide5.jpg",
+      "posts/2026-11-11_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "5fcc699220a7a4dedeb4a25bc96e1216940010760f92f9b7b740bd62c684c857",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-11T03:45:38.011689+00:00"
   }
 }
