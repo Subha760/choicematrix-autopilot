@@ -4531,16 +4531,16 @@
       "id": "1279646595235354_122137742367465406"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18606478843064949",
+      "container": "18123581513470290",
       "attempted_at": "2026-11-12T08:30:18.693281+00:00"
     },
     "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-12T08:30:32.476194+00:00"
+      "attempted_at": "2026-11-12T08:31:04.172251+00:00"
     },
     "created_at": "2026-11-12T03:30:40.861489+00:00"
   },
