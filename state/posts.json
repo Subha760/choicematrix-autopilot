@@ -4646,15 +4646,16 @@
       "attempted_at": "2026-11-12T14:30:07.448273+00:00"
     },
     "ig": {
-      "status": "attempting",
-      "id": null,
-      "container": null,
+      "status": "published",
+      "id": "18220978642349014",
+      "container": "18123613418470290",
       "attempted_at": "2026-11-12T14:30:27.113640+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-12T14:31:04.809792+00:00"
     },
     "created_at": "2026-11-12T03:31:29.709137+00:00"
   }
