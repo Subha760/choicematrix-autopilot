@@ -4866,15 +4866,14 @@
     "approved_at": "2026-11-13T03:44:36.916371+00:00",
     "approval_hash": "2ad4ec52a510b169a2185e350891ebff469920e4f70a9aa67cff5f8a57f8cfa0",
     "fb": {
+      "status": "published",
+      "id": "1279646595235354_122138198211465406"
+    },
+    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-13T14:30:05.623454+00:00"
-    },
-    "ig": {
-      "status": "not_started",
-      "id": null,
-      "container": null
+      "attempted_at": "2026-11-13T14:30:24.747397+00:00"
     },
     "threads": {
       "status": "not_started",
