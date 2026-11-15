@@ -5192,7 +5192,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "0b037801137d4c1d0ecfc900fd6bfa3804bfd49459b379c43ba24fd825d24d90",
-    "status": "publishing",
+    "status": "needs_attention",
     "approved_at": "2026-11-15T03:31:54.653724+00:00",
     "approval_hash": "c71a9e8235b47c29f929d3fc61f76e65e18406185b75146982d3bfd99818608e",
     "fb": {
@@ -5200,16 +5200,16 @@
       "id": "1279646595235354_122138685369465406"
     },
     "ig": {
-      "status": "published",
-      "id": "18037712948907689",
-      "container": "18123973592470290",
-      "attempted_at": "2026-11-15T08:30:23.448250+00:00"
-    },
-    "threads": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-15T08:31:16.153391+00:00"
+      "attempted_at": "2026-11-15T08:30:23.448250+00:00"
+    },
+    "threads": {
+      "status": "published",
+      "id": "18345058159276234",
+      "container": "17992617111113014",
+      "attempted_at": "2026-11-15T08:30:38.586919+00:00"
     },
     "created_at": "2026-11-15T03:30:33.993441+00:00"
   },
