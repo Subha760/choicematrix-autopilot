@@ -5310,9 +5310,10 @@
       "attempted_at": "2026-11-15T14:30:03.919835+00:00"
     },
     "ig": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-15T14:30:05.193009+00:00"
     },
     "threads": {
       "status": "not_started",
