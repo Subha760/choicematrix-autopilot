@@ -5192,12 +5192,13 @@
     ],
     "recommended_audio": null,
     "image_sha256": "0b037801137d4c1d0ecfc900fd6bfa3804bfd49459b379c43ba24fd825d24d90",
-    "status": "pending",
-    "approved_at": null,
-    "approval_hash": null,
+    "status": "approved",
+    "approved_at": "2026-11-15T03:31:54.653724+00:00",
+    "approval_hash": "c71a9e8235b47c29f929d3fc61f76e65e18406185b75146982d3bfd99818608e",
     "fb": {
       "status": "not_started",
-      "id": null
+      "id": null,
+      "container": null
     },
     "ig": {
       "status": "not_started",
