@@ -5635,7 +5635,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "55b4c26870a922ed07a17d0163f68805c76366d1452b20f5cb1f2fad7f372859",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -5746,7 +5746,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "d0d1850a1dda19e58ddc5241ee78aee7237675b8be2a0c83c1d56d556688d05e",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -5764,5 +5764,222 @@
       "container": null
     },
     "created_at": "2026-11-17T03:45:37.187877+00:00"
+  },
+  "2026-11-18_afternoon": {
+    "date": "2026-11-18_afternoon",
+    "clean_date": "2026-11-18",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Cosmic Giants Born in Silence",
+    "subtitle": "Astronomers discover a new, silent way black holes form, challenging everything we thought we knew about stellar death.",
+    "caption": "🚀 UNVEILING COSMIC GIANTS\n\n🔍 WHAT HAPPENED TODAY: In a groundbreaking discovery, astronomers have found rare black holes that formed when massive stars simply failed to go supernova. This challenges long-held theories about how stars die and opens a new window into the universe's most enigmatic objects.\n\n💡 CORE TAKEAWAYS:\n• ⚡ A new pathway: Not all black holes are born from violent supernova explosions. Some form when stars directly collapse.\n• 📊 Redefining stellar death: This discovery forces us to rethink fundamental models of stellar evolution and the lifecycle of massive stars.\n• 🎯 Unseen cosmic processes: It highlights the universe's hidden mechanisms, revealing that some of the most dramatic events unfold in silent, direct collapses.\n\n🔥 WHY THIS MATTERS NOW: This isn't just a niche astronomical finding; it's a profound shift in our understanding of cosmic mechanics. It helps explain the diversity of black holes observed and pushes the boundaries of astrophysics, reminding us how much more we have to learn about the vast cosmos.\n\n💬 What cosmic mystery fascinates you the most? Share below! 👇\n\n#Choicematrix #CosmicDiscovery #BlackHoles #SpaceScience #UniverseMysteries\n\nReference: Space — https://news.google.com/rss/articles/CBMixgFBVV95cUxQZjRqNFAzSnVZd0N6M29kdnJSbXNnWmQtNjY1ZWFRR3Zmd290dGVmQmF4VzdCSktVSDlzZUVFa1dsLVBDbWVRdmZiVC10QVFvYWV4VnNkYUdVOXN3MUxWVHcweUZhMjIzcVI3VDNaNGI1OVZNWV9WUmFidnJLOHp2QkJlU3ZYN2M2TnpjQmV5MHRNZkJOa1JSUDNzcjZKY0pHU1RfekFqZS11N1poZEdCaEsxNDJpWWJfdWJlY3ZsY3Y4bU02V1E?oc=5",
+    "category": "Cosmos & Deep Science Mysteries",
+    "content_type": "practical",
+    "source": {
+      "label": "Space",
+      "url": "https://news.google.com/rss/articles/CBMixgFBVV95cUxQZjRqNFAzSnVZd0N6M29kdnJSbXNnWmQtNjY1ZWFRR3Zmd290dGVmQmF4VzdCSktVSDlzZUVFa1dsLVBDbWVRdmZiVC10QVFvYWV4VnNkYUdVOXN3MUxWVHcweUZhMjIzcVI3VDNaNGI1OVZNWV9WUmFidnJLOHp2QkJlU3ZYN2M2TnpjQmV5MHRNZkJOa1JSUDNzcjZKY0pHU1RfekFqZS11N1poZEdCaEsxNDJpWWJfdWJlY3ZsY3Y4bU02V1E?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "Black Holes Born in Silence",
+        "body": "For decades, we believed black holes primarily formed from spectacular supernova explosions. But a recent discovery has turned this theory on its head: astronomers have found rare black holes that formed when massive stars simply failed to go supernova, collapsing directly under their own gravity. This mind-bending revelation opens a new chapter in understanding stellar death and cosmic evolution.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "black hole accretion disk"
+      },
+      {
+        "slide_number": 2,
+        "tag": "DECODING THE COSMOS",
+        "headline": "The 'Failed Supernova' Enigma",
+        "body": "Traditionally, black holes are the remnants of massive stars (at least 8 times the Sun's mass) that collapse and then explode as supernovae. However, some stars, particularly very massive ones, might skip this explosive phase. Instead, their core collapses directly into a black hole without the outward pressure of a supernova, creating these 'direct collapse' or 'failed supernova' black holes, which are incredibly hard to detect.",
+        "image_query": "collapsing star illustration",
+        "visual_badge": {
+          "label": "DISCOVERY TYPE",
+          "value": "Direct Collapse Black Hole",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "OBSERVATIONAL PROOF",
+        "headline": "Hunting Invisible Giants",
+        "body": "How do you find a black hole that doesn't announce its birth with a blinding explosion? Astronomers use sophisticated observational techniques, often looking for black holes in binary systems where they gravitationally influence a companion star. Advanced telescopes and gravitational wave observatories are crucial, detecting the subtle clues left behind by these 'silent' cosmic giants through their gravitational pull on surrounding matter.",
+        "image_query": "observatory telescope space",
+        "visual_badge": {
+          "label": "METHOD",
+          "value": "Binary System Observation",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "UNLOCKING SECRETS",
+        "headline": "Redefining Stellar Death",
+        "body": "This discovery holds profound implications for astrophysics. It suggests a more diverse range of stellar endpoints than previously imagined, impacting our understanding of how galaxies are chemically enriched and the distribution of black hole masses across the universe. These 'failed supernova' black holes represent a crucial missing piece in the complex puzzle of stellar evolution, prompting a reevaluation of current models.",
+        "image_query": "stellar evolution diagram",
+        "visual_badge": {
+          "label": "IMPACT",
+          "value": "Stellar Evolution Models",
+          "type": "chart"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "COSMIC PERSPECTIVE",
+        "headline": "The Universe's Hidden Processes",
+        "body": "This groundbreaking finding serves as a powerful reminder that the universe is a realm of endless surprises, with processes we are only just beginning to comprehend. It highlights the dynamic and often counter-intuitive nature of cosmic phenomena, urging us to continuously question established paradigms and push the boundaries of scientific inquiry. The silent formation of black holes is a testament to the cosmos's mysterious elegance.",
+        "image_query": "galaxy cluster formation"
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "celestial black hole nebula",
+    "image": "posts/2026-11-18_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-18_afternoon-v1-slide1.jpg",
+      "posts/2026-11-18_afternoon-v1-slide2.jpg",
+      "posts/2026-11-18_afternoon-v1-slide3.jpg",
+      "posts/2026-11-18_afternoon-v1-slide4.jpg",
+      "posts/2026-11-18_afternoon-v1-slide5.jpg",
+      "posts/2026-11-18_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "4e525ad389d9fb71b9b25467a849c15298d3a01a97dc8946eedfddac8b23d640",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-18T03:30:46.763927+00:00"
+  },
+  "2026-11-18_evening": {
+    "date": "2026-11-18_evening",
+    "clean_date": "2026-11-18",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Bengali",
+    "revision": 1,
+    "title": "ইসরোর শিখরে বাঙালি স্বপ্ন",
+    "subtitle": "সাধারণ পরিবার থেকে মহাকাশ গবেষণার শীর্ষে সৌম্যদীপের অসাধারণ যাত্রার গল্প।",
+    "caption": "🚀 **ইসরোর শিখরে এক বাঙালির বিজয়গাথা!**\n\n🔍 **আজকের খবর:** পশ্চিমবঙ্গের এক সাধারণ পরিবার থেকে উঠে এসে কীভাবে সৌম্যদীপ ইসরোর মতো মহাকাশ গবেষণা সংস্থার এক গুরুত্বপূর্ণ অংশ হয়ে উঠলেন, সেই অসাধারণ গল্প নিয়ে আমরা আজ হাজির। তার এই যাত্রা শুধু ব্যক্তিগত সাফল্য নয়, গোটা বাংলার কাছে এক বিরাট অনুপ্রেরণা। এটি প্রমাণ করে যে, স্বপ্ন আর কঠোর পরিশ্রমের সঠিক সংমিশ্রণ যেকোনো অসম্ভবকে সম্ভব করে তুলতে পারে।\n\n💡 **মূল বার্তা:**\n• ⚡ **অদম্য জেদ:** প্রতিকূলতার মাঝেও নিজের লক্ষ্যে অবিচল থাকা।\n• 📊 **মেধার উন্মোচন:** সঠিক শিক্ষার মাধ্যমে নিজের সম্ভাবনাকে কাজে লাগানো।\n• 🎯 **জাতীয় গর্ব:** মহাকাশ গবেষণায় বাঙালির অবদান এবং দেশের জন্য সম্মান বয়ে আনা।\n\n🔥 **কেন এটি গুরুত্বপূর্ণ:** সৌম্যদীপের গল্প হাজার হাজার তরুণ-তরুণীকে বিজ্ঞান ও গবেষণার প্রতি আগ্রহী করে তুলবে। এটি আমাদের মনে করিয়ে দেয় যে, দেশের প্রতিটি কোণায় লুকিয়ে আছে অপার সম্ভাবনা, যা সঠিক সুযোগ পেলে মহাবিশ্বের রহস্য উন্মোচনে সহায়ক হতে পারে।\n\n💬 **আপনারা কি এমন কোনো অনুপ্রেরণামূলক গল্প জানেন? কমেন্টে জানান!**\n\n#SoumyadeepISRO #BengaliPride #ISROSuccess #SpaceScience #Choicematrix\n\nReference: Calcutta News LIVE TV — https://news.google.com/rss/articles/CBMi3gFBVV95cUxNZkFnMlEwSHNlanZaWmZNbmI1RHJRajFCVy1JYloxeXVSQkFnT0JFT1RieUpTRFNOdGRxZUtCS3lwUFAtMzF0Rl9DcEJzRVktQm1Ma1VLb205ZHpfazJYN0lCSXVUWDZWYU1md2ZtbVFZSkxxUld4OUdmT2ZmQjg1RUlwd2w4VVF3dERoVndUYjhsRXl5REQwLTJwNUQxVTlMdGtEXzY4RUJaY21ybHNhMExWQ3lCNVl2S01wS1p3X3JLbFRzSlN6NmpDcXVJQlZRVG9xUjAtXy1QZ1dFcVE?oc=5",
+    "category": "মহাকাশ বিজ্ঞান ও গবেষণার রহস্য",
+    "content_type": "practical",
+    "source": {
+      "label": "Calcutta News LIVE TV",
+      "url": "https://news.google.com/rss/articles/CBMi3gFBVV95cUxNZkFnMlEwSHNlanZaWmZNbmI1RHJRajFCVy1JYloxeXVSQkFnT0JFT1RieUpTRFNOdGRxZUtCS3lwUFAtMzF0Rl9DcEJzRVktQm1Ma1VLb205ZHpfazJYN0lCSXVUWDZWYU1md2ZtbVFZSkxxUld4OUdmT2ZmQjg1RUlwd2w4VVF3dERoVndUYjhsRXl5REQwLTJwNUQxVTlMdGtEXzY4RUJaY21ybHNhMExWQ3lCNVl2S01wS1p3X3JLbFRzSlN6NmpDcXVJQlZRVG9xUjAtXy1QZ1dFcVE?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "সাধারণ থেকে ইসরোর শীর্ষে",
+        "body": "পশ্চিমবঙ্গের এক সাধারণ পরিবার থেকে উঠে এসে ইসরোর মতো মহাকাশ গবেষণা সংস্থার গুরুত্বপূর্ণ পদে আসীন হওয়া – এ যেন এক রূপকথার গল্প। সৌম্যদীপের এই যাত্রা শুধু তার ব্যক্তিগত সাফল্য নয়, গোটা বাংলার কাছে এক বিরাট অনুপ্রেরণা। মহাকাশের অজানা রহস্য উন্মোচনে তার অবদান ভারতের বিজ্ঞানচর্চাকে নতুন দিশা দেখাচ্ছে।",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "Young bengali man looking at ISRO rocket"
+      },
+      {
+        "slide_number": 2,
+        "tag": "স্বপ্ন ও বিজ্ঞান",
+        "headline": "প্রাথমিক সংগ্রাম ও মেধার উন্মোচন",
+        "body": "ছোটবেলা থেকেই সৌম্যদীপের চোখে ছিল মহাকাশের প্রতি অদম্য কৌতূহল। প্রতিকূল পরিস্থিতি সত্ত্বেও, অদম্য জেদ আর কঠোর পরিশ্রমে তিনি বিজ্ঞান শিক্ষায় নিজেকে উৎসর্গ করেন। তার এই প্রাথমিক ভিত্তিই তাকে ইসরোর মতো প্রতিষ্ঠানের জন্য প্রস্তুত করে তোলে, যেখানে প্রতিটি চ্যালেঞ্জ মহাবিশ্বের নতুন দিক উন্মোচনের সুযোগ নিয়ে আসে।",
+        "visual_badge": {
+          "label": "মেধার পথ",
+          "value": "অদম্য কৌতূহল",
+          "type": "badge"
+        },
+        "image_query": "Young student studying science books night"
+      },
+      {
+        "slide_number": 3,
+        "tag": "ইসরোর পথে",
+        "headline": "কঠোর পরিশ্রমের ফল: ইসরোর আহ্বান",
+        "body": "ইসরোতে প্রবেশ করা কোনো সহজ কাজ নয়; এটি অগণিত মেধাবী শিক্ষার্থীর স্বপ্ন। সৌম্যদীপ কঠোর প্রতিযোগিতার মধ্যে দিয়ে নিজের যোগ্যতা প্রমাণ করেছেন। তার অধ্যাবসায়, আধুনিক বৈজ্ঞানিক জ্ঞান এবং প্রযুক্তিগত দক্ষতা তাকে এই মর্যাদাপূর্ণ প্রতিষ্ঠানে স্থান করে নিতে সাহায্য করেছে। এটি কেবল একটি চাকরি নয়, মহাকাশ গবেষণায় নিজেকে সঁপে দেওয়ার এক অঙ্গীকার।",
+        "visual_badge": {
+          "label": "সাফল্যের হার",
+          "value": "শীর্ষ ১%",
+          "type": "chart"
+        },
+        "image_query": "ISRO building with satellite dishes"
+      },
+      {
+        "slide_number": 4,
+        "tag": "মহাকাশে অবদান",
+        "headline": "মহাকাশ গবেষণায় সৌম্যদীপের ভূমিকা",
+        "body": "ইসরোতে সৌম্যদীপের কাজ মহাকাশ গবেষণার বিভিন্ন অত্যাধুনিক দিককে স্পর্শ করে। স্যাটেলাইট ডিজাইন থেকে শুরু করে রকেট প্রযুক্তির উন্নয়ন, অথবা মহাকাশ থেকে প্রাপ্ত ডেটা বিশ্লেষণ – তার অবদান ভারতের মহাকাশ অভিযানকে আরও শক্তিশালী করছে। তিনি আমাদের সৌরজগতের গভীরতম রহস্য ভেদ করতে এবং মহাবিশ্বের নতুন দিগন্ত উন্মোচনে গুরুত্বপূর্ণ ভূমিকা পালন করছেন।",
+        "visual_badge": {
+          "label": "গবেষণার ক্ষেত্র",
+          "value": "স্যাটেলাইট ও রকেট",
+          "type": "badge"
+        },
+        "image_query": "Scientist working on satellite model"
+      },
+      {
+        "slide_number": 5,
+        "tag": "অনুপ্রেরণার উৎস",
+        "headline": "স্বপ্নপূরণের বার্তা: সবার জন্য শিক্ষা",
+        "body": "সৌম্যদীপের গল্প প্রমাণ করে যে, সঠিক দিকনির্দেশনা, কঠোর পরিশ্রম এবং অদম্য ইচ্ছাশক্তি থাকলে যেকোনো সাধারণ পরিবার থেকেও অসাধারণ সাফল্য অর্জন করা সম্ভব। তার এই যাত্রা শুধু বিজ্ঞানীদের নয়, প্রতিটি স্বপ্নবান তরুণ-তরুণীকে অনুপ্রাণিত করবে বিজ্ঞান ও গবেষণার জগতে নিজেদের অবদান রাখতে। এটি বাঙালি হিসেবে আমাদের গর্বকে আরও বাড়িয়ে তোলে।",
+        "visual_badge": {
+          "label": "প্রেরণা",
+          "value": "অগণিত তরুণ-তরুণী",
+          "type": "badge"
+        },
+        "image_query": "Group of young students looking at stars"
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "তথ্যটি ভালো লেগেছে কি? 💡",
+        "body": "Follow @choicematrix প্রতিদিনের সেরা টেক ট্রেন্ড, শিক্ষা ও উদ্ভাবনের আপডেটের জন্য! 🚀🔥✨\n\n📌 পোস্টটি সেভ করে রাখুন\n↗️ বন্ধুদের সাথে শেয়ার করুন"
+      }
+    ],
+    "unsplash_query": "ISRO rocket launch india space",
+    "image": "posts/2026-11-18_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-18_evening-v1-slide1.jpg",
+      "posts/2026-11-18_evening-v1-slide2.jpg",
+      "posts/2026-11-18_evening-v1-slide3.jpg",
+      "posts/2026-11-18_evening-v1-slide4.jpg",
+      "posts/2026-11-18_evening-v1-slide5.jpg",
+      "posts/2026-11-18_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "be999076d27cffb0241682b0bb25c6b2d7ba197a3076f7bdf727eb6c245e36ae",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-18T03:31:36.491795+00:00"
   }
 }
