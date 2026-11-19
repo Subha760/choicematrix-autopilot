@@ -5981,5 +5981,116 @@
       "container": null
     },
     "created_at": "2026-11-18T03:31:36.491795+00:00"
+  },
+  "2026-11-19_afternoon": {
+    "date": "2026-11-19_afternoon",
+    "clean_date": "2026-11-19",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "60 Years: Nutrition for Longevity",
+    "subtitle": "Unlock science-backed nutrition secrets from Rutgers' 60 years of research for lasting energy and wellness.",
+    "caption": "🚀 60 Years of Nutrition: Your Blueprint for Longevity!\n\n🔍 [WHAT HAPPENED TODAY]: Rutgers Department of Nutritional Sciences recently celebrated 60 incredible years of groundbreaking research! This milestone highlights decades of scientific advancements that have reshaped our understanding of diet, health, and vitality, offering powerful insights for a longer, more energetic life.\n\n💡 [CORE TAKEAWAYS]:\n• ⚡ 1. Discover how evolving nutrition science impacts daily energy and wellness.\n• 📊 2. Learn actionable, evidence-based habits for sustained vitality.\n• 🎯 3. Embrace a proactive approach to longevity through informed food choices.\n\n🔥 [WHY THIS MATTERS NOW]: In an age of health fads, understanding the bedrock of nutritional science is crucial. Rutgers' legacy provides a trustworthy compass, empowering us to make informed decisions that extend not just our lifespan, but our 'healthspan' – the years we live vibrantly and energetically. This isn't just about food; it's about life quality.\n\n💬 [CALL TO ACTION QUESTION]: What's one nutrition habit you've adopted that significantly boosted your energy? Share your wisdom below! 👇\n\n#Choicematrix #LongevitySecrets #NutritionScience #WellnessJourney #RutgersNutrition #BiohackingLife\n\nReference: Rutgers University — https://news.google.com/rss/articles/CBMi4gFBVV95cUxNdmg2UUdZTnhaWGhqTFMwWEJVdjFaZ19ES0YycWFVei1va1VQRlE4XzIxQmF0eEh1emtERy12bVBzbExyX1V2S1M5NEZCQ3BlS3pDdHdJSGlJNHExZFB0b1BZTUNwVHFTNWNERnRUTEZZWTZzWnRwR1psM2hPR09ja3BPLUFvYW5VT0t1SFdLUWVJLVA4b0w5c2hhdUVDVFIxalhDM2xKc3RYbXlCWXNMX0xTVkNwd1h6VWEyWlc2SDhweWEyRi1UbUJRZVY4aE1JdVFkdHVYMFhERXJNSG83VHl3?oc=5",
+    "category": "Longevity, Wellness & Biohacking",
+    "content_type": "practical",
+    "source": {
+      "label": "Rutgers University",
+      "url": "https://news.google.com/rss/articles/CBMi4gFBVV95cUxNdmg2UUdZTnhaWGhqTFMwWEJVdjFaZ19ES0YycWFVei1va1VQRlE4XzIxQmF0eEh1emtERy12bVBzbExyX1V2S1M5NEZCQ3BlS3pDdHdJSGlJNHExZFB0b1BZTUNwVHFTNWNERnRUTEZZWTZzWnRwR1psM2hPR09ja3BPLUFvYW5VT0t1SFdLUWVJLVA4b0w5c2hhdUVDVFIxalhDM2xKc3RYbXlCWXNMX0xTVkNwd1h6VWEyWlc2SDhweWEyRi1UbUJRZVY4aE1JdVFkdHVYMFhERXJNSG83VHl3?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "60 Years, Infinite Health",
+        "body": "For six decades, Rutgers Department of Nutritional Sciences has been at the forefront of understanding how what we eat shapes our lives. Their 60-year journey reveals not just scientific breakthroughs, but a roadmap to unlocking sustained vitality and energy. This isn't just history; it's your future of well-being.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "healthy vibrant lifestyle"
+      },
+      {
+        "slide_number": 2,
+        "tag": "FOUNDATION",
+        "headline": "The Evolving Science of Fuel",
+        "body": "Early nutrition focused on preventing deficiency diseases, but Rutgers' research has propelled us into an era of optimal health and longevity. They've moved beyond basic vitamins, exploring micronutrient synergy, gut microbiome impact, and personalized nutrition. This foundational shift helps us understand how to not just survive, but truly thrive, enhancing cellular energy and metabolic efficiency through targeted dietary choices.",
+        "image_query": "nutritional science lab",
+        "visual_badge": {
+          "label": "RESEARCH SPAN",
+          "value": "60+ YEARS",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 3,
+        "tag": "DAILY HABITS",
+        "headline": "Biohacking Your Plate",
+        "body": "Leverage Rutgers' insights by integrating whole, nutrient-dense foods that support mitochondrial function and reduce inflammation. Prioritize diverse plant-based foods for gut health, lean proteins for muscle maintenance, and healthy fats for brain function. Start with mindful eating, track your energy levels, and make incremental changes like adding a daily serving of fermented foods or ensuring adequate hydration to feel the difference.",
+        "image_query": "balanced healthy meal",
+        "visual_badge": {
+          "label": "CORE PRINCIPLES",
+          "value": "Whole Foods, Gut Health, Hydration",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 4,
+        "tag": "OPTIMIZATION",
+        "headline": "Beyond the Basics: Personalized Power",
+        "body": "While general guidelines are helpful, true longevity optimization often lies in personalization. Rutgers' advanced studies highlight the importance of individual genetic predispositions, activity levels, and stress responses. Consider seeking a personalized nutritional assessment or experimenting with macro cycling to fine-tune your intake. Avoid restrictive fad diets; instead, focus on sustainable habits that align with your unique biology and long-term health goals, emphasizing consistency over intensity.",
+        "image_query": "personalized nutrition plan",
+        "visual_badge": {
+          "label": "KEY INSIGHT",
+          "value": "Personalization is Key",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 5,
+        "tag": "FUTURE VISION",
+        "headline": "Your Longevity Blueprint",
+        "body": "Rutgers' 60 years of nutritional science teaches us that vitality isn't a fluke; it's a choice built on informed habits. By embracing a diet rich in whole foods, understanding your body's unique needs, and consistently applying science-backed principles, you can cultivate a life brimming with energy and well-being. This legacy empowers you to be your own biohacker, creating a personalized blueprint for lasting health and a vibrant future.",
+        "image_query": "vibrant healthy community",
+        "visual_badge": {
+          "label": "IMPACT",
+          "value": "Enhanced Healthspan",
+          "type": "badge"
+        }
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "longevity wellness vibrant",
+    "image": "posts/2026-11-19_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-19_afternoon-v1-slide1.jpg",
+      "posts/2026-11-19_afternoon-v1-slide2.jpg",
+      "posts/2026-11-19_afternoon-v1-slide3.jpg",
+      "posts/2026-11-19_afternoon-v1-slide4.jpg",
+      "posts/2026-11-19_afternoon-v1-slide5.jpg",
+      "posts/2026-11-19_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "bddb942b6b8d1cefe19bc9228bdd1d41809da068c91883438aed8ec7fde8f898",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-19T03:45:32.161197+00:00"
   }
 }
