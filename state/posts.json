@@ -6169,19 +6169,22 @@
     "approved_at": "2026-11-19T08:38:32.776142+00:00",
     "approval_hash": "00565e3628ca7ae2932fe26c6e444d6f2885643bffb0d9e9417a868c0494b310",
     "fb": {
-      "status": "published",
-      "id": "1279646595235354_122140021071465406"
-    },
-    "ig": {
       "status": "attempting",
       "id": null,
       "container": null,
-      "attempted_at": "2026-11-19T14:30:20.948800+00:00"
+      "attempted_at": "2026-11-19T14:30:04.288705+00:00"
+    },
+    "ig": {
+      "status": "published",
+      "id": "18124943233945880",
+      "container": "18124509233470290",
+      "attempted_at": "2026-11-19T14:30:17.587077+00:00"
     },
     "threads": {
-      "status": "not_started",
+      "status": "attempting",
       "id": null,
-      "container": null
+      "container": null,
+      "attempted_at": "2026-11-19T14:31:01.262503+00:00"
     },
     "created_at": "2026-11-19T04:00:32.577810+00:00"
   }
