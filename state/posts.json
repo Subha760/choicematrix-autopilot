@@ -6278,7 +6278,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "29e02a6d9b052a25ff1b799e23f37f65ec783166e3fbe3fd60d1345811caeabd",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -6389,7 +6389,7 @@
     ],
     "recommended_audio": null,
     "image_sha256": "4d27c9b85626d5a9133ad56f49be8dd931a7ce36bf7337f68a46946ab34ce348",
-    "status": "pending",
+    "status": "expired",
     "approved_at": null,
     "approval_hash": null,
     "fb": {
@@ -6407,5 +6407,222 @@
       "container": null
     },
     "created_at": "2026-11-20T03:45:42.890825+00:00"
+  },
+  "2026-11-21_afternoon": {
+    "date": "2026-11-21_afternoon",
+    "clean_date": "2026-11-21",
+    "slot": "afternoon",
+    "publish_time_ist": "14:00",
+    "language": "English",
+    "revision": 1,
+    "title": "Hanoi's Global Craft Festival!",
+    "subtitle": "Discover how Hanoi united global artisans to celebrate living heritage, architectural wonders & sustainable craft traditions.",
+    "caption": "🚀 **HANOI'S GLOBAL HERITAGE CELEBRATION!**\n\n🔍 **WHAT HAPPENED TODAY**: Hanoi recently hosted the inaugural Festival of Global Craft Village Conservation and Development, a landmark event uniting artisans and cultural enthusiasts from across continents. This vibrant gathering celebrated the world's rich tapestry of traditional crafts, underscoring their critical role in preserving living heritage and fostering sustainable development.\n\n💡 **CORE TAKEAWAYS**:\n• ⚡ Global Unity: Over 50 countries showcased their unique craft traditions, fostering cross-cultural exchange.\n• 📊 Economic Empowerment: The festival created vital market access and networking opportunities for artisans.\n• 🎯 Heritage Preservation: It highlighted innovative strategies for safeguarding traditional skills against modern challenges.\n\n🔥 **WHY THIS MATTERS NOW**: In an age of rapid globalization, events like this are crucial. They not only preserve the soul of communities but also empower artisans, drive sustainable tourism, and remind us of the enduring beauty and value of handmade culture. It's a blueprint for nurturing our global living heritage for generations to come.\n\n💬 **WHAT'S YOUR FAVORITE TRADITIONAL CRAFT? SHARE BELOW!**\n\n#Choicematrix #HanoiCraftFestival #GlobalHeritage #LivingCulture #ArtisanCrafts #CulturalPreservation\n\nReference: VIR — https://news.google.com/rss/articles/CBMitAFBVV95cUxOWkRWVHFPeWFOSlUyRER4d3ZqRU0xcW9Vbk9xNjBXSlNPUzI5VEFWd1BWSmo3YmpfWTVaN0RENXBoZFBtSXFJWnhuNnZoamp5ZldjZFRZRHI2OWNKUENwc2JTc3EwR1ZZWk1LYTNNWm1NM3JmdTdnMWRxR3JDa0F6R0pfNUxuVmNNc2QzcmZqVmJGbHlDUTdDUFpialo3LVJvYm9RbHIxZjdtbTRkODNvQS1GM1E?oc=5",
+    "category": "Living Culture, Architecture & Design",
+    "content_type": "practical",
+    "source": {
+      "label": "VIR",
+      "url": "https://news.google.com/rss/articles/CBMitAFBVV95cUxOWkRWVHFPeWFOSlUyRER4d3ZqRU0xcW9Vbk9xNjBXSlNPUzI5VEFWd1BWSmo3YmpfWTVaN0RENXBoZFBtSXFJWnhuNnZoamp5ZldjZFRZRHI2OWNKUENwc2JTc3EwR1ZZWk1LYTNNWm1NM3JmdTdnMWRxR3JDa0F6R0pfNUxuVmNNc2QzcmZqVmJGbHlDUTdDUFpialo3LVJvYm9RbHIxZjdtbTRkODNvQS1GM1E?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "Hanoi Unites Global Crafts!",
+        "body": "Hanoi has proudly hosted the first-ever Festival of Global Craft Village Conservation and Development, marking a significant milestone in cultural diplomacy. This groundbreaking event brought together artisans, policymakers, and enthusiasts from over 50 nations to spotlight the immense value of traditional crafts, celebrate their architectural influences, and forge pathways for their sustainable future. It's a vibrant testament to humanity's shared heritage.",
+        "swipe_prompt": "Swipe to explore ➡️",
+        "image_query": "Hanoi craft festival vibrant traditional"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "The Soul of Craft Villages",
+        "body": "Craft villages are more than just production hubs; they are living museums, repositories of ancestral knowledge, unique architectural styles, and community identity. This festival addressed the critical threats they face, from industrialization to fading interest, by providing a global platform. It emphasized how preserving these villages ensures the continuity of unique art forms, sustains local economies, and maintains the distinct cultural fabric that enriches our world.",
+        "visual_badge": {
+          "label": "GLOBAL REACH",
+          "value": "50+ Nations United",
+          "type": "badge"
+        },
+        "image_query": "Vietnamese artisan silk weaving"
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "Empowering Artisans Globally",
+        "body": "The festival wasn't just a showcase; it was a dynamic marketplace and knowledge exchange. Artisans engaged directly with international buyers, learned innovative marketing strategies, and participated in skill-sharing workshops. This direct engagement bypasses intermediaries, ensuring fairer compensation and empowering craftspeople to adapt their traditions for modern markets while preserving authenticity. It’s a vital step towards economic sustainability for these unique cultural enterprises.",
+        "visual_badge": {
+          "label": "HERITAGE PRESERVATION",
+          "value": "Craft Skills Revived",
+          "type": "chart"
+        },
+        "image_query": "Hanoi traditional lacquerware workshop"
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "Innovation Meets Tradition",
+        "body": "A key focus was blending age-old techniques with contemporary design and digital tools to attract younger generations and new markets. Discussions centered on sustainable sourcing, ethical production, and leveraging e-commerce for global reach without compromising cultural integrity. The festival fostered a dialogue on how to innovate responsibly, ensuring that crafts remain relevant and economically viable for future artisans, securing a vibrant future for living heritage.",
+        "visual_badge": {
+          "label": "INNOVATION & TRADITION",
+          "value": "New Markets Unlocked",
+          "type": "badge"
+        },
+        "image_query": "young artisan carving wood traditional"
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "A Blueprint for Cultural Pride",
+        "body": "Hanoi's festival emerges as a powerful blueprint for cultural diplomacy and sustainable development. By spotlighting the beauty and economic potential of global craft villages, it fosters a renewed sense of pride in living heritage and traditional architectural forms. This initiative not only protects precious cultural assets but also empowers communities, drives ethical tourism, and reminds us of the profound value of human creativity and skill in a rapidly changing world.",
+        "image_query": "Hanoi ancient temple community festival"
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "FOUND THIS HELPFUL? 💡",
+        "body": "Follow @choicematrix for more daily global tech breakthroughs, smart hacks & productivity frameworks! 🚀🔥✨\n\n📌 Save this post for later\n↗️ Share with a friend"
+      }
+    ],
+    "unsplash_query": "Hanoi craft festival traditional",
+    "image": "posts/2026-11-21_afternoon-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-21_afternoon-v1-slide1.jpg",
+      "posts/2026-11-21_afternoon-v1-slide2.jpg",
+      "posts/2026-11-21_afternoon-v1-slide3.jpg",
+      "posts/2026-11-21_afternoon-v1-slide4.jpg",
+      "posts/2026-11-21_afternoon-v1-slide5.jpg",
+      "posts/2026-11-21_afternoon-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "a79b74de4f209fb024299e905a96b6c3b8a8afe305674df79094105244986f97",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-21T03:30:35.492324+00:00"
+  },
+  "2026-11-21_evening": {
+    "date": "2026-11-21_evening",
+    "clean_date": "2026-11-21",
+    "slot": "evening",
+    "publish_time_ist": "20:00",
+    "language": "Hindi",
+    "revision": 1,
+    "title": "देव दीपावली: दीपदान का रहस्य!",
+    "subtitle": "जानें आटे या मिट्टी के दीयों का सही प्रयोग और दीपदान के खास नियम.",
+    "caption": "🚀 देव दीपावली 2026: दीपदान का सही तरीका!\n\n🔍 [आज की बात]: TV9 हिंदी की रिपोर्ट के अनुसार, देव दीपावली पर दीपदान की परंपरा और इसके नियमों पर विशेष चर्चा हो रही है. यह सिर्फ एक त्योहार नहीं, बल्कि हमारी समृद्ध संस्कृति और आध्यात्मिक गौरव का प्रतीक है. इस साल भी, दीपदान के सही तरीके और दीयों के चुनाव पर लोग उत्सुक हैं.\n\n💡 [मुख्य सीख]:\n• ⚡ आटे और मिट्टी के दीयों का धार्मिक महत्व और कब किसका उपयोग करें.\n• 📊 दीपदान के पीछे का आध्यात्मिक कारण और इसके लाभ.\n• 🎯 दीपदान की सही विधि, दिशा और अन्य महत्वपूर्ण नियम.\n\n🔥 [यह अब क्यों महत्वपूर्ण है]: देव दीपावली हमारे सांस्कृतिक जड़ों से जुड़ने और अपनी विरासत का सम्मान करने का एक सुनहरा अवसर है. सही जानकारी के साथ, हम इस पर्व को और भी श्रद्धा और गौरव के साथ मना सकते हैं, अपनी परंपराओं को अगली पीढ़ी तक पहुंचा सकते हैं.\n\n💬 आप देव दीपावली पर किस प्रकार के दीयों का उपयोग करते हैं? हमें कमेंट्स में बताएं! 👇\n#DevDeepawali #Deepdan #IndianCulture #FestivalOfLights #Varanasi #Choicematrix\n\nReference: TV9 Hindi — https://news.google.com/rss/articles/CBMiwgFBVV95cUxNRFY4TWNBbXlidFVqdVd4ME95U1gyZk9wS2VvOGdmUEw4S3NER3FfNEJvclg5ZjhEZFFTQUxVNmJkU2dQejhfRjl0clVJOHN0UGx1OVc0MGNmU21lR25RNHFQN3Y3bVp5Ui1qd3Rmd1BfWXlyQmNyTzd5Rzk2Mm5NRWdiR0RvU25vMDBxZXBzQzNheDdHRVFfQkg1VF9RZG91UkQ5OVgwTlpPbXRhNDViUGo4UHR0Q0JCMUNnWGZCUlktQQ?oc=5",
+    "category": "भारतीय संस्कृति, त्यौहार & गौरव",
+    "content_type": "practical",
+    "source": {
+      "label": "TV9 Hindi",
+      "url": "https://news.google.com/rss/articles/CBMiwgFBVV95cUxNRFY4TWNBbXlidFVqdVd4ME95U1gyZk9wS2VvOGdmUEw4S3NER3FfNEJvclg5ZjhEZFFTQUxVNmJkU2dQejhfRjl0clVJOHN0UGx1OVc0MGNmU21lR25RNHFQN3Y3bVp5Ui1qd3Rmd1BfWXlyQmNyTzd5Rzk2Mm5NRWdiR0RvU25vMDBxZXBzQzNheDdHRVFfQkg1VF9RZG91UkQ5OVgwTlpPbXRhNDViUGo4UHR0Q0JCMUNnWGZCUlktQQ?oc=5"
+    },
+    "slides": [
+      {
+        "slide_number": 1,
+        "tag": "HOT TREND",
+        "headline": "देव दीपावली: दीपदान का रहस्य!",
+        "body": "देव दीपावली, जो देवों की दिवाली के रूप में मनाई जाती है, गंगा के घाटों को लाखों दीयों से जगमगा देती है. यह पर्व न सिर्फ आध्यात्मिकता का प्रतीक है, बल्कि हमारी समृद्ध संस्कृति और विरासत का भी गौरवगान करता है. इस पावन अवसर पर दीपदान का विशेष महत्व है, लेकिन सही तरीका क्या है? ",
+        "swipe_prompt": "जानने के लिए स्वाइप करें ➡️",
+        "image_query": "dev deepawali varanasi night"
+      },
+      {
+        "slide_number": 2,
+        "tag": "STEP 01",
+        "headline": "क्यों करें दीपदान? जानें महत्व!",
+        "body": "देव दीपावली पर दीपदान भगवान शिव, गंगा मैया और पूर्वजों के प्रति श्रद्धा व्यक्त करने का एक तरीका है. मान्यता है कि इस दिन देवता पृथ्वी पर आकर दिवाली मनाते हैं. दीपदान करने से घर में सुख-शांति आती है, पापों का नाश होता है और पितरों को शांति मिलती है. यह प्रकाश, ज्ञान और समृद्धि का प्रतीक है.",
+        "visual_badge": {
+          "label": "✨ आध्यात्मिक लाभ",
+          "value": "मन की शांति",
+          "type": "badge"
+        },
+        "image_query": "traditional clay diyas glowing"
+      },
+      {
+        "slide_number": 3,
+        "tag": "STEP 02",
+        "headline": "आटे का दीया या मिट्टी का? सही चुनाव!",
+        "body": "देव दीपावली पर आटे और मिट्टी दोनों के दीयों का प्रयोग किया जाता है, लेकिन इनके महत्व अलग-अलग हैं. मिट्टी के दीये शुद्धता और प्रकृति से जुड़ाव का प्रतीक हैं, जो आमतौर पर सभी पूजा-पाठ में उपयोग होते हैं. आटे के दीये विशेष रूप से मनौती पूर्ण होने या किसी विशेष इच्छा की पूर्ति के लिए जलाए जाते हैं, क्योंकि ये जल में विसर्जित होकर मछली और जीवों का आहार बनते हैं, जिससे पुण्य मिलता है.",
+        "visual_badge": {
+          "label": "💡 दीया प्रकार",
+          "value": "परंपरागत भेद",
+          "type": "badge"
+        },
+        "image_query": "dough diya clay diya comparison"
+      },
+      {
+        "slide_number": 4,
+        "tag": "STEP 03",
+        "headline": "दीपदान के खास नियम और विधि!",
+        "body": "दीपदान करते समय कुछ खास नियमों का पालन करना चाहिए. दीयों में शुद्ध घी या तिल का तेल ही प्रयोग करें. दीपदान हमेशा शुभ मुहूर्त में और स्वच्छ मन से करें. दीयों को गंगा नदी या किसी पवित्र जल स्रोत में प्रवाहित करते समय 'गंगा मैया की जय' का उच्चारण करें. घर में दीपदान करते समय मुख्य द्वार पर, तुलसी के पास और मंदिर में दीये अवश्य जलाएं. दीये को सही दिशा में रखना भी महत्वपूर्ण है, जैसे पूर्व या उत्तर दिशा में.",
+        "visual_badge": {
+          "label": "✅ सही विधि",
+          "value": "शुद्धता और दिशा",
+          "type": "badge"
+        },
+        "image_query": "hands lighting diya ritual"
+      },
+      {
+        "slide_number": 5,
+        "tag": "SUMMARY",
+        "headline": "देव दीपावली: भक्ति और गौरव का पर्व!",
+        "body": "देव दीपावली केवल दीये जलाने का पर्व नहीं, बल्कि हमारी सांस्कृतिक धरोहर, आध्यात्मिकता और सामूहिक चेतना का उत्सव है. यह हमें प्रकाश की ओर बढ़ने, सकारात्मकता फैलाने और अपनी परंपराओं का सम्मान करने की प्रेरणा देता है. आटे या मिट्टी का दीया, महत्वपूर्ण है आपकी श्रद्धा और सही विधि का पालन. इस पर्व को पूरी आस्था और गौरव के साथ मनाएं, अपनी जड़ों से जुड़ें और नई पीढ़ी को भी इस विरासत से परिचित कराएं.",
+        "visual_badge": {
+          "label": "🇮🇳 सांस्कृतिक गौरव",
+          "value": "ज्योति का पर्व",
+          "type": "badge"
+        },
+        "image_query": "grand dev deepawali celebration india"
+      },
+      {
+        "slide_number": 6,
+        "tag": "CONNECT",
+        "headline": "क्या यह जानकारी उपयोगी लगी? 💡",
+        "body": "@choicematrix को फॉलो करें रोज़ाना बेहतरीन टेक इनसाइट्स, स्मार्ट टिप्स और ट्रेंडिंग अपडेट्स के लिए! 🚀🔥✨\n\n📌 इस पोस्ट को सेव करें\n↗️ दोस्तों के साथ शेयर करें"
+      }
+    ],
+    "unsplash_query": "varanasi dev deepawali ghats",
+    "image": "posts/2026-11-21_evening-v1-slide1.jpg",
+    "images": [
+      "posts/2026-11-21_evening-v1-slide1.jpg",
+      "posts/2026-11-21_evening-v1-slide2.jpg",
+      "posts/2026-11-21_evening-v1-slide3.jpg",
+      "posts/2026-11-21_evening-v1-slide4.jpg",
+      "posts/2026-11-21_evening-v1-slide5.jpg",
+      "posts/2026-11-21_evening-v1-slide6.jpg"
+    ],
+    "recommended_audio": null,
+    "image_sha256": "94e87baca24fcb6fa3730e41939d26219f380f18f056e62966631b4b7bab4a5d",
+    "status": "pending",
+    "approved_at": null,
+    "approval_hash": null,
+    "fb": {
+      "status": "not_started",
+      "id": null
+    },
+    "ig": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "threads": {
+      "status": "not_started",
+      "id": null,
+      "container": null
+    },
+    "created_at": "2026-11-21T03:31:19.819036+00:00"
   }
 }
