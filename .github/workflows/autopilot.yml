@@ -1,74 +1,49 @@
-name: Social Autopilot 24/7 (Choicematrix)
-
+name: Manual VM command
 on:
-  # Automated 24/7 execution runs exclusively on the Oracle Cloud VM daemon.
-  # Schedule disabled here to prevent race conditions and duplicate publishing.
-  # schedule:
-  #   - cron: '30 3 * * *'
-  #   - cron: '30 8 * * *'
-  #   - cron: '30 14 * * *'
-  #   - cron: '*/15 * * * *'
   workflow_dispatch:
     inputs:
       manual_action:
-        description: 'Optional manual trigger action'
-        required: false
-        default: 'auto'
+        description: Queue an action on the existing persistent VM worker
+        required: true
+        default: draft_now
         type: choice
-        options:
-          - auto
-          - draft_now
-          - publish_now
-
+        options: [draft_now, publish_now, auto, preflight]
 permissions:
-  contents: write
-
+  contents: read
+concurrency:
+  group: autopilot-manual-command
+  cancel-in-progress: false
 jobs:
-  autopilot:
+  dispatch:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: production
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
-      - name: Run Social Autopilot Cycle
+      - name: Queue command on the single state authority
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          META_PAGE_TOKEN: ${{ secrets.META_PAGE_TOKEN }}
-          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
-          IG_USER_ID: ${{ secrets.IG_USER_ID }}
-          THREADS_USER_ID: ${{ secrets.THREADS_USER_ID }}
-          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
-          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
-          TG_APPROVER_ID: ${{ secrets.TG_APPROVER_ID }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-          HUGGINGFACE_API_KEY: ${{ secrets.HUGGINGFACE_API_KEY }}
-          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          VM_HOST: ${{ secrets.AUTOPILOT_VM_HOST }}
+          VM_USER: ${{ secrets.AUTOPILOT_VM_USER }}
+          VM_DIR: ${{ secrets.AUTOPILOT_VM_DIR }}
+          VM_SSH_KEY: ${{ secrets.AUTOPILOT_VM_SSH_KEY }}
+          VM_KNOWN_HOSTS: ${{ secrets.AUTOPILOT_VM_KNOWN_HOSTS }}
+          ACTION: ${{ inputs.manual_action }}
+        shell: bash
         run: |
-          python autopilot.py
-
-      - name: Commit and persist state & rendered carousels
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add state/ docs/posts/
-          if git diff --staged --quiet; then
-            echo "No state or post changes to commit."
+          set -euo pipefail
+          case "$ACTION" in auto|draft_now|publish_now|preflight) ;; *) exit 2 ;; esac
+          [[ "$VM_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
+          [[ "$VM_USER" =~ ^[a-zA-Z0-9_-]+$ ]]
+          [[ "$VM_DIR" =~ ^/[a-zA-Z0-9_./-]+$ ]]
+          [[ -n "$VM_SSH_KEY" && -n "$VM_KNOWN_HOSTS" ]]
+          umask 077
+          printf '%s\n' "$VM_SSH_KEY" > "$RUNNER_TEMP/autopilot-key"
+          printf '%s\n' "$VM_KNOWN_HOSTS" > "$RUNNER_TEMP/autopilot-known-hosts"
+          trap 'rm -f "$RUNNER_TEMP/autopilot-key" "$RUNNER_TEMP/autopilot-known-hosts"' EXIT
+          if [[ "$ACTION" == preflight ]]; then
+            command="cd '$VM_DIR' && .venv/bin/python autopilot.py --preflight --online"
           else
-            git commit -m "chore(autopilot): persist state and generated carousel slides [skip ci]"
-            git push origin main
+            command="cd '$VM_DIR' && .venv/bin/python autopilot.py --action '$ACTION'"
           fi
+          ssh -o BatchMode=yes -o ConnectTimeout=20 -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$RUNNER_TEMP/autopilot-known-hosts" \
+            -i "$RUNNER_TEMP/autopilot-key" "$VM_USER@$VM_HOST" "$command"

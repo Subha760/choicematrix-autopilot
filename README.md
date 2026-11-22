@@ -1,87 +1,116 @@
-# Social Autopilot — mixed daily content, approval required
+# Choicematrix Autoposter
 
-**Current state:** Complete downloadable source project with 22 passing local tests (no paid tools used in tests). **Not deployed, not connected to Meta/Telegram/Gemini, not live-post tested.** Default `publishing_enabled=false` ensures no Facebook/Instagram publishing during setup.
+An approval-gated, single-host publisher for Facebook Pages, Instagram and Threads. It creates English afternoon and Hindi/Bengali evening carousels, sends their complete artwork and exact platform captions to the owner on Telegram, and publishes only the approved revision.
 
-A free-tier design for an original, **single image + caption** every day on your own Facebook Page and Instagram Professional account. No employee, editor, designer or computer running locally is needed after one-time account/API setup. **Only the user's Telegram approval can authorize a social post**. No approval = no posting.
+## Runtime and safety
 
-## Weekly schedule (Asia/Kolkata)
+- One persistent VM worker handles scheduling, Telegram updates, and publishing. Manual commands enqueue work on that same VM. GitHub runners never publish from a second state copy.
+- SQLite is the authority for posts, Telegram offsets, jobs, publication attempts, audit events, and provider usage. Runtime databases and new approval history stay private. Existing committed history remains public until separately removed from Git history.
+- Only the configured Telegram owner in their private chat can issue commands. Approval buttons bind the post ID, revision, and review message. Old slot-only buttons are rejected.
+- Approval covers every ordered image and its SHA-256 hash, all captions, source, schedule, enabled platforms and destination accounts. Every public JPEG must match its local approved hash.
+- Regeneration, a new preview, and theme changes revoke previous approval. Drafts with existing publication attempts cannot be replaced through normal approval controls.
+- Each external mutation has a checkpoint. Known containers resume processing. Explicit authentication/transient rejections have bounded delayed retries; uncertain or interrupted mutations stop for account reconciliation. Reapproval never resets attempts.
+- Content validation covers slides and badges. Renderers add no statistics or fake charts. RSS feeds supply dated topic headlines, not verified article bodies; headline-only drafts are labeled for owner verification. This does not independently prove every generated statement.
+- Chromium shapes Hindi/Bengali and checks layout. Text that does not fit fails rather than silently truncating. A Pillow fallback is available explicitly for development.
 
-| Day | Pillar | Content standard |
-|---|---|---|
-| Monday | Productivity | One actionable, original organizing/focus tip |
-| Tuesday | Digital Safety | One code-selected fact from CISA |
-| Wednesday | Science & Nature | One code-selected fact from NASA or USGS |
-| Thursday | Everyday Life | One non-medical household or learning idea |
-| Friday | Sustainable Living | One modest reuse or low-waste action |
-| Saturday | Creativity & DIY | One safe, simple, original craft or creativity exercise |
-| Sunday | Culture & Learning | One fact grounded in a curated UNESCO explainer |
+## Install and configure
 
-Configuration: [`content_calendar.json`](content_calendar.json) (pillar names, directions, code-selected factual seeds, exact source URLs), [`settings.json`](settings.json) (brand, audience, language, generation/publishing times and safety flags). The selected fact rotates weekly and on owner-triggered regeneration.
+Use Python 3.12+ and a persistent Ubuntu VM. Run the installer from the intended production checkout as its non-root service account:
 
-## End-to-end automated process
+```bash
+bash deploy/setup_vm.sh
+```
 
-1. GitHub Actions wakes approximately twice every hour (best effort).
-2. At/after **09:00 IST**, if today has no draft, it chooses that weekday's pillar, calls Gemini 2.5 Flash-Lite to write a new English headline/subtitle/caption, rejects obvious duplications or risky/unattributed content, and generates an original **1080×1350 JPEG** using only Pillow shapes and local fonts; no online photo or copyrighted music used.
-3. Telegram bot privately sends you the **full image and full caption** with **Approve / Regenerate / Reject** buttons. Curated-source facts retain the institutional source URL in the actual draft. The user ID, date and revision are validated.
-4. Rejection never publishes. Regeneration changes the revision and invalidates earlier approval buttons. No response leaves the post pending. After 48 hours from the start of its scheduled day, it expires safely.
-5. After owner approval and **19:00 IST**, the system verifies the exact approved text/image hash and provenance, the public JPEG URL, and publishing eligibility. It persists a *may-have-published* checkpoint to GitHub **before** making the publishing API call to avoid blind duplicate retries if the job crashes.
-6. Facebook Page photo publish and Instagram container/media publish are tracked **separately**. Success and failures are sent to Telegram. When a result is ambiguous, it is blocked for manual reconciliation instead of silently reposting.
-7. On changes to the artwork, the same workflow **explicitly deploys** images to GitHub Pages. This is important: standard GitHub Actions `GITHUB_TOKEN` commits do **not** trigger branch-based Pages builds.
+The installer creates the environment and systemd service without starting or restarting production. The two older cloud setup scripts delegate to this installer. No cron process is needed.
 
-Post time is *at/after* 19:00 IST, not guaranteed 19:00 exactly. Workflows, Instagram processing, and public image deployments can be delayed. Each approved card is submitted to both accounts with the same caption and visual.
+Edit the VM `.env` (mode 600), using `.env.example` as the reference:
 
-## One-time setup (follow in order)
+- Telegram: `TG_BOT_TOKEN`, numeric `TG_APPROVER_ID`. Start the bot in the owner's private chat. No Telegram webhook may be active.
+- Generation: `GEMINI_API_KEY` and/or `GROQ_API_KEY`. `AI_PROVIDER_ORDER` selects primary/fallback providers; `GEMINI_MODEL` and `GROQ_MODEL` select models.
+- Publishing: `META_PAGE_TOKEN`, `FB_PAGE_ID`, `IG_USER_ID`; optionally `THREADS_USER_ID` and a separate `THREADS_ACCESS_TOKEN`.
+- Optional illustrative stock media: `UNSPLASH_ACCESS_KEY`. Photo provenance is retained. Without it, the renderer uses its designed background instead of unrelated stock-photo fallbacks.
+- Media hosting: configure Git push authentication for the service account, `GITHUB_REPOSITORY`, `MEDIA_GIT_BRANCH` and `MEDIA_SYNC_ENABLED=true`. The worker stages only its generated JPEGs, refuses pre-existing staged changes, and never rebases running source. Alternatively host exact JPEG bytes under `PUBLIC_BASE_URL`.
+- On the one production host only, set `ALLOW_LOCAL_PUBLISH=true` after migration/preflight. `.env.example` defaults to false.
 
-1. **Make a NEW, PUBLIC repository** for this project in GitHub (don't mix this into another app). Upload the contents of this folder so `autopilot.py`, `.github/workflows/automation.yml`, `content_calendar.json`, `docs/index.html`, `settings.json` and `state/*` are at the repo root. This is the only project this package assumes. The free runner/Pages approach requires public content; **drafts and images in the public repository are not private**, even before social-media approval. Never include personal information.
-2. **Enable GitHub Actions write permissions.** Repository `Settings → Actions → General → Workflow permissions`: grant `Read and write permissions` so the bot can commit state. Avoid branch rules that reject the built-in bot commits.
-3. **Enable Pages via GitHub Actions, NOT via the branch.** Repository `Settings → Pages → Build and deployment → Source`: choose **GitHub Actions**. The supplied workflow performs upload/deployment itself whenever new image assets are committed or you run it manually. Confirm your Page deployment URL is public and works in a private browser window. Typical URL: `https://USERNAME.github.io/REPOSITORY/` (the special `USERNAME.github.io` repository has no repo path).
-4. Create a **dedicated Telegram bot** using [@BotFather](https://t.me/BotFather). Start the bot in a private chat and determine your *numeric* Telegram user ID (which is normally also your personal chat ID). Ensure the bot does not have a webhook configured: the code uses Telegram's `getUpdates` polling API. Don't share the bot token.
-5. Create an API key in [Google AI Studio](https://aistudio.google.com/apikey). Select a key/project eligible for Gemini 2.5 Flash-Lite's free tier in your region. Limits and eligibility can change. Do not enable paid Gemini billing if you require an absolute cost cap. Free-tier submissions may be used to improve Google's products; **never send confidential text as draft inputs**.
-6. Configure a Meta developer app and access token with required rights for the **Facebook Page** (not a personal profile) and a connected **Instagram Professional/Creator** account using *Instagram API with Facebook Login*. Meta app mode, role and permission review are account-dependent. Use an appropriate Page Access Token with necessary Page posting and Instagram publishing permissions. Obtain `FB_PAGE_ID` and the linked `IG_USER_ID`. Set a token renewal procedure: API tokens may expire or be invalidated.
-7. In repository `Settings → Secrets and variables → Actions`, add these **secrets** (never plain committed files):
+`settings.json` contains brand, schedule, renderer and publishing controls. `publishing_enabled` remains an explicit gate; `approval_required` must be true. The evening language alternates by date. `platforms`, if provided, must be a list chosen from `fb`, `ig`, and `threads`; otherwise Facebook/Instagram are enabled and Threads is enabled when configured.
 
-   | Secret | Expected value |
-   |---|---|
-   | `GEMINI_API_KEY` | Google Gemini API key |
-   | `TG_BOT_TOKEN` | BotFather Telegram token |
-   | `TG_APPROVER_ID` | Your numeric Telegram user ID |
-   | `META_PAGE_TOKEN` | Authorized Meta Page token |
-   | `FB_PAGE_ID` | Facebook Page ID |
-   | `IG_USER_ID` | Instagram professional account ID |
-   | `THREADS_USER_ID` | (Optional) Threads User ID for Threads posting |
-   | `THREADS_ACCESS_TOKEN` | (Optional) Threads User Token (or use META_PAGE_TOKEN) |
+The default Gemini model is `gemini-3.5-flash-lite`, replacing the deprecated 2.5 Flash default. Check account model availability through online preflight. References: [Google model documentation](https://ai.google.dev/gemini-api/docs/models), [Groq supported models](https://console.groq.com/docs/models), [Unsplash documentation](https://unsplash.com/documentation).
 
-   Optional **variables**: `PUBLIC_BASE_URL` (Pages root URL; detected from `GITHUB_REPOSITORY` by default), `GEMINI_MODEL` (`gemini-2.5-flash-lite` default), and `META_API_VERSION` (`v26.0` configured default, review as versions change).
-8. Edit the safe placeholder brand (`"Daily Spark"`) in `settings.json` to match the name on your Page. Set audience/language if needed. **English is the only artwork typography tested**; scripts like Hindi/Bengali need font-shaping and design testing before production.
-9. From `Actions → Mixed Content Social Autopilot → Run workflow`, run once, **after 09:00 IST** if you want a preview immediately. If your app's Page hosting isn't active, re-run manually to trigger Pages deploy. Check Telegram for full artwork + text. Approve, reject, and regenerate a TEST draft and confirm state changes; nothing is published with the default safety flag.
-10. Only after you've inspected permissions, correct IDs, accessible image URL, and the relevant Meta API publishing setup, edit `settings.json` to set `"publishing_enabled": true`. **Warning:** any still-approved eligible current-day draft can then publish when the next run starts. Reject unwanted drafts first.
+## Upgrade an existing VM safely
 
-## Important boundaries and safeguards
+1. Back up the existing JSON state, `.env`, deployed source revision, and JPEGs. Stop the legacy daemon and remove the matching cron job before deploying this version. Do not run old and new workers together.
+2. Use the latest remote runtime state and existing media. Keep `state/posts.json`, `state/telegram.json`, and `state/generation-attempts.json` on the VM for first startup. On first read, SQLite imports them once. If using `AUTOPILOT_STATE_DIR`, copy the legacy JSON files there first.
+3. Existing approved/pending drafts become `needs_review`; existing platform attempts and published IDs remain intact. Request `preview afternoon` or `preview evening` to review an eligible legacy draft again. Expired drafts cannot be approved.
+4. Install the environment and run:
 
-- **No auto-approval:** Missing owner click, wrong Telegram ID, revoked approval, stale date, changed approved text, changed image bytes, missing required source and disabled publishing all prevent a new publish API call.
-- **No hired people:** Only you approve. Third-party APIs and hosting execute the other steps. Account creation, first-time authentication, app permissions and occasional reauthorization still require the account owner.
-- **Copyright:** The artwork is drawn programmatically with abstract shapes and locally installed fonts, not scraped photos, reposted content, celebrities or music. The AI is instructed not to reproduce quotes, articles, lyrics or slogans. Similarity filters reject repetitions **within your own history**, not against the entire internet; **no system can guarantee copyright clearance** without legal review.
-- **Facts:** Curated official-source seed facts (CISA, NASA, USGS, UNESCO) are used instead of AI-invented citations. The model's words are still not independently fact-checked phrase by phrase. The person approving should check factual truth, licenses and suitability before publishing.
-- **No breaking news or automated trend scraping:** This mixed-content v2 uses evergreen material and does not copy others' feeds. Live news requires verified ingestion, attribution and additional moderation; it isn't included.
-- **Limited output:** Static single-photo posts only. Reels, video, music, Stories and carousels require separate tools, permissions and review.
-- **No guarantees of zero charges or uptime:** Free-tier availability, rate limits, API behavior, restrictions and Meta app review requirements can change. GitHub may delay/drop scheduled runs and may disable scheduled workflows after prolonged inactivity. Source code is designed for low usage and without paid subscriptions, not guaranteed zero operational intervention.
-- **Checkpoint risk:** GitHub checkpoint commits reduce blind retries after API timeouts, but still require user reconciliation after uncertain outcomes. They do not provide distributed exactly-once posting guarantees.
-- **State is publicly visible** in a public repo (draft captions, state and media references). API keys, Telegram user ID and page access tokens must stay in Actions Secrets; `docs/` and repository files are never secret.
+   ```bash
+   .venv/bin/python autopilot.py --preflight --online
+   .venv/bin/python autopilot.py --status
+   .venv/bin/python autopilot.py --backup state/backups/initial.sqlite3
+   ```
 
-## Run local tests safely
+5. Inspect the configuration, credentials, selected model availability and Git push access. Configure the one production host's publishing gate. Then start the worker:
+
+   ```bash
+   sudo systemctl enable --now autopilot-daemon.service
+   journalctl -u autopilot-daemon.service -f
+   ```
+
+A code rollback requires stopping the worker first. Do not run the legacy JSON-only publisher against the new database or restore an older approval snapshot as publishable state.
+
+## Commands and review
+
+```bash
+# Queue work for the running worker; these do not launch another publisher.
+.venv/bin/python autopilot.py --action draft_now
+.venv/bin/python autopilot.py --action publish_now
+
+# Private operational views and verified backup.
+.venv/bin/python autopilot.py --status
+.venv/bin/python autopilot.py --report .runtime/operations-2026-11-19.html
+.venv/bin/python autopilot.py --backup state/backups/snapshot.sqlite3
+```
+
+`publish_now` processes only already approved, due, eligible posts; it bypasses neither approval nor the schedule. `draft_now` creates missing drafts without publishing. A bounded retry handles generation/preview delivery failures. `--once --action ...` is an exclusive maintenance cycle and requires stopping the daemon first.
+
+Telegram commands: `status`, `preview afternoon`, `preview evening`, `recreate afternoon`, `recreate evening`, `/topic <idea>`, `/diagnose`, `token`. Approve/reject with the current preview buttons, or reply directly to that review message with `approve`/`reject`. Incidental words such as “okay” do not approve anything. Theme changes use the revision-bound preview button.
+
+Uncertain results must be inspected on the target account. After stopping the worker, a known published ID can be reconciled with:
+
+```bash
+.venv/bin/python autopilot.py --reconcile POST_ID fb PUBLISHED_ID
+```
+
+Reconciliation verifies the destination account and exact caption through read-only platform requests. It never creates a social post or clears attempts for automatic retry. Instagram/Threads verification currently searches the latest 100 account media items. If the result is absent or ambiguous, the attempt remains blocked.
+
+To restore, stop the worker and use `--restore BACKUP_FILE`. Restore verifies database integrity, backs up the current database, preserves newer publication evidence and Telegram offsets, and invalidates unpublished approvals.
+
+## GitHub manual actions
+
+The manual workflow connects to the existing VM and queues the selected action. Configure the `production` environment and these repository/environment secrets:
+
+`AUTOPILOT_VM_HOST`, `AUTOPILOT_VM_USER`, `AUTOPILOT_VM_DIR`, `AUTOPILOT_VM_SSH_KEY`, `AUTOPILOT_VM_KNOWN_HOSTS`.
+
+Use the VM's verified SSH host key in `KNOWN_HOSTS`. No automatic host-key trust is added. The SSH user must own the deployment and runtime state. The separate Tests workflow has read-only repository permissions and runs offline tests, Chromium rendering and syntax checks.
+
+## Test locally without credentials or social writes
 
 ```bash
 python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
+python -m playwright install chromium
+AUTOPILOT_LOAD_ENV=false python -m unittest discover -s tests -v
 ```
 
-Twenty-two mocked/unit tests exercise weekday rotation, source seed selection, content safety rejections, image properties, full Telegram review, owner authorization, approval fingerprints, image integrity, time window, stale rejection, checkpoint failure, independent platform states, and nonretry of ambiguous outcomes. They **do not** claim real Meta publishing or live Gemini generation has been performed.
+PowerShell: set `$env:AUTOPILOT_LOAD_ENV='false'` before running the test command. Tests use temporary state/media, block unexpected HTTP requests, and mock publication APIs. Chromium tests exercise English, Hindi, Bengali, actual theme overrides, escaped HTML and overflow rejection. They skip only when Chromium is not installed. Never use the older root `test_*.py` exploratory scripts as the safe suite; some intentionally call live services.
 
-## Useful official references
+## Files
 
-- [Meta — Instagram API with Facebook Login](https://www.postman.com/meta/instagram/folder/u4g5a2a/instagram-api-with-facebook-login)
-- [GitHub — Scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
-- [GitHub — Pages via Actions](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site)
-- [Google — Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing)
+- `autopilot.py`: content/calendar and artwork helpers plus compatibility entry points.
+- `autoposter/review.py`: authorization, callback identities and approval manifests.
+- `autoposter/storage.py`: SQLite, atomic reservations, job queue and OS lock.
+- `autoposter/runtime.py`: scheduling, preflight and single worker.
+- `autoposter/platforms.py`: checkpointed publishing adapters.
+- `autoposter/content.py`, `rendering.py`, `media.py`: validated provider fallback and visual generation.
+- `autoposter/operations.py`, `report.py`: reconciliation, restore and private operations report.
 
-**Security:** Never paste real tokens into commits, messages, screenshots, public issues or a ZIP intended for sharing. Rotate any credential that leaks.
+Reels/video generation and platform analytics ingestion remain separate feature work. This upgrade fixes the existing static-carousel pipeline; it does not claim those features or a verified live production rollout.

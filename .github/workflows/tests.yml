@@ -1,0 +1,24 @@
+name: Tests
+on:
+  push:
+    paths: ['**.py', 'requirements.txt', 'settings.json', '.github/workflows/**', 'deploy/**']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AUTOPILOT_LOAD_ENV: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m unittest discover -s tests -v
+      - run: python -m compileall -q autopilot.py telegram_bot_daemon.py autoposter
+      - run: bash -n deploy/setup_vm.sh setup_gcp_vm.sh setup_oracle_vm.sh

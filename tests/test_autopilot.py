@@ -1,3 +1,5 @@
+import os
+os.environ["AUTOPILOT_LOAD_ENV"] = "false"
 import copy
 import hashlib
 import json
@@ -9,9 +11,13 @@ from unittest.mock import patch
 
 import autopilot as app
 
+SIX_SLIDES = [{"slide_number": i, "tag": "IDEA", "headline": "Consider One Clear Step",
+               "body": "Take a moment to choose a useful practical step."} for i in range(1, 7)]
+
 SETTINGS = {
     "brand": "Daily Spark", "niche": "mixed", "audience": "adults", "language": "English",
     "publish_time_ist": "19:00", "generation_time_ist": "09:00", "publishing_enabled": True,
+    "platforms": ["fb", "ig"],
     "approval_required": True, "require_source_for_facts": True,
     "max_post_age_hours": 48, "content_style": "Accessible, helpful and modest",
 }
@@ -20,6 +26,13 @@ NOW = datetime(2026, 10, 15, 21, tzinfo=app.IST)
 
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
+        env_patch = patch.dict(os.environ, {**{k: v for k, v in os.environ.items() if k.upper() in ("SYSTEMROOT", "WINDIR", "PATH", "TEMP", "TMP", "USERPROFILE", "LOCALAPPDATA", "HOME")}, "AUTOPILOT_LOAD_ENV": "false", "ALLOW_LOCAL_PUBLISH": "true",
+            "TG_APPROVER_ID": "1234", "FB_PAGE_ID": "page", "IG_USER_ID": "ig", "META_PAGE_TOKEN": "fake"}, clear=True)
+        env_patch.start()
+        self.addCleanup(env_patch.stop)
+        network = patch("requests.sessions.Session.request", side_effect=AssertionError("Unexpected network in test"))
+        network.start()
+        self.addCleanup(network.stop)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         root = Path(self.temp.name)
@@ -30,6 +43,11 @@ class WorkflowTests(unittest.TestCase):
             previous = getattr(app, attr)
             setattr(app, attr, path)
             self.addCleanup(setattr, app, attr, previous)
+        import telegram_bot_daemon as daemon
+        for attr in ("ROOT", "STATE", "TG_STATE", "GEN_ERRORS"):
+            patcher = patch.object(daemon, attr, getattr(app, attr))
+            patcher.start()
+            self.addCleanup(patcher.stop)
         (root / "docs" / "posts").mkdir(parents=True)
         (root / "docs" / "posts" / "2026-10-15-v1.jpg").write_bytes(b"test image bytes")
 
@@ -49,8 +67,12 @@ class WorkflowTests(unittest.TestCase):
             "ig": {"status": "not_started", "id": None, "container": None},
             "threads": {"status": "not_started", "id": None, "container": None},
         }
+        app.prepare_review(p, SETTINGS)
+        p.update(preview_delivered=True, review_message_id=91, review_chat_id="1234")
+        p["preview_hash"] = app.approval_digest(p)
         if p["approved_at"]:
             p["approval_hash"] = app.approval_digest(p)
+        app.write_json(app.STATE, {p["date"]: p})
         return p
 
     def test_seven_rotating_weekday_pillars(self):
@@ -91,7 +113,7 @@ class WorkflowTests(unittest.TestCase):
             status_code = 200
             def json(self):
                 return {"candidates": [{"content": {"parts": [{"text": json.dumps({
-                    "title": "Use A Safer Login Habit",
+                    "title": "Use A Safer Login Habit", "slides": SIX_SLIDES,
                     "subtitle": "Try enabling another sign-in check.",
                     "caption": "Another sign-in factor adds a barrier. #Safety #Passwords #DigitalTips"
                 })}]}}]}
@@ -109,7 +131,7 @@ class WorkflowTests(unittest.TestCase):
             status_code = 200
             def json(self):
                 return {"choices": [{"message": {"content": json.dumps({
-                    "title": "Use A Safer Login Habit",
+                    "title": "Use A Safer Login Habit", "slides": SIX_SLIDES,
                     "subtitle": "Try enabling another sign-in check.",
                     "caption": "Another sign-in factor adds a barrier. #Safety #Passwords #DigitalTips"
                 })}}]}
@@ -156,7 +178,9 @@ class WorkflowTests(unittest.TestCase):
         p = self.example('pending')
         rejected = self.example('rejected')
         with patch.object(app, 'check_image_ready') as check:
-            app.process_publications({'a': p, 'b': rejected}, SETTINGS, NOW)
+            records = {'a': p, 'b': rejected}
+            app.write_json(app.STATE, records)
+            app.process_publications(records, SETTINGS, NOW)
             check.assert_not_called()
 
     def test_approval_text_mutation_invalidates_authorization(self):
@@ -188,6 +212,7 @@ class WorkflowTests(unittest.TestCase):
         p['fb'] = {'status': 'published', 'id': 'fb123'}
         p['threads'] = {'status': 'published', 'id': 'th123'}
         posts = {p['date']: p}
+        app.write_json(app.STATE, posts)
         def fake_ig(e):
             e['ig']['status'] = 'published'
             e['ig']['id'] = 'ig123'
@@ -211,6 +236,7 @@ class WorkflowTests(unittest.TestCase):
             p['fb'] = {'status': failure, 'id': None}
             p['ig'] = {'status': 'published', 'id': 'ig123', 'container': 'c123'}
             p['threads'] = {'status': 'published', 'id': 'th123', 'container': 'c123'}
+            app.write_json(app.STATE, {p['date']: p})
             with patch.object(app, 'public_url', return_value='https://example.org/photo.jpg'), \
                  patch.object(app, 'check_image_ready', return_value=True), \
                  patch.object(app, 'durable_reserve') as rs, \
@@ -236,17 +262,17 @@ class WorkflowTests(unittest.TestCase):
     def test_approval_callback_denies_another_user(self):
         entry = self.example('pending')
         updates = [{'update_id': 40, 'callback_query': {
-            'id': 'cb1', 'data': 'approve:2026-10-15:1', 'from': {'id': 9999}}}]
+            'id': 'cb1', 'data': 'approve:2026-10-15:1', 'from': {'id': 9999}, 'message': {'message_id': 91, 'chat': {'id': 9999, 'type': 'private'}}}}]
         with patch.object(app, 'telegram', side_effect=[updates, True]), \
              patch.object(app, 'getenv', return_value='1234'):
             app.take_approvals({entry['date']: entry}, SETTINGS, now=NOW)
         self.assertEqual(entry['status'], 'pending')
-        self.assertEqual(json.loads(app.TG_STATE.read_text())['offset'], 41)
+        self.assertEqual(app.read_json(app.TG_STATE, {})['offset'], 41)
 
     def test_approval_callback_writes_digest_only_for_owner(self):
         entry = self.example('pending')
         updates = [{'update_id': 40, 'callback_query': {
-            'id': 'cb1', 'data': 'approve:2026-10-15:1', 'from': {'id': 1234}}}]
+            'id': 'cb1', 'data': 'approve:2026-10-15:1', 'from': {'id': 1234}, 'message': {'message_id': 91, 'chat': {'id': 1234, 'type': 'private'}}}}]
         with patch.object(app, 'telegram', side_effect=[updates, True]), \
              patch.object(app, 'getenv', return_value='1234'):
             app.take_approvals({entry['date']: entry}, SETTINGS, now=NOW)
@@ -256,19 +282,20 @@ class WorkflowTests(unittest.TestCase):
     def test_preview_sends_both_artwork_and_full_caption(self):
         entry = self.example('pending')
         with patch.object(app, 'getenv', return_value='1234'), \
-             patch.object(app, 'telegram') as tg:
+             patch.object(app, 'telegram', return_value={'message_id': 91}) as tg:
             app.send_preview(entry, SETTINGS)
         self.assertEqual([c.args[0] for c in tg.call_args_list], ['sendPhoto', 'sendMessage'])
         full = tg.call_args_list[1].args[1]
         self.assertIn(entry['caption'], full['text'])
-        self.assertIn("approve afternoon", full['text'])
-        self.assertIn("reject afternoon", full['text'])
+        buttons = json.loads(full['reply_markup'])['inline_keyboard'][0]
+        self.assertEqual(buttons[0]['callback_data'], 'approve:2026-10-15:1')
+        self.assertEqual(buttons[1]['callback_data'], 'reject:2026-10-15:1')
 
     def test_old_preview_button_cannot_approve_regenerated_revision(self):
         entry = self.example('pending')
         entry['revision'] = 2
         updates = [{'update_id': 11, 'callback_query': {
-            'id': 'cb2', 'data': 'approve:2026-10-15:1', 'from': {'id': 1234}}}]
+            'id': 'cb2', 'data': 'approve:2026-10-15:1', 'from': {'id': 1234}, 'message': {'message_id': 91, 'chat': {'id': 1234, 'type': 'private'}}}}]
         with patch.object(app, 'telegram', side_effect=[updates, True]), \
              patch.object(app, 'getenv', return_value='1234'):
             app.take_approvals({entry['date']: entry}, SETTINGS, now=NOW)
@@ -298,27 +325,14 @@ class WorkflowTests(unittest.TestCase):
 
     def test_threads_publishing_lifecycle(self):
         p = self.example()
-        p["threads"] = {"status": "not_started", "id": None, "container": None}
-        mock_container_resp = unittest.mock.MagicMock(ok=True, status_code=200)
-        mock_container_resp.headers = {"Content-Type": "application/json"}
-        mock_container_resp.json.return_value = {"id": "th_container_123"}
-
-        mock_status_resp = unittest.mock.MagicMock(ok=True, status_code=200)
-        mock_status_resp.headers = {"Content-Type": "application/json"}
-        mock_status_resp.json.return_value = {"status": "FINISHED"}
-
-        mock_publish_resp = unittest.mock.MagicMock(ok=True, status_code=200)
-        mock_publish_resp.headers = {"Content-Type": "application/json"}
-        mock_publish_resp.json.return_value = {"id": "th_post_999"}
-
-        with patch.object(app, "getenv", side_effect=lambda k, req=False: "th_user_1" if k == "THREADS_USER_ID" else ("mock_token" if "TOKEN" in k else "")), \
-             patch.object(app.requests, "post", side_effect=[mock_container_resp, mock_publish_resp]), \
-             patch.object(app.requests, "get", return_value=mock_status_resp), \
-             patch.object(app, "public_url", return_value="https://example.com/test.jpg"):
+        p['captions']['threads'] = p['caption']
+        token = app._PUBLICATION.set(({p['date']: p}, p['date']))
+        self.addCleanup(app._PUBLICATION.reset, token)
+        with patch.object(app, 'getenv', return_value='fake'), patch.object(app, 'threads_request',
+                side_effect=[{'id': 'container'}, {'status': 'FINISHED'}, {'id': 'post999'}]):
             app.threads_publish(p)
-
-        self.assertEqual(p["threads"]["status"], "published")
-        self.assertEqual(p["threads"]["id"], "th_post_999")
+        self.assertEqual(p['threads']['status'], 'published')
+        self.assertEqual(p['threads']['id'], 'post999')
 
     def test_dual_slots_alternation_hindi_bengali(self):
         self.assertEqual(app.get_evening_language("2026-10-20"), "Hindi")

@@ -1,5 +1,12 @@
-requests>=2.32,<3
-Pillow>=11,<13
-tzdata; sys_platform == 'win32'
-playwright>=1.40.0
+requests==2.34.2
+Pillow==12.3.0
+playwright==1.64.0
+tzdata==2026.5; sys_platform == 'win32'
+certifi==2026.7.22
+charset-normalizer==3.5.2
+idna==3.20
+urllib3==2.8.0
+greenlet==3.5.6
+pyee==14.0.0
+typing_extensions==4.16.0
 

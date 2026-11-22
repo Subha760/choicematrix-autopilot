@@ -27,9 +27,10 @@
   "content_style": "Engaging, authentic, visually rich; specific and practical, not generic filler; culturally celebratory and deeply inspiring",
   "max_post_age_hours": 48,
   "manual_publish_only": false,
-  "require_original_artwork": true,
-  "require_source_for_facts": false,
+  "require_source_for_facts": true,
   "content_plan": "content_calendar.json",
   "use_live_web_feed": true,
-  "content_policy_version": 2
+  "content_policy_version": 3,
+  "renderer": "chromium",
+  "artwork_policy": "original_layout_with_illustrative_stock"
 }

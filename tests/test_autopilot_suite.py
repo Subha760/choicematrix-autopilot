@@ -1,187 +1,95 @@
-from PIL import Image, ImageDraw
-"""Comprehensive Autopilot Test Suite & Feature Verification.
-Tests:
-1. Rotational Visual Archetypes (Modes 0, 1, 2, 3)
-2. Theme Palette Integrity (All 20 Themes)
-3. Zero-Tofu Box Vector Rendering
-4. Custom Topic Content & Carousel Pipeline
-5. Telegram Callback Query Parser & Dispatch
-6. System Diagnostics & Resource Monitor
-7. Meta Token Health Check
-"""
-import os
-import sys
-import json
-import time
+"""Deterministic typography and layout verification; never calls live services."""
+import copy
+import hashlib
 from pathlib import Path
-from datetime import datetime
+import shutil
+import unittest
+from unittest.mock import patch
+import test_autopilot as fixtures
+from PIL import Image
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
+app = fixtures.app
+SOURCE_ROOT = Path(__file__).resolve().parents[1]
 
-ROOT = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(ROOT))
 
-import autopilot
-import telegram_bot_daemon
+class RenderingTests(unittest.TestCase):
+    setUp = fixtures.WorkflowTests.setUp
 
-def run_tests():
-    print("=" * 60)
-    print("🧪 STARTING CHOICEMATRIX AUTOPILOT COMPREHENSIVE TEST SUITE")
-    print("=" * 60)
-    
-    passed = 0
-    total = 0
-
-    # TEST 1: Imports and Environment
-    total += 1
-    print("\n[Test 1/7] Testing module imports & configuration...")
-    try:
-        import autopilot
-        import telegram_bot_daemon
-        assert len(autopilot.THEMES_MASTER) == 20, f"Expected 20 themes, got {len(autopilot.THEMES_MASTER)}"
-        assert len(telegram_bot_daemon.ARCHETYPE_LABELS) == 4, "Expected 4 archetype labels"
-        print("  ✅ Module imports & constants verified successfully.")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 1: {e}")
-
-    # TEST 2: System Diagnostics Tool
-    total += 1
-    print("\n[Test 2/7] Testing System Diagnostics tool...")
-    try:
-        diag = telegram_bot_daemon.get_system_diagnostics()
-        assert "AUTOPILOT SYSTEM DIAGNOSTICS" in diag
-        assert "Host Platform:" in diag
-        assert "Disk Space:" in diag
-        assert "Git Version:" in diag
-        print("  ✅ System Diagnostics generated formatted report:")
-        for line in diag.splitlines()[:5]:
-            print(f"     {line}")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 2: {e}")
-
-    # TEST 3: All 4 Visual Archetypes Rendering
-    total += 1
-    print("\n[Test 3/7] Testing 4 Rotational Visual Archetypes (Modes 0, 1, 2, 3)...")
-    try:
-        settings = autopilot.read_json(ROOT / "settings.json", {})
-        dummy_item = {
-            "title": "Autonomous AI Systems 2026",
-            "subtitle": "How agentic intelligence is transforming software engineering",
-            "category": "INNOVATION",
-            "language": "English",
-            "unsplash_query": "artificial intelligence futuristic",
-            "slides": [
-                {"slide_number": 1, "tag": "AGENTIC AI", "headline": "The 2026 Autonomous Shift", "body": "Agents now pair-program seamlessly across cloud infrastructure."},
-                {"slide_number": 2, "tag": "BENEFITS", "headline": "Instant Deployment", "body": "Continuous background verification eliminates deployment friction."}
-            ]
+    def item(self, language='English'):
+        texts = {
+            'English': ('Make Space for Clear Thinking', 'A small pause can help you choose your next step. Write down one task, put away a distraction, and give that task a little room. Return to your plan when you need a reminder.'),
+            'Hindi': ('अपने अगले कदम को स्पष्ट बनाएं', 'एक छोटा विराम लेकर अपने अगले काम के बारे में सोचें। कागज़ पर एक आसान कदम लिखें और ध्यान भटकाने वाली चीज़ों को थोड़ी देर के लिए दूर रखें। अपनी योजना को देखकर फिर से शुरुआत करें।'),
+            'Bengali': ('পরের কাজটি সহজ করে নিন', 'একটু থেমে নিজের পরবর্তী কাজটি নিয়ে ভাবুন। কাগজে একটি সহজ পদক্ষেপ লিখে রাখুন এবং মনোযোগ সরিয়ে নেওয়া জিনিসগুলো কিছুক্ষণ দূরে রাখুন। প্রয়োজন হলে নিজের পরিকল্পনাটি আবার পড়ুন। AI-এর সাহায্য নিলেও নিজের সিদ্ধান্ত নিজে নিন।'),
         }
-        test_paths = []
+        headline, body = texts[language]
+        return {'title': headline, 'subtitle': body, 'category': 'IDEAS', 'language': language,
+                'slides': [{'slide_number': i, 'tag': 'IDEAS', 'headline': headline, 'body': body}
+                           for i in range(1, 7)]}
+
+    def prepare_fonts(self):
+        shutil.copytree(SOURCE_ROOT / 'fonts', app.ROOT / 'fonts')
+
+    def test_chromium_all_three_languages_fit_and_render(self):
+        self.prepare_fonts()
+        browser = app.get_browser_executable()
+        if not browser:
+            self.skipTest('Playwright Chromium must be installed for visual tests')
+        for language in ('English', 'Hindi', 'Bengali'):
+            item = self.item(language)
+            with patch.object(app, 'fetch_unsplash_image', return_value=Image.new('RGB', (920, 340), (35, 100, 130))):
+                paths = app.render_carousel_slides('2026-10-15_evening', 1, {'brand': 'Choicematrix'}, item,
+                    slot='evening', forced_design_mode=2)
+            self.assertEqual(len(paths), 6)
+            self.assertEqual(item['design_mode'], 2)
+            for path in paths:
+                with Image.open(app.ROOT / 'docs' / path) as image:
+                    self.assertEqual(image.size, (1080, 1350))
+                    self.assertEqual(image.format, 'JPEG')
+
+    def test_chromium_theme_override_changes_actual_image(self):
+        self.prepare_fonts()
+        if not app.get_browser_executable():
+            self.skipTest('Playwright Chromium must be installed for visual tests')
+        digests = []
         for mode in range(4):
-            mode_name = telegram_bot_daemon.ARCHETYPE_LABELS[mode]
-            slides = autopilot.render_carousel_slides(
-                date_key="2026-11-01_afternoon",
-                revision=1,
-                settings=settings,
-                item=dummy_item,
-                slot="afternoon",
-                forced_design_mode=mode
-            )
-            assert slides and len(slides) == 2, f"Expected 2 slides for mode {mode}"
-            for s in slides:
-                assert (ROOT / "docs" / s).exists(), f"Slide file missing: {s}"
-            test_paths.extend(slides)
-            print(f"  ✅ Archetype {mode} ({mode_name.split('(')[0].strip()}): rendered {len(slides)} slides successfully.")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 3: {e}")
+            item = self.item()
+            with patch.object(app, 'fetch_unsplash_image', return_value=None):
+                paths = app.render_carousel_slides('2026-10-15_afternoon', mode+1, {'brand': 'Choicematrix'}, item,
+                                                   forced_design_mode=mode)
+            self.assertEqual(item['design_mode'], mode)
+            digests.append(hashlib.sha256((app.ROOT / 'docs' / paths[0]).read_bytes()).hexdigest())
+        self.assertEqual(len(set(digests)), 4)
 
-    # TEST 4: Zero Tofu Box Font Integrity Check
-    total += 1
-    print("\n[Test 4/7] Testing Zero Tofu Box Font Integrity...")
-    try:
-        # Check clean_text_for_canvas
-        raw_bengali = "⚡ বিশেষ প্রতিবেদন: সুন্দরবনের রহস্যময় বাঘ ✦"
-        cleaned = autopilot.clean_text_for_canvas(raw_bengali)
-        assert "⚡" not in cleaned, "Emoji was not cleaned"
-        assert "✦" not in cleaned, "Black four pointed star was not cleaned"
-        assert "সুন্দরবনের রহস্যময় বাঘ" in cleaned, "Bengali text was incorrectly stripped"
+    def test_html_input_is_displayed_as_text_and_cannot_execute(self):
+        self.prepare_fonts()
+        if not app.get_browser_executable():
+            self.skipTest('Playwright Chromium must be installed for visual tests')
+        item = self.item()
+        item['slides'][0]['headline'] = '<script>throw new Error("unsafe")</script>'
+        with patch.object(app, 'fetch_unsplash_image', return_value=None):
+            paths = app.render_carousel_slides('2026-10-15_afternoon', 1, {'brand': '<Choicematrix>'}, item)
+        self.assertEqual(len(paths), 6)
 
-        # Verify sub-token script segmentation for hyphenated Latin-Indic compound words
-        compound_word = "AI-এর প্রভাব: কর্মজীবনের মোড় (@ChoiceMatrix) > ৫০% বৃদ্ধি!"
-        runs = autopilot.split_script_runs(compound_word)
-        assert any(seg == "AI-" and not is_ind for seg, is_ind in runs), "AI- was not classified as Latin run"
-        assert any("এর" in seg and is_ind for seg, is_ind in runs), "এর was not classified as Indic run"
+    def test_pillow_keeps_complete_text_in_all_themes(self):
+        self.prepare_fonts()
+        for mode in range(4):
+            item = self.item()
+            with patch.object(app, 'fetch_unsplash_image', return_value=None):
+                paths = app.render_carousel_slides('2026-10-15_afternoon', mode+1,
+                    {'brand': 'Choicematrix', 'renderer': 'pillow'}, item, forced_design_mode=mode)
+            self.assertEqual(len(paths), 6)
+            self.assertEqual(item['design_mode'], mode)
 
-        dummy_img = Image.new("RGB", (800, 100))
-        dummy_draw = ImageDraw.Draw(dummy_img)
-        w = autopilot.get_mixed_text_width(dummy_draw, compound_word, 32, bold=True, language="Bengali")
-        assert w > 100, f"Calculated width {w} is unexpectedly small"
-        autopilot.draw_mixed_text(dummy_draw, (10, 10), compound_word, 32, bold=True, language="Bengali")
+    def test_overflow_is_rejected_instead_of_truncating(self):
+        self.prepare_fonts()
+        item = self.item()
+        item['slides'][0]['body'] = 'Unbounded content ' * 1000
+        with patch.object(app, 'fetch_unsplash_image', return_value=None):
+            with self.assertRaises(ValueError):
+                app.render_carousel_slides('2026-10-15_afternoon', 1,
+                    {'brand': 'Choicematrix', 'renderer': 'pillow'}, item)
 
-        print(f"  ✅ Cleaned Indic text: '{cleaned}'")
-        print(f"  ✅ Sub-token script runs verified for '{compound_word}' (Zero tofu boxes)")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 4: {e}")
-
-    # TEST 5: Custom Topic Pipeline Integration
-    total += 1
-    print("\n[Test 5/7] Testing Custom Topic Parameter Integration...")
-    try:
-        # Verify generated_content receives and uses custom_topic
-        posts = autopilot.read_json(ROOT / "state" / "posts.json", {})
-        topic_prompt = "Next-Gen Quantum Computing Chips"
-        # We test the prompt structure without calling network if needed, or inspect function signature
-        import inspect
-        gc_sig = inspect.signature(autopilot.generated_content)
-        assert "custom_topic" in gc_sig.parameters, "custom_topic not in generated_content signature"
-        cp_sig = inspect.signature(autopilot.create_post)
-        assert "custom_topic" in cp_sig.parameters, "custom_topic not in create_post signature"
-        assert "forced_design_mode" in cp_sig.parameters, "forced_design_mode not in create_post signature"
-        print("  ✅ Custom topic & forced design mode signatures verified.")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 5: {e}")
-
-    # TEST 6: Telegram Callback Query Dispatch
-    total += 1
-    print("\n[Test 6/7] Testing Telegram Inline Callback Query parsing...")
-    try:
-        # Test simulated callback actions
-        for action in ("approve:afternoon", "recreate:evening", "theme:afternoon", "status", "reject:evening", "diagnose"):
-            if ":" in action:
-                verb, slot = action.split(":", 1)
-                assert verb in ("approve", "recreate", "theme", "reject")
-                assert slot in ("afternoon", "evening")
-            else:
-                assert action in ("status", "diagnose", "health")
-        print("  ✅ All inline button callback routes validated.")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 6: {e}")
-
-    # TEST 7: Meta Token Verification Function
-    total += 1
-    print("\n[Test 7/7] Testing Meta Token Health Checker...")
-    try:
-        ok, msg = telegram_bot_daemon.check_meta_token_health(force=True)
-        print(f"  ℹ️ Meta Token Status: ok={ok}, message='{msg[:60]}'")
-        # Note: Even if token expired on Meta side, the function itself must not crash and must return a boolean and string.
-        assert isinstance(ok, bool)
-        assert isinstance(msg, str)
-        print("  ✅ Meta Token Health function executed reliably without exception.")
-        passed += 1
-    except Exception as e:
-        print(f"  ❌ FAILED Test 7: {e}")
-
-    print("\n" + "=" * 60)
-    print(f"📊 TEST SUMMARY: {passed}/{total} tests PASSED ({passed/total*100:.1f}%)")
-    print("=" * 60)
-    return passed == total
-
-if __name__ == "__main__":
-    success = run_tests()
-    sys.exit(0 if success else 1)
+    def test_script_runs_preserve_mixed_latin_indic_text(self):
+        runs = app.split_script_runs('AI-এর প্রভাব')
+        self.assertTrue(any('AI-' in text and not indic for text, indic in runs))
+        self.assertTrue(any('এর' in text and indic for text, indic in runs))
