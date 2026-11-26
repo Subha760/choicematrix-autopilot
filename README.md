@@ -75,6 +75,10 @@ A code rollback requires stopping the worker first. Do not run the legacy JSON-o
 
 Telegram commands: `status`, `preview afternoon`, `preview evening`, `recreate afternoon`, `recreate evening`, `/topic <idea>`, `/diagnose`, `token`. Approve/reject with the current preview buttons, or reply directly to that review message with `approve`/`reject`. Incidental words such as “okay” do not approve anything. Theme changes use the revision-bound preview button.
 
+To edit a caption without regenerating the artwork, reply to the latest draft review message with `/caption fb Your new text`, `/caption ig Your new text`, `/caption threads Your new text`, or `/caption all Your new text`. Line breaks are preserved. Only enabled platforms can be edited. Threads (and `all` when Threads is enabled) allows 500 characters; Facebook/Instagram allow 2200. Text is never silently shortened. An edit creates a new revision, revokes approval, sends the full artwork and exact captions again, and requires a new approval. Expired drafts, stale review replies and drafts with publication attempts cannot be edited. A failed preview leaves the edit unapproved for a fresh preview retry.
+
+The private HTML operations report supports text search and state/language filters, including a needs-attention view. It shows provider successes, failures and reported input/output tokens among the latest 100 usage events. Unreported tokens and billing costs are not estimated. Filters run locally without a server or external requests. Reports and database backups cannot be saved under the public `docs` directory.
+
 Uncertain results must be inspected on the target account. After stopping the worker, a known published ID can be reconciled with:
 
 ```bash

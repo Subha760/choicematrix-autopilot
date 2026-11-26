@@ -190,6 +190,20 @@ def dispatch_update(update, posts, settings, now=None):
         tg_api('answerCallbackQuery', {'callback_query_id': query['id'], 'text': 'Processing this revision.'})
     else:
         text = message.get('text', '').strip()
+        caption_command = re.fullmatch(r'/caption\s+(all|fb|ig|threads)\s+(.+)', text, re.S)
+        if text.startswith('/caption'):
+            reply_id = message.get('reply_to_message', {}).get('message_id')
+            matches = [p for p in posts.values() if reply_id and p.get('review_message_id') == reply_id
+                       and str(p.get('review_chat_id')) == owner]
+            if not caption_command or len(matches) != 1:
+                tg_api('sendMessage', {'chat_id': owner, 'text':
+                    'Reply to the latest draft review message with /caption fb, ig, threads, or all, followed by the new text.'})
+                return
+            from autoposter.drafts import edit_caption
+            _, result = edit_caption(autopilot, posts, matches[0]['date'], caption_command[1],
+                                     caption_command[2], settings, now)
+            tg_api('sendMessage', {'chat_id': owner, 'text': result})
+            return
         normalized = re.sub(r'[^\w /:-]', '', text.lower()).strip()
         command = re.fullmatch(r'(approve|reject|recreate|regen|theme|preview)(?: (afternoon|evening))?', normalized)
         if command:
@@ -219,7 +233,7 @@ def dispatch_update(update, posts, settings, now=None):
             tg_api('sendMessage', {'chat_id': owner, 'text': result})
             return
         else:
-            tg_api('sendMessage', {'chat_id': owner, 'text': 'Commands: status, preview afternoon/evening, recreate afternoon/evening, /topic <idea>, /diagnose. Approve using a current preview button.'})
+            tg_api('sendMessage', {'chat_id': owner, 'text': 'Commands: status, preview afternoon/evening, recreate afternoon/evening, /topic <idea>, /diagnose. Reply to a review with /caption fb|ig|threads|all <text> to edit. Approve using a current preview button.'})
             return
     if action == 'approve':
         _, result = approve_pending_post(posts, target_key=key, now=now)

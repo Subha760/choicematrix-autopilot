@@ -158,6 +158,9 @@ def cli(app):
         print(write_report(app, args.report))
         return 0
     if args.backup:
+        from pathlib import Path
+        if Path(args.backup).resolve().is_relative_to((app.ROOT / 'docs').resolve()):
+            raise ValueError("Private backups cannot be saved in the public media directory")
         app.state_store().backup(args.backup)
         return 0
     if args.restore:

@@ -377,7 +377,7 @@ class HardeningTests(unittest.TestCase):
         report = write_report(app, app.ROOT / "private.html")
         text = report.read_text(encoding="utf-8")
         self.assertIn("&lt;script&gt;", text)
-        self.assertNotIn("<script>", text)
+        self.assertNotIn("<script>unsafe</script>", text)
         with self.assertRaises(ValueError):
             write_report(app, app.ROOT / "docs/report.html")
 
