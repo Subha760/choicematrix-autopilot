@@ -19,6 +19,9 @@ def validate_settings(app, settings):
     if not settings.get("slots") or set(settings["slots"]) - {"afternoon", "evening"}:
         raise ValueError("Configure afternoon/evening slots")
     app.configured_platforms(settings)
+    paused = settings.get("paused_platforms", [])
+    if not isinstance(paused, list) or any(p not in ("fb", "ig", "threads") for p in paused):
+        raise ValueError("Invalid paused_platforms setting")
 
 
 def cycle(app, action="auto", now=None):
@@ -126,6 +129,8 @@ def run_worker(app):
                 if time.monotonic() >= next_health:
                     next_health = time.monotonic() + 21600
                     telegram_bot_daemon.check_meta_token_health()
+                    from .health import threads_health
+                    threads_health(app)
             except Exception as exc:
                 app.state_store().event("worker_error", {"error_type": type(exc).__name__})
                 print(f"Worker error: {type(exc).__name__}", flush=True)

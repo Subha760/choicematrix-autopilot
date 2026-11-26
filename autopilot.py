@@ -1155,6 +1155,8 @@ def send_preview(post, settings):
     full_text = (f"{post['date']} | revision {post['revision']} | {post.get('language', 'English')}\n"
         f"{post['title']}\n\n{post['caption']}\n\nScheduled: {post.get('publish_time_ist', '14:00')} IST\n"
         "Review every slide and the exact platform captions below. Use the revision-specific buttons.")
+    if settings.get("paused_platforms"):
+        full_text += "\nPaused by owner: " + ", ".join(settings["paused_platforms"])
     for platform, caption in post["captions"].items():
         if caption != post["caption"]:
             telegram("sendMessage", {"chat_id": chat, "text": f"Exact {platform.upper()} caption:\n{caption}"})
@@ -1293,8 +1295,9 @@ def process_publications(posts, settings, now):
         if read_json(STATE, {}) != posts:
             raise RuntimeError("Stale state snapshot; reload before publishing")
         publishers = {"fb": fb_publish, "ig": ig_publish, "threads": threads_publish}
+        paused = set(settings.get("paused_platforms", []))
         for key, entry in sorted(posts.items()):
-            if entry.get("status") not in ("approved", "publishing") and not (entry.get("status") == "needs_attention" and any(entry.get(p, {}).get("status") == "retry_pending" for p in entry.get("enabled_platforms", []))):
+            if entry.get("status") not in ("approved", "publishing") and not (entry.get("status") == "needs_attention" and any(entry.get(p, {}).get("status") == "retry_pending" and p not in paused for p in entry.get("enabled_platforms", []))):
                 continue
             try:
                 if not due(entry, settings, now):
@@ -1315,7 +1318,12 @@ def process_publications(posts, settings, now):
             try:
                 for name in entry["enabled_platforms"]:
                     state = entry[name]
-                    if state.get("status") in ("published", "ambiguous", "error", "attempting"):
+                    if name in paused and state.get("status") != "published":
+                        state["paused"] = True
+                        if state.get("status") == "not_started":
+                            state["status"] = "blocked"
+                        continue
+                    if state.get("status") in ("published", "ambiguous", "error", "attempting", "blocked"):
                         continue
                     try:
                         if state.get("status") == "retry_pending" and now < datetime.fromisoformat(state["retry_at"]):
@@ -1340,7 +1348,8 @@ def process_publications(posts, settings, now):
                 statuses = [entry[p]["status"] for p in entry["enabled_platforms"]]
                 if all(value == "published" for value in statuses):
                     entry["status"] = "published"
-                elif any(value in ("ambiguous", "error", "attempting") for value in statuses):
+                elif any(value in ("ambiguous", "error", "attempting", "blocked") for value in statuses) or any(
+                        name in paused and entry[name].get("status") != "published" for name in entry["enabled_platforms"]):
                     entry["status"] = "needs_attention"
                 write_json(STATE, posts)
                 if entry["status"] in ("published", "needs_attention"):

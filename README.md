@@ -34,6 +34,8 @@ Edit the VM `.env` (mode 600), using `.env.example` as the reference:
 
 `settings.json` contains brand, schedule, renderer and publishing controls. `publishing_enabled` remains an explicit gate; `approval_required` must be true. The evening language alternates by date. `platforms`, if provided, must be a list chosen from `fb`, `ig`, and `threads`; otherwise Facebook/Instagram are enabled and Threads is enabled when configured.
 
+`paused_platforms` blocks selected adapters without changing approved captions, destination accounts or attempt history. Threads is currently paused by owner request. Facebook/Instagram may complete while Threads is reported as blocked; old failed or blocked posts are never automatically replayed when a pause is lifted. Active Threads accounts receive a separate, cached authorization health check and bounded alerts; paused accounts are not contacted.
+
 The default Gemini model is `gemini-3.5-flash-lite`, replacing the deprecated 2.5 Flash default. Check account model availability through online preflight. References: [Google model documentation](https://ai.google.dev/gemini-api/docs/models), [Groq supported models](https://console.groq.com/docs/models), [Unsplash documentation](https://unsplash.com/documentation).
 
 ## Upgrade an existing VM safely

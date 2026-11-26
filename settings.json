@@ -32,5 +32,8 @@
   "use_live_web_feed": true,
   "content_policy_version": 3,
   "renderer": "chromium",
-  "artwork_policy": "original_layout_with_illustrative_stock"
+  "artwork_policy": "original_layout_with_illustrative_stock",
+  "paused_platforms": [
+    "threads"
+  ]
 }

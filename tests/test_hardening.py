@@ -434,3 +434,54 @@ class HardeningTests(unittest.TestCase):
         with patch("autoposter.content.requests.post", side_effect=[bad, bad, good]), patch("autoposter.content.time.sleep"):
             item = generate("prompt", {}, getenv, lambda item: item, lambda *args: None)
         self.assertEqual(item["title"], "A Valid Fresh Idea")
+
+    def test_paused_threads_never_reserves_or_publishes(self):
+        settings = dict(SETTINGS, platforms=["fb", "ig", "threads"], paused_platforms=["threads"])
+        entry = self.example()
+        entry["captions"]["threads"] = entry["caption"]
+        app.prepare_review(entry, settings)
+        entry["approval_hash"] = app.approval_digest(entry)
+        posts = {entry["date"]: entry}
+        app.write_json(app.STATE, posts)
+        def fb(e):
+            e["fb"].update(status="published", id="fb-known")
+        def ig(e):
+            e["ig"].update(status="published", id="ig-known")
+        with patch.object(app, "check_image_ready", return_value=True), patch.object(app, "fb_publish", side_effect=fb), patch.object(
+                app, "ig_publish", side_effect=ig), patch.object(app, "threads_publish") as threads, patch.object(app, "safe_notify"):
+            app.process_publications(posts, settings, NOW)
+        threads.assert_not_called()
+        self.assertEqual(entry["threads"]["status"], "blocked")
+        self.assertEqual(entry["fb"]["id"], "fb-known")
+        with app.state_store().connect() as db:
+            count = db.execute("SELECT count(*) FROM attempts WHERE platform='threads'").fetchone()[0]
+        self.assertEqual(count, 0)
+
+    def test_paused_threads_health_makes_no_api_call(self):
+        from autoposter.health import threads_health
+        app.write_json(app.ROOT / "settings.json", dict(SETTINGS, paused_platforms=["threads"]))
+        with patch.object(app.requests, "get") as request:
+            ok, detail = threads_health(app, force=True)
+        request.assert_not_called()
+        self.assertTrue(ok)
+        self.assertIn("paused", detail)
+
+    def test_threads_auth_health_detects_expiry_independently_and_debounces_alert(self):
+        from autoposter.health import threads_health
+        from unittest.mock import Mock
+        app.write_json(app.ROOT / "settings.json", dict(SETTINGS, platforms=["fb", "ig", "threads"]))
+        response = Mock(ok=False)
+        response.json.return_value = {"error": {"code": 190}}
+        with patch.dict(os.environ, {"THREADS_ACCESS_TOKEN": "private-fake-token", "THREADS_USER_ID": "threads-user"}), patch.object(
+                app.requests, "get", return_value=response), patch.object(app, "safe_notify") as notify:
+            ok, detail = threads_health(app, force=True)
+            threads_health(app, force=True)
+        self.assertFalse(ok)
+        self.assertIn("expired", detail)
+        notify.assert_called_once()
+        self.assertNotIn("private-fake-token", json.dumps(app.state_store().read("account_health", {})))
+
+    def test_pause_configuration_rejects_unknown_platform(self):
+        settings = dict(SETTINGS, slots={"afternoon": {"publish_time_ist": "14:00"}}, paused_platforms=["unknown"])
+        with self.assertRaises(ValueError):
+            validate_settings(app, settings)

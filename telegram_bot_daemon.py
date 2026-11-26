@@ -212,6 +212,9 @@ def dispatch_update(update, posts, settings, now=None):
             return
         elif normalized in ('token', '/token'):
             _, detail = check_meta_token_health(force=True)
+            from autoposter.health import threads_health
+            _, threads_detail = threads_health(autopilot, force=True)
+            detail += "\n" + threads_detail
             tg_api('sendMessage', {'chat_id': owner, 'text': detail})
             return
         elif text.startswith('/topic '):

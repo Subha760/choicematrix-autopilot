@@ -91,6 +91,8 @@ def result_text(entry):
     for name in entry.get("enabled_platforms", PLATFORMS):
         state = entry.get(name, {})
         line = f"{name.upper()}: {state.get('status', 'not_started')}"
+        if state.get("paused"):
+            line += " (paused by owner)"
         if state.get("status") == "published" and state.get("id"):
             line += f" (ID {state['id']})"
         lines.append(line)
