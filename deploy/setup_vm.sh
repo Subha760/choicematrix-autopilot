@@ -8,7 +8,7 @@ if [ "$(id -u)" -eq 0 ]; then
     exit 1
 fi
 sudo apt-get update -y
-sudo apt-get install -y git python3 python3-venv python3-pip fonts-noto-core
+sudo apt-get install -y git python3 python3-venv python3-pip fonts-noto-core ffmpeg
 cd "$repo_dir"
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt

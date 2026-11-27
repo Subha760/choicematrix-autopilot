@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "tracks": [
+    {
+      "id": "shiny-tech",
+      "title": "Shiny Tech",
+      "artist": "Kevin MacLeod",
+      "profiles": [
+        "technology"
+      ],
+      "mood": "Energetic electronic instrumental",
+      "source_url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100078",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Shiny%20Tech.mp3"
+    },
+    {
+      "id": "carefree",
+      "title": "Carefree",
+      "artist": "Kevin MacLeod",
+      "profiles": [
+        "creative",
+        "uplifting",
+        "culture"
+      ],
+      "mood": "Bright acoustic instrumental",
+      "source_url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400037",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3"
+    },
+    {
+      "id": "life-of-riley",
+      "title": "Life of Riley",
+      "artist": "Kevin MacLeod",
+      "profiles": [
+        "creative",
+        "uplifting",
+        "culture"
+      ],
+      "mood": "Relaxed, cheerful instrumental",
+      "source_url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400054",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Life%20of%20Riley.mp3"
+    },
+    {
+      "id": "dreams-become-real",
+      "title": "Dreams Become Real",
+      "artist": "Kevin MacLeod",
+      "profiles": [
+        "science",
+        "reflective",
+        "calm",
+        "focus"
+      ],
+      "mood": "Dreamy, subdued piano and synth",
+      "source_url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500027",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dreams%20Become%20Real.mp3"
+    },
+    {
+      "id": "dhaka",
+      "title": "Dhaka",
+      "artist": "Kevin MacLeod",
+      "profiles": [
+        "culture"
+      ],
+      "mood": "Reflective sarod and dilruba instrumental",
+      "source_url": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400003",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "audio_url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dhaka.mp3"
+    }
+  ]
+}

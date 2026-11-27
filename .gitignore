@@ -8,6 +8,8 @@ __pycache__/
 *.tmp
 .DS_Store
 state/unsplash_cache/
+state/music_cache/
+state/video-*/
 *.png
 /test_*.py
 /test_*.jpg

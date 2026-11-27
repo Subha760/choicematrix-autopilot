@@ -1,6 +1,6 @@
 # Choicematrix Autoposter
 
-An approval-gated, single-host publisher for Facebook Pages, Instagram and Threads. It creates English afternoon and Hindi/Bengali evening carousels, sends their complete artwork and exact platform captions to the owner on Telegram, and publishes only the approved revision.
+An approval-gated, single-host publisher for Facebook Pages, Instagram and Threads. It creates English afternoon and Hindi/Bengali evening artwork and optional music videos, sends the complete media and exact platform captions to the owner on Telegram, and publishes only the approved revision.
 
 ## Runtime and safety
 
@@ -8,6 +8,7 @@ An approval-gated, single-host publisher for Facebook Pages, Instagram and Threa
 - SQLite is the authority for posts, Telegram offsets, jobs, publication attempts, audit events, and provider usage. Runtime databases and new approval history stay private. Existing committed history remains public until separately removed from Git history.
 - Only the configured Telegram owner in their private chat can issue commands. Approval buttons bind the post ID, revision, and review message. Old slot-only buttons are rejected.
 - Approval covers every ordered image and its SHA-256 hash, all captions, source, schedule, enabled platforms and destination accounts. Every public JPEG must match its local approved hash.
+- Music video approval also binds the selected track, the complete MP4, its hash and audio provenance. A changed video or music choice requires a fresh preview and approval.
 - Regeneration, a new preview, and theme changes revoke previous approval. Drafts with existing publication attempts cannot be replaced through normal approval controls.
 - Each external mutation has a checkpoint. Known containers resume processing. Explicit authentication/transient rejections have bounded delayed retries; uncertain or interrupted mutations stop for account reconciliation. Reapproval never resets attempts.
 - Content validation covers slides and badges. Renderers add no statistics or fake charts. RSS feeds supply dated topic headlines, not verified article bodies; headline-only drafts are labeled for owner verification. This does not independently prove every generated statement.
@@ -79,6 +80,24 @@ To edit a caption without regenerating the artwork, reply to the latest draft re
 
 The private HTML operations report supports text search and state/language filters, including a needs-attention view. It shows provider successes, failures and reported input/output tokens among the latest 100 usage events. Unreported tokens and billing costs are not estimated. Filters run locally without a server or external requests. Reports and database backups cannot be saved under the public `docs` directory.
 
+## Music and video posts
+
+The tracked configuration enables `music.enabled=true`, `music.mode="video"`, and `music.slide_seconds=7` for newly generated posts. The original carousel JPEGs remain available. The worker also creates a portrait 1080×1920 MP4, fits each complete slide without cropping, adds the selected music at a reduced volume with fades, and includes a six-second attribution end card. A six-slide post is normally 48 seconds. FFmpeg and FFprobe are required; the VM installer installs them and preflight checks their presence.
+
+Automatic selection matches the post category/title to the curated tracks in `music_catalog.json`: electronic music for technology, reflective music for science/focus, bright music for creative/business topics, and an instrumental option for cultural topics. The selector avoids recent repeats when another matching track exists. Sensitive topics default to silence. It makes no extra AI calls and does not search trending songs or the Instagram music library.
+
+The catalog contains five composer-listed CC BY 4.0 tracks by Kevin MacLeod with their exact source and license links. Audio downloads are restricted to the curated composer MP3 endpoint, checked for an audio stream, bounded in size, and cached privately under the runtime state directory. Music credit, source and license are shown during review; credit and an edit notice are also embedded in the finished video. Replacing the catalog requires checking the new track's source and license and retaining the appropriate attribution.
+
+Telegram sends the finished video first, followed by all source slides and exact captions. Listen to the video and inspect the attribution before approving. Reply to the latest review message with `/music auto`, `/music none`, or `/music <track-id>` to change the selection. IDs: `shiny-tech`, `carefree`, `life-of-riley`, `dreams-become-real`, `dhaka`. The old approval is revoked before rendering a replacement, and the new revision must be approved again. `none` produces a silent video when video mode is enabled.
+
+For a video-mode post, the worker publishes **one** approved output: an Instagram Reel, Facebook Page video, and/or Threads video on the enabled destinations. It does not also auto-publish a duplicate carousel. Known video containers resume processing without another upload. Both the public JPEGs and the exact public MP4 must be available before publishing starts. A music or render failure stops the draft rather than silently substituting a different track or format. MP4 files are capped below Telegram's standard 50 MB upload limit and are synced alongside their JPEGs when media sync is enabled.
+
+To preserve image/carousel posting, set `music.mode="suggestion"`; track recommendations then appear in review but audio is not attached. Set `music.enabled=false` to disable automatic music selection for new drafts. Existing image-only approvals retain their fingerprints; use `/music auto` on an eligible draft to explicitly create and review its video version. Changing a track, caption or theme cannot erase an existing publication attempt.
+
+Meta's [image/carousel publishing reference](https://developers.facebook.com/documentation/instagram-platform/instagram-graph-api/reference/ig-user/media) does not offer library music attachment for the current photo flow. Embedded video audio uses the documented video/Reel paths, rather than an invented music parameter: [Facebook Page videos](https://developers.facebook.com/docs/graph-api/reference/page/videos/), [Instagram media](https://developers.facebook.com/documentation/instagram-platform/instagram-graph-api/reference/ig-user/media), and [Threads video posts](https://developers.facebook.com/documentation/threads/posts).
+
+Before deploying this update, stop the worker, install FFmpeg/FFprobe, run offline tests and online preflight, verify MP4 hosting and account permissions, then restart the one worker using the existing upgrade procedure. This implementation is tested with real local video encoding and mocked platform APIs; it does not claim a verified live social-publishing rollout.
+
 Uncertain results must be inspected on the target account. After stopping the worker, a known published ID can be reconciled with:
 
 ```bash
@@ -102,6 +121,7 @@ Use the VM's verified SSH host key in `KNOWN_HOSTS`. No automatic host-key trust
 ```bash
 python -m pip install -r requirements.txt
 python -m playwright install chromium
+# Install FFmpeg and FFprobe on PATH (Ubuntu: sudo apt-get install ffmpeg).
 AUTOPILOT_LOAD_ENV=false python -m unittest discover -s tests -v
 ```
 
@@ -116,5 +136,6 @@ PowerShell: set `$env:AUTOPILOT_LOAD_ENV='false'` before running the test comman
 - `autoposter/platforms.py`: checkpointed publishing adapters.
 - `autoposter/content.py`, `rendering.py`, `media.py`: validated provider fallback and visual generation.
 - `autoposter/operations.py`, `report.py`: reconciliation, restore and private operations report.
+- `autoposter/music.py`, `video.py`, `music_catalog.json`: track matching, controlled source downloads and attributed video generation.
 
-Reels/video generation and platform analytics ingestion remain separate feature work. This upgrade fixes the existing static-carousel pipeline; it does not claim those features or a verified live production rollout.
+Platform analytics ingestion remains separate feature work. Music videos use the same owner approval and durable publication protections as image posts; deploying or restarting the live VM is a separate rollout step.

@@ -19,6 +19,21 @@ def require_id(result):
 def facebook(app, entry):
     token, page = app.getenv("META_PAGE_TOKEN", True), app.getenv("FB_PAGE_ID", True)
     state = entry["fb"]
+    if entry.get("media_format") == "video":
+        if not state.get("container"):
+            checkpoint(app, entry, "fb", phase="publish_started", status="attempting")
+            result = app.meta_request("POST", f"{page}/videos", token,
+                {"file_url": app.public_url(entry["video"]["path"]), "description": caption(entry, "fb"), "published": "true"})
+            checkpoint(app, entry, "fb", container=require_id(result), phase="processing", status="awaiting_media")
+        result = app.meta_request("GET", state["container"], token, {"fields": "status"})
+        status = result.get("status", {})
+        if status.get("video_status") in ("error", "failed"):
+            raise ValueError("Facebook video processing failed")
+        if status.get("video_status") != "ready":
+            checkpoint(app, entry, "fb", phase="processing", status="awaiting_media")
+            return
+        checkpoint(app, entry, "fb", status="published", phase="complete", id=state["container"])
+        return
     images = entry["images"]
     if len(images) == 1:
         checkpoint(app, entry, "fb", phase="publish_started", status="attempting")
@@ -42,7 +57,10 @@ def instagram(app, entry):
     token, user = app.getenv("META_PAGE_TOKEN", True), app.getenv("IG_USER_ID", True)
     state = entry["ig"]
     if not state.get("container"):
-        if len(entry["images"]) > 1:
+        if entry.get("media_format") == "video":
+            data = {"media_type": "REELS", "video_url": app.public_url(entry["video"]["path"]),
+                    "caption": caption(entry, "ig"), "share_to_feed": "true"}
+        elif len(entry["images"]) > 1:
             ids = list(state.get("children", []))
             for image in entry["images"][len(ids):]:
                 checkpoint(app, entry, "ig", phase="upload_started", status="attempting")
@@ -79,7 +97,10 @@ def threads(app, entry):
     token, user = app.getenv("THREADS_ACCESS_TOKEN", True), app.getenv("THREADS_USER_ID", True)
     state = entry["threads"]
     if not state.get("container"):
-        if len(entry["images"]) > 1:
+        if entry.get("media_format") == "video":
+            data = {"media_type": "VIDEO", "video_url": app.public_url(entry["video"]["path"]),
+                    "text": caption(entry, "threads")}
+        elif len(entry["images"]) > 1:
             ids = list(state.get("children", []))
             for image in entry["images"][len(ids):]:
                 checkpoint(app, entry, "threads", phase="upload_started", status="attempting")

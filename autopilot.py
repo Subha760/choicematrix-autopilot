@@ -581,6 +581,10 @@ def eligible_for_publication(entry, settings, now):
     if not entry.get("approval_hash") or entry["approval_hash"] != approval_digest(entry):
         return False
     try:
+        review.verify_video(ROOT, entry)
+    except (OSError, KeyError, TypeError, ValueError):
+        return False
+    try:
         if review.local_manifest(ROOT, entry) != entry.get("asset_manifest"):
             return False
         platforms = configured_platforms(settings)
@@ -1098,6 +1102,9 @@ def create_post(date_key, settings, posts, revision=1, slot=None, custom_topic=N
         created_at=datetime.now(timezone.utc).isoformat())
     for platform in review.PLATFORMS:
         entry[platform] = {"status": "not_started", "id": None, "container": None}
+    from autoposter.music import prepare_media
+    import sys
+    prepare_media(sys.modules[__name__], entry, posts, settings)
     prepare_review(entry, settings)
     posts[date_key] = entry
     write_json(STATE, posts)
@@ -1119,6 +1126,9 @@ def persist_media(entry):
     if not re.fullmatch(r"[A-Za-z0-9_./-]+", branch) or branch.startswith("-"):
         raise ValueError("Invalid media branch")
     paths = ["docs/" + asset["path"] for asset in entry["asset_manifest"]]
+    if entry.get("media_format") == "video":
+        review.verify_video(ROOT, entry)
+        paths.append("docs/" + entry["video"]["path"])
     def git(*args):
         return subprocess.run(["git", "-C", str(ROOT), *args], check=True, capture_output=True, timeout=40, text=True)
     # Never stage source changes or private runtime state, and never rebase a running worker.
@@ -1141,6 +1151,13 @@ def send_preview(post, settings):
     images = post.get("images") or [post["image"]]
     prepare_review(post, settings)
     post.update(preview_delivered=False, review_message_id=None)
+    if post.get("media_format") == "video":
+        with (ROOT / "docs" / post["video"]["path"]).open("rb") as stream:
+            delivered = telegram("sendVideo", {"chat_id": chat, "supports_streaming": "true",
+                "caption": "DRAFT VIDEO — listen to the soundtrack and review the credits before approval."},
+                {"video": stream})
+        if not isinstance(delivered, dict) or not delivered.get("message_id"):
+            raise RuntimeError("Video preview was not acknowledged")
     if len(images) > 1:
         with ExitStack() as stack:
             files = {f"photo{i}": (Path(path).name, stack.enter_context((ROOT / "docs" / path).open("rb")), "image/jpeg")
@@ -1152,9 +1169,12 @@ def send_preview(post, settings):
     else:
         with (ROOT / "docs" / images[0]).open("rb") as stream:
             telegram("sendPhoto", {"chat_id": chat, "caption": f"DRAFT {post['date']} r{post['revision']}"}, {"photo": stream})
+    from autoposter.music import preview_text
     full_text = (f"{post['date']} | revision {post['revision']} | {post.get('language', 'English')}\n"
         f"{post['title']}\n\n{post['caption']}\n\nScheduled: {post.get('publish_time_ist', '14:00')} IST\n"
-        "Review every slide and the exact platform captions below. Use the revision-specific buttons.")
+        "Review every slide and the exact platform captions below. Use the revision-specific buttons."
+        + ("\nPublishing format: Instagram Reel / Facebook and Threads video. Original slides remain available." if post.get("media_format") == "video" else "")
+        + preview_text(post.get("music")))
     for platform, caption in post["captions"].items():
         if caption != post["caption"]:
             telegram("sendMessage", {"chat_id": chat, "text": f"Exact {platform.upper()} caption:\n{caption}"})
@@ -1205,6 +1225,26 @@ def check_image_ready(url, expected_sha256=None):
     except requests.RequestException:
         return False
 
+
+
+def check_video_ready(url, expected_sha256):
+    from autoposter.video import MAX_VIDEO_BYTES
+    try:
+        with requests.get(url, timeout=(10, 45), stream=True, allow_redirects=True) as response:
+            content_type = response.headers.get("Content-Type", "").split(";", 1)[0]
+            if response.status_code != 200 or content_type not in ("video/mp4", "application/mp4", "application/octet-stream"):
+                return False
+            digest, length, beginning = hashlib.sha256(), 0, b""
+            for chunk in response.iter_content(65536):
+                if len(beginning) < 12:
+                    beginning += chunk[:12 - len(beginning)]
+                length += len(chunk)
+                if length > MAX_VIDEO_BYTES:
+                    return False
+                digest.update(chunk)
+            return beginning[4:8] == b"ftyp" and digest.hexdigest() == expected_sha256
+    except requests.RequestException:
+        return False
 
 
 def fb_publish(entry):
@@ -1308,6 +1348,8 @@ def process_publications(posts, settings, now):
                 write_json(STATE, posts)
                 continue
             if not all(check_image_ready(public_url(a["path"]), a["sha256"]) for a in entry["asset_manifest"]):
+                continue
+            if entry.get("media_format") == "video" and not check_video_ready(public_url(entry["video"]["path"]), entry["video"]["sha256"]):
                 continue
             entry["status"] = "publishing"
             write_json(STATE, posts)

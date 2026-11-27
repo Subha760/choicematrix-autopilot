@@ -46,6 +46,8 @@ def digest(entry):
             "category", "content_type", "source", "slides", "images", "image", "image_sha256",
             "asset_manifest", "captions", "enabled_platforms", "publish_time_ist", "manifest_version",
             "design_mode", "theme_name", "photo_credits", "publish_targets")
+    # Older image-only approvals keep their fingerprint until explicitly edited.
+    keys += tuple(key for key in ("music", "video", "media_format") if key in entry)
     return hashlib.sha256(json.dumps({key: entry.get(key) for key in keys},
                          sort_keys=True, ensure_ascii=False, allow_nan=False).encode()).hexdigest()
 
@@ -66,6 +68,17 @@ def prepare(root, entry, platforms, targets):
         if not isinstance(text, str) or not text.strip() or len(text) > (500 if platform == "threads" else 2200):
             raise ValueError("Invalid platform caption")
     entry["publish_targets"] = targets
+    verify_video(root, entry)
+
+
+def verify_video(root, entry):
+    if entry.get("media_format") == "video":
+        from .video import local_manifest as video_manifest
+        actual = video_manifest(root, entry)
+        if actual["sha256"] != entry["video"].get("sha256"):
+            raise ValueError("Video changed; generate and review it again")
+        if (entry.get("music") or {}).get("track") and not entry["video"].get("attribution_embedded"):
+            raise ValueError("Music video is missing attribution")
 
 
 def can_replace(entry):
@@ -79,6 +92,7 @@ def approve(root, entry, now, stale):
         raise ValueError("Deliver the complete preview first")
     if entry.get("manifest_version") != MANIFEST_VERSION or local_manifest(root, entry) != entry.get("asset_manifest"):
         raise ValueError("Artwork changed; send a new preview")
+    verify_video(root, entry)
     if entry.get("preview_hash") != digest(entry):
         raise ValueError("Draft changed since its preview; send a new preview")
     if not can_replace(entry):

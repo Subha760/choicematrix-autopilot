@@ -8,6 +8,8 @@ from .storage import worker_lock
 
 
 def validate_settings(app, settings):
+    from .music import validate_config
+    validate_config(settings)
     if settings.get("approval_required") is not True:
         raise ValueError("approval_required must remain true")
     for name in ("brand", "audience", "niche", "generation_time_ist"):
@@ -73,6 +75,11 @@ def preflight(app, online=False):
               "telegram_credentials": bool(app.getenv("TG_BOT_TOKEN") and app.getenv("TG_APPROVER_ID").isdigit()),
               "ai_credentials": bool(app.getenv("GEMINI_API_KEY") or app.getenv("GROQ_API_KEY")),
               "publish_runtime": app.getenv("ALLOW_LOCAL_PUBLISH").lower() == "true" and app.getenv("GITHUB_ACTIONS").lower() != "true"}
+    if settings.get("music", {}).get("enabled") and settings["music"].get("mode") == "video":
+        from .video import tools_available
+        from .music import load_catalog
+        checks["ffmpeg"] = tools_available()
+        checks["music_catalog"] = bool(load_catalog(app.ROOT))
     for platform in app.configured_platforms(settings):
         required = {"fb": ("FB_PAGE_ID", "META_PAGE_TOKEN"), "ig": ("IG_USER_ID", "META_PAGE_TOKEN"),
                     "threads": ("THREADS_USER_ID", "THREADS_ACCESS_TOKEN")}[platform]

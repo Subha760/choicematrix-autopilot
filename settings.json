@@ -23,6 +23,7 @@
   "publish_time_afternoon_ist": "14:00",
   "publish_time_evening_ist": "20:00",
   "approval_required": true,
+  "music": {"enabled": true, "mode": "video", "slide_seconds": 7},
   "publishing_enabled": true,
   "content_style": "Engaging, authentic, visually rich; specific and practical, not generic filler; culturally celebratory and deeply inspiring",
   "max_post_age_hours": 48,

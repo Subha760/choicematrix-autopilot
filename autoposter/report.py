@@ -52,6 +52,9 @@ def write_report(app, destination):
     for key, entry in sorted(posts.items(), reverse=True):
         platforms = "<br>".join(escape(line) for line in app.publication_summary(entry).splitlines()[1:])
         source = (entry.get("source") or {}).get("label", "Practical / owner topic")
+        music = entry.get("music") or {}
+        music_label = ((music.get("track") or {}).get("title", "No music") +
+                       (" (embedded)" if music.get("attachment_status") == "embedded" else " (suggestion)")) if music.get("track") else "No music"
         attention = (entry.get("status") in ("needs_attention", "preview_failed") or any(
             entry.get(p, {}).get("status") in ("ambiguous", "attempting", "error", "retry_pending")
             for p in ("fb", "ig", "threads")))
@@ -60,7 +63,7 @@ def write_report(app, destination):
                  f'data-attention="{str(attention).lower()}"')
         rows.append(f"<tr {attrs}>" + "".join(f"<td>{value}</td>" for value in (
             escape(key), escape(entry.get("publish_time_ist", "")), escape(entry.get("language", "")),
-            escape(entry.get("title", "")), escape(entry.get("status", "")), platforms, escape(source))) + "</tr>")
+            escape(entry.get("title", "")), escape(entry.get("status", "")), platforms, escape(source), escape(music_label))) + "</tr>")
     with app.state_store().connect() as db:
         usage = db.execute("SELECT detail FROM events WHERE kind='ai_usage' ORDER BY id DESC LIMIT 100").fetchall()
         jobs = db.execute("SELECT id,action,status FROM jobs ORDER BY created_at DESC LIMIT 20").fetchall()
@@ -98,7 +101,7 @@ def write_report(app, destination):
     <label>Language<select id="language"><option value="">All languages</option>{language_options}</select></label>
     <button id="reset" type="button">Clear filters</button></div>
     <p id="result-count" role="status" aria-live="polite">Showing {len(rows)} of {len(rows)} drafts</p>
-    <div class="scroll"><table><thead><tr><th>Draft</th><th>Time</th><th>Language</th><th>Title</th><th>State</th><th>Platforms</th><th>Source</th></tr></thead>
+    <div class="scroll"><table><thead><tr><th>Draft</th><th>Time</th><th>Language</th><th>Title</th><th>State</th><th>Platforms</th><th>Source</th><th>Music</th></tr></thead>
     <tbody id="drafts">{''.join(rows)}</tbody></table><p id="empty" hidden>No drafts match these filters.</p></div><h2>Recent command jobs</h2>
     <div class="scroll"><table><thead><tr><th>Job</th><th>Action</th><th>State</th></tr></thead><tbody>{job_rows}</tbody></table></div>
     <h2>Provider usage</h2><p>Latest {len(usage)} usage events, up to 100. Tokens include only usage reported by the provider; these are not billing totals.</p>

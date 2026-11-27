@@ -56,9 +56,10 @@ def reconcile(app, key, platform, published_id):
     if target != (entry.get("publish_targets") or {}).get(platform):
         raise ValueError("Publishing target changed")
     if platform == "fb":
+        caption_field = "description" if entry.get("media_format") == "video" else "message"
         data = app.meta_request("GET", published_id, app.getenv("META_PAGE_TOKEN", True),
-                                {"fields": "id,message,from,permalink_url"})
-        if str(data.get("from", {}).get("id")) != target or data.get("message") != entry["captions"]["fb"]:
+                                {"fields": f"id,{caption_field},from,permalink_url"})
+        if str(data.get("from", {}).get("id")) != target or data.get(caption_field) != entry["captions"]["fb"]:
             raise ValueError("Facebook owner or exact caption does not match")
     else:
         request = app.meta_request if platform == "ig" else app.threads_request

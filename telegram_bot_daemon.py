@@ -139,6 +139,8 @@ def switch_theme_and_send_post(posts=None, approver_name='Owner', target_key=Non
     images = autopilot.render_carousel_slides(entry['date'], revision, settings, candidate,
                                               slot=entry.get('slot', 'afternoon'), forced_design_mode=new_mode)
     candidate.update(images=images, image=images[0], preview_delivered=False, review_message_id=None)
+    from autoposter.music import prepare_media
+    prepare_media(autopilot, candidate, posts, settings)
     autopilot.prepare_review(candidate, settings)
     posts[entry['date']] = candidate
     write_json(STATE, posts)
@@ -190,6 +192,19 @@ def dispatch_update(update, posts, settings, now=None):
         tg_api('answerCallbackQuery', {'callback_query_id': query['id'], 'text': 'Processing this revision.'})
     else:
         text = message.get('text', '').strip()
+        music_command = re.fullmatch(r'/music\s+([a-z0-9-]+)', text)
+        if text.startswith('/music'):
+            reply_id = message.get('reply_to_message', {}).get('message_id')
+            matches = [p for p in posts.values() if reply_id and p.get('review_message_id') == reply_id
+                       and str(p.get('review_chat_id')) == owner]
+            if not music_command or len(matches) != 1:
+                tg_api('sendMessage', {'chat_id': owner, 'text':
+                    'Reply to the latest review with /music auto, /music none, or /music <track-id>. Track IDs are listed in music_catalog.json.'})
+                return
+            from autoposter.music import change_music
+            _, result = change_music(autopilot, posts, matches[0]['date'], music_command[1], settings, now)
+            tg_api('sendMessage', {'chat_id': owner, 'text': result})
+            return
         caption_command = re.fullmatch(r'/caption\s+(all|fb|ig|threads)\s+(.+)', text, re.S)
         if text.startswith('/caption'):
             reply_id = message.get('reply_to_message', {}).get('message_id')
